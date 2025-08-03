@@ -174,7 +174,65 @@
         });
     </script>
 
+    <script>
+        function updateCountdown() {
+            const now = new Date();
+
+            // Cấu hình giờ flash sale (ví dụ: 8h sáng đến 15h chiều)
+            const startHour = 8;
+            const endHour = 15;
+
+            const startTime = new Date(now);
+            startTime.setHours(startHour, 0, 0, 0);
+
+            const endTime = new Date(now);
+            endTime.setHours(endHour, 0, 0, 0);
+
+            let targetTime;
+            let isBeforeStart = now < startTime;
+            let isAfterEnd = now >= endTime;
+
+            if (isBeforeStart) {
+                // Đếm đến giờ bắt đầu
+                targetTime = startTime;
+                document.getElementById('countdown-start-label').style.display = 'block';
+                document.getElementById('countdown-label').style.display = 'none';
+            } else if (!isAfterEnd) {
+                // Đếm đến giờ kết thúc
+                targetTime = endTime;
+                document.getElementById('countdown-start-label').style.display = 'none';
+                document.getElementById('countdown-label').style.display = 'block';
+            } else {
+                // Hết flash sale rồi => reset về hôm sau
+                const tomorrowStart = new Date(now);
+                tomorrowStart.setDate(now.getDate() + 1);
+                tomorrowStart.setHours(startHour, 0, 0, 0);
+                targetTime = tomorrowStart;
+                document.getElementById('countdown-start-label').style.display = 'block';
+                document.getElementById('countdown-label').style.display = 'none';
+            }
+
+            const distance = targetTime - now;
+
+            if (distance > 0) {
+                const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((distance / (1000 * 60)) % 60);
+                const seconds = Math.floor((distance / 1000) % 60);
+
+                document.getElementById("countdown-hour").textContent = String(hours).padStart(2, '0');
+                document.getElementById("countdown-minute").textContent = String(minutes).padStart(2, '0');
+                document.getElementById("countdown-second").textContent = String(seconds).padStart(2, '0');
+            }
+        }
+
+        // Cập nhật mỗi giây
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+
+
     <!-- Khởi tạo các slider -->
+
     <script>
         $(document).ready(function () {
             const sliderConfigs = [
@@ -220,10 +278,7 @@
         const hourEl = document.querySelector('.time-hour');
         const minuteEl = document.querySelector('.time-minute');
         const secondEl = document.querySelector('.time-second');
-<<<<<<< HEAD
-=======
         const saleSection = document.querySelector('.product-sale');
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 
         let hours = parseInt(hourEl?.textContent || 0);
         let minutes = parseInt(minuteEl?.textContent || 0);
@@ -233,10 +288,7 @@
         function updateCountdown() {
             if (totalSeconds <= 0) {
                 clearInterval(countdown);
-<<<<<<< HEAD
-=======
-            //     if (saleSection) saleSection.style.display = 'none';
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
+                // if (saleSection) saleSection.style.display = 'none';
                 return;
             }
 
@@ -250,52 +302,10 @@
             if (secondEl) secondEl.textContent = s.toString().padStart(2, '0');
         }
 
-<<<<<<< HEAD
         const countdown = setInterval(updateCountdown, 1000);
 
         //chặn gửi form khi chưa nhập từ khóa
-=======
-        function updateCountdown() {
-            let hour = parseInt(document.getElementById("countdown-hour").textContent);
-            let minute = parseInt(document.getElementById("countdown-minute").textContent);
-            let second = parseInt(document.getElementById("countdown-second").textContent);
 
-            if (hour === 0 && minute === 0 && second === 0) {
-                document.getElementById("countdown-label").style.display = "none";
-                document.getElementById("flash-sale-start").style.display = "block";
-                return;
-            }
-
-            // Giảm giây
-            if (second > 0) {
-                second--;
-            } else {
-                if (minute > 0) {
-                    minute--;
-                    second = 59;
-                } else if (hour > 0) {
-                    hour--;
-                    minute = 59;
-                    second = 59;
-                } else {
-                    second = 0;
-                }
-            }
-
-            document.getElementById("countdown-hour").textContent = hour.toString().padStart(2, '0');
-            document.getElementById("countdown-minute").textContent = minute.toString().padStart(2, '0');
-            document.getElementById("countdown-second").textContent = second.toString().padStart(2, '0');
-        }
-
-        setInterval(updateCountdown, 1000);
-
-
-
-
-        const countdown = setInterval(updateCountdown, 1000);
-
-        //chặn gửi phom khi chưa nhập từ khóa
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
         document.getElementById('search-form').addEventListener('submit', function (e) {
             const input = document.getElementById('search-input');
             const keyword = input.value.trim();
@@ -307,10 +317,7 @@
         });
     </script>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
     {{-- cuar sp moi --}}
     <script>
         const tabs = document.querySelectorAll('.tab');

@@ -9,13 +9,13 @@ class NewController extends Controller
 {
     public function show_new()
     {
-        $newList = News::paginate(3);  // 6 bài mỗi trang
+        $newList = News::where('status', '=', 'Đã xuất bản')->paginate(3);
 
-        $newListView = News::orderBy('views', 'desc')->take(3)->get();
+        $newListView = News::where('status', '=', 'Đã xuất bản')->orderBy('views', 'desc')->take(3)->get();
 
-        $newestNew = News::orderBy('posted_date', 'desc')->take(3)->get();
+        $newestNew = News::where('status', '=', 'Đã xuất bản')->orderBy('posted_date', 'desc')->take(3)->get();
 
-        $highlightNews = News::select('*')
+        $highlightNews = News::where('status', '=', 'Đã xuất bản')->select('*')
             ->selectRaw('(views / DATEDIFF(NOW(), posted_date + INTERVAL 1 DAY)) as score')
             ->orderByDesc('score')
             ->first();
@@ -48,7 +48,7 @@ class NewController extends Controller
 
     public function news_all()
     {
-        $news_all = News::paginate(6);
+        $news_all = News::where('status', '=', 'Đã xuất bản')->paginate(6);
 
         $data =  ["news_all" => $news_all];
         return view('news/news_all', $data);

@@ -98,11 +98,7 @@
             <div class="user-all">
                 <ul>
                     <li>
-<<<<<<< HEAD
                         <a href="{{asset('/check-login')}}"><i class="fa-solid fa-circle-user fa-2xl" style="color: rgb(189, 189, 189);"></i></a>
-=======
-                        <a href="{{asset('/infouser')}}"><i class="fa-solid fa-circle-user fa-2xl" style="color: rgb(189, 189, 189);"></i></a>
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                         <ul>
                             @guest
                                 {{-- Chưa đăng nhập --}}
@@ -112,21 +108,15 @@
 
                             @auth
                                 {{-- Đã đăng nhập --}}
-<<<<<<< HEAD
                                 <li><a href="/infouser">Trang cá nhân</a></li>
                                 <li><a href="/wishlist">Yêu thích</a></li>
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                                 <li>
                                     <style>
                                         .form-logout>.btn-logout{
                                             border: none;
                                             background-color: white;
                                             cursor: pointer;
-<<<<<<< HEAD
                                             font-size: 15px
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                                         }
                                     </style>
                                     <form class="form-logout" method="POST" action="{{ route('logout') }}">

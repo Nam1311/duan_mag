@@ -31,7 +31,7 @@ if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY in .env")
 
 genai.configure(api_key=GEMINI_API_KEY)
-CLIENT = genai  # Không cần khởi tạo instance, dùng trực tiếp module genai
+CLIENT = genai
 
 
 async def find_products(query: str) -> List[Dict]:
@@ -52,21 +52,6 @@ async def find_products(query: str) -> List[Dict]:
     rows = await cur.fetchall()
     all_names = [row[0].lower() for row in rows]
     
-
-    # Kết nối database với pool
-    # async with aiomysql.create_pool(
-    #     host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER,
-    #     password=MYSQL_PASSWORD, db=MYSQL_DB, autocommit=True
-    # ) as pool:
-    #     async with pool.acquire() as conn:
-    #         async with conn.cursor() as cur:
-    #             await cur.execute("""
-    #                 SELECT LOWER(name)
-    #                 FROM products
-    #                 GROUP BY name
-    #                 """)
-    #             rows = await cur.fetchall()
-    #             all_names = [row[0].lower() for row in rows]
 
     # 2) Tìm các term khớp
     matched_terms = [name for name in all_names if name in query_lower]

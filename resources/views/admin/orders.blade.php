@@ -1,12 +1,7 @@
 @extends('admin.app')
 
 @section('admin.body')
-<<<<<<< HEAD
     <link rel="stylesheet" href="{{ asset('/css/admin/orders.css') }}">
-
-=======
-  
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
     <div class="aorders-main-content">
         <div class="aorders-header">
             <div class="aorders-search-bar">
@@ -98,11 +93,7 @@
                                 </span>
                             </td>
                             <td>
-<<<<<<< HEAD
                                 <button class="aorders-btn aorders-btn-edit"
-=======
-                                <button class="aorders-btn aorders-btn-edit" 
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                                         onclick="openEditModal('#DH-{{ $order->id }}', '{{ $order->status }}', '{{ $customerName }}', '{{ number_format($order->total_price, 0, ',', '.') }}đ', '{{ $order->created_at->format('Y-m-d') }}', '{{ $order->address->phone ?? 'Không xác định' }}')"
                                         {{ $order->status == 'Đã hủy' || $order->status == 'Thành công' ? 'disabled' : '' }}>
                                     Sửa
@@ -271,8 +262,4 @@
             };
         });
     </script>
-<<<<<<< HEAD
 @endsection
-=======
-@endsection
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03

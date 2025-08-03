@@ -114,24 +114,27 @@
 
 
 <!-- Trending Section -->
+
     <section id="trending" class="news-trending-section">
         <div class="news-container">
             <h2 class="news-section-title">Đang thịnh hành</h2>
-
-            <div class="news-trending-container">
-                <div class="news-trending-main">
-                    <div class="news-trending-image">
-                        <img src="{{ asset('img/' . $highlightNews->image) }}" alt="Fashion week">
-                    </div>
-                    <div class="news-trending-content">
-                        <span class="news-trending-category">{{ $highlightNews->new_category->name }}</span>
-                        <h3 class="news-trending-title">{{ $highlightNews->title }}
-                        </h3>
-                        <p class="news-trending-excerpt">{{ $highlightNews->description }}</p>
-                        <a href="new_detail/{{ $highlightNews->id }}" class="news-btn news-btn-primary">Xem chi tiết</a>
+            @if ($highlightNews)
+                <div class="news-trending-container">
+                    <div class="news-trending-main">
+                        <div class="news-trending-image">
+                            <img src="{{ asset('img/' . $highlightNews->image) }}" alt="Fashion week">
+                        </div>
+                        <div class="news-trending-content">
+                            <span class="news-trending-category">{{ $highlightNews->new_category->name }}</span>
+                            <h3 class="news-trending-title">{{ $highlightNews->title }}
+                            </h3>
+                            <p class="news-trending-excerpt">{{ $highlightNews->description }}</p>
+                            <a href="new_detail/{{ $highlightNews->id }}" class="news-btn news-btn-primary">Xem chi
+                                tiết</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 

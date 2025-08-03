@@ -1,18 +1,10 @@
 <?php
 
-<<<<<<< HEAD
-=======
-use App\Http\Controllers\Admin\CategoryAdminController;
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 use App\Http\Controllers\Admin\HomeAdminController;
 
 use App\Http\Controllers\Admin\NewAdminController;
 
 
-<<<<<<< HEAD
-=======
-use App\Http\Controllers\admin\VoucherAdminController;
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Auth\SocialLoginController;
@@ -43,16 +35,15 @@ use App\Http\Controllers\Admin\ImageAdminController;
 use App\Http\Controllers\Admin\ContactAdminController;
 use App\Http\Controllers\Admin\AdminCustomerController;
 use App\Http\Controllers\Admin\AdminUserController;
-<<<<<<< HEAD
 use App\Http\Controllers\Admin\CategoryAdminController;
 use App\Http\Controllers\admin\VoucherAdminController;
 use App\Http\Controllers\Admin\BannerAdminController;
 use League\Uri\Contracts\UserInfoInterface;
-=======
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminBaocaoController;
+use App\Http\Controllers\ReviewController;
 
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
+
 
 Route::get('about', function () {
     return view('about');
@@ -161,6 +152,7 @@ Route::get('/search', [ProductController::class, 'search'])->name('search');
 Route::get('/', [PageController::class, 'home'])->name('home');
 // detail product
 Route::get('/detail/{id}', [PageController::class, 'detail']);
+// Route::get('/detail/{id}', [ProductController::class, 'show']);
 // detail-color-sizesize
 
 Route::get('/get-variant-quantity', [PageController::class, 'getVariantQuantity'])->name('getVariantQuantity');
@@ -217,13 +209,9 @@ Route::post('/admin/reply-comment', [HomeAdminController::class, 'replyComment']
 // Route::get('/admin/', function () {
 //     return view('admin.home');
 // });
-<<<<<<< HEAD
 Route::get('/admin/baocao', function () {
     return view('admin.baocao');
 });
-=======
-
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 Route::get('/admin/caidat', function () {
     return view('admin.caidat');
 });
@@ -288,10 +276,13 @@ Route::get('/admin/countdown', [PromotionController::class, 'index'])->name('adm
 Route::put('/admin/countdown/{promotion}', [PromotionController::class, 'update'])->name('admin.countdown.update');
 Route::delete('/admin/countdown/{promotion}', [PromotionController::class, 'destroy'])->name('admin.countdown.destroy');
 
-// auto kích hoạt giảm khi đến giờ
-Route::get('/apply-countdown', [CountDownController::class, 'applyCountdown'])->name('ajax.applyCountdown');
-// auto reset khi hết h
-Route::get('/check-reset-countdown', [CountDownController::class, 'resetCountdownSale'])->name('ajax.resetCountdown');
+// kiểm tra reload khi đến giờ và khi kết thúc
+// Route::get('/apply-countdown', [CountDownController::class, 'applyCountdown'])->name('ajax.applyCountdown');
+// Route::get('/check-reset-countdown', [CountDownController::class, 'resetCountdownSale'])->name('ajax.resetCountdown');
+
+Route::get('/kiem_tra_flashsale', [CountDownController::class, 'kiem_tra_flashsale'])->name('ajax.kiem_tra_flashsale');
+
+
 
 
 // router trung
@@ -367,7 +358,6 @@ Route::delete('/admin/quanlynguoidung/{id}/remove-role', [AdminUserController::c
 Route::get('/admin/quanlynguoidung/{id}', [AdminUserController::class, 'show'])->name('admin.users.show');
 
 
-<<<<<<< HEAD
 // Danh sách banner
 Route::get('/admin/quanlybanner', [BannerAdminController::class, 'index'])->name('admin.banners.index');
 
@@ -381,7 +371,6 @@ Route::put('/admin/banners/{id}', [BannerAdminController::class, 'update'])->nam
 Route::delete('/admin/banners/{id}', [BannerAdminController::class, 'destroy'])->name('admin.banners.destroy');
 
 Route::get('/check-login', [UserInfoController::class, 'Kiem_tra_login']);
-=======
 // chung theem
 Route::get('/admin/khuyenmai', [VoucherAdminController::class, 'index'])->name('admin.vouchers.index');
 Route::post('/admin/vouchers', [VoucherAdminController::class, 'store'])->name('admin.vouchers.store');
@@ -409,4 +398,9 @@ Route::get('/admin/comment/delete/{id}', [AdminReviewController::class, 'destroy
 // });
 Route::get('/admin/baocao', [AdminBaocaoController::class, 'index']);
 Route::post('/admin/reports/filter', [AdminBaocaoController::class, 'filter'])->name('admin.reports.filter');
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
+
+Route::post('/admin/send-bulk-mail', [AdminCustomerController::class, 'sendBulkMail']);
+Route::get('/review/{order}', [ReviewController::class, 'create'])->name('review.form');
+Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review.store');
+
+

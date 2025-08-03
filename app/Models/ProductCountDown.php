@@ -11,6 +11,7 @@ class ProductCountDown extends Model
         'start_hour',
         'end_hour',
         'status',
+        'applied'
     ];
 
     public function products()

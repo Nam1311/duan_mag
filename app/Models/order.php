@@ -21,15 +21,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
-<<<<<<< HEAD
      public function address()
     {
         return $this->belongsTo(addresses::class);
     }
-=======
-    public function address()
-{
-    return $this->belongsTo(addresses::class, 'address_id');
-}
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 }

@@ -1,12 +1,7 @@
 @extends('admin.app')
 
 @section('admin.body')
-<<<<<<< HEAD
     <link rel="stylesheet" href="{{ asset('/css/admin/products.css') }}">
-
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
-
     <div class="aproducts-main-content">
         <div class="aproducts-header">
             <div class="aproducts-search-bar">
@@ -35,11 +30,7 @@
                 <!-- Dropdown danh mục -->
                 <div class="dropdown">
                     <button class="dropdown-toggle" id="categoryDropdown">
-<<<<<<< HEAD
                         {{ isset($category) ? $category->name : 'Tất cả danh mục' }} <i class="fa fa-angle-down" aria-hidden="true"></i>
-=======
-                        {{ isset($category) ? $category->name : 'Tất cả' }}
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                     </button>
                     <div class="dropdown-menu" id="categoryMenu">
                         <a href="{{ route('admin.products.index') }}">Tất cả</a>
@@ -54,11 +45,7 @@
                 <!-- Dropdown trạng thái -->
                 <div class="dropdown">
                     <button class="dropdown-toggle" id="statusDropdown">
-<<<<<<< HEAD
                         {{ isset($status) ? $status : 'Tất cả trạng thái' }}<i class="fa fa-angle-down" aria-hidden="true"></i>
-=======
-                        {{ isset($status) ? $status : 'Tất cả trạng thái' }}
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                     </button>
                     <div class="dropdown-menu">
                         <a href="{{ route('admin.products.index') }}">Tất cả trạng thái</a>

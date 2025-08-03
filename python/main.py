@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from routers import tryon
 from routers.test import router as ui_router
 from routers.article_generator import router as ui_article_generator
+from routers.chatbox import router as chatbox_router
 
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
@@ -37,6 +38,7 @@ active_connections = []
 app.include_router(tryon.router, prefix="/api")
 app.include_router(ui_router, prefix="/api")
 app.include_router(ui_article_generator, prefix="/api")
+app.include_router(chatbox_router, prefix="/api")
 
 
 

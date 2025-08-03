@@ -40,34 +40,21 @@
                 </div>
             </div>
         </div>
-
-        {{-- <div class="quick-actions">
-            <div class="action-btn">
-                <i class="fas fa-tshirt"></i> Áo thun
-            </div>
-            <div class="action-btn">
-                <i class="fas fa-female"></i> Sơ mi
-            </div>
-            <div class="action-btn">
-                <i class="fas fa-male"></i> Quần
-            </div>
-            <div class="action-btn">
-                <i class="fas fa-shoe-prints"></i> Phụ kiện
-            </div>
-            <div class="action-btn">
-                <i class="fas fa-question-circle"></i> Tư vấn kích cỡ
-            </div>
-        </div> --}}
         <div class="chat-input">
             <input type="text" id="message-input" placeholder="Nhập câu hỏi của bạn...">
             <button id="send-btn">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
+
+
+        <div id="suggestion-list" class="suggestion-list">
+            <!-- JS sẽ inject HTML gợi ý tại đây -->
+        </div>
     </div>
 
 
-    <div id="dynamic-suggestions"></div>
+    {{-- <div id="dynamic-suggestions"></div> --}}
 
 
     <script>
@@ -120,7 +107,7 @@
                     scrollToBottom();
 
                     try {
-                        const response = await fetch('http://127.0.0.1:8000/api/gpt-chat', {
+                        const response = await fetch('http://127.0.0.1:8000/api/chatbox', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -138,13 +125,13 @@
 
                             addMessage(data.message, true);
 
-                            // if (data.suggestions && data.suggestions.trim()) {
-                            //     const block = document.createElement('div');
-                            //     block.classList.add('suggestion-section');
-                            //     block.innerHTML = data.suggestions;
-                            //     chatMessages.appendChild(block);
-                            //     scrollToBottom();
-                            // }
+                            if (data.suggestions && data.suggestions.trim()) {
+                                const block = document.createElement('div');
+                                block.classList.add('suggestion-section');
+                                block.innerHTML = data.suggestions;
+                                chatMessages.appendChild(block);
+                                scrollToBottom();
+                            }
                             updateDynamicSuggestions(data.suggestions);
                         } else {
                             throw new Error(data.detail || 'Có lỗi xảy ra');
@@ -164,7 +151,7 @@
                     dynamicSuggestions.innerHTML = '';
                     dynamicSuggestions.style.display = 'none';
                 }
-               
+
             }
 
             sendBtn.addEventListener('click', sendMessage);

@@ -23,10 +23,7 @@ class Products extends Model
         return $this->hasMany(product_variants::class, 'product_id', 'id');
     }
 
-    public function thumbnail()
-    {
-        return $this->hasOne(Product_images::class, 'product_id', 'id')->where('order', 1);
-    }
+
     public function countDowns()
     {
         return $this->belongsToMany(ProductCountDown::class, 'product_count_down_pivot', 'product_id', 'count_down_id');
@@ -73,6 +70,16 @@ class Products extends Model
     {
         return $this->belongsTo(Product_categories::class, 'category_id');
     }
+    public function reviews()
+{
+    return $this->hasMany(\App\Models\reviews::class, 'product_id', 'id');
+}
+
+public function thumbnail()
+{
+    return $this->hasOne(product_images::class, 'product_id', 'id')->where('order', 1);
+}
+
 
     // Khi xóa sản phẩm thì xóa ảnh luôn
     protected static function booted()

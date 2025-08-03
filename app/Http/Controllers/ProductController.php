@@ -11,52 +11,59 @@ class ProductController extends Controller
 {
     public function ProductAll(Request $request)
     {
-        $query = Products::with(['thumbnail', 'variants' => function ($q) {
-            $q->where('quantity', '>', 0);
-            // $q->where('is_active', '>', 0);
-        }])
-        ->where('is_active', '>', 0)
-        ->whereHas('variants', function ($q) {
-            $q->where('quantity', '>', 0);
-            // $q->where('is_active', '>', 0);
-        })
-        ->select('id', 'name', 'sale', 'price', 'original_price');
+        $category = $request->category;
+        $size     = $request->size;
+        $price    = $request->price;
 
-        if ($request->has('category') && ($request->category)) {
-            $query->whereIn('category_id', $request->category);
+        $productAll = Products::with([
+                'thumbnail',
+                'variants' => function ($q) {
+                    $q->where('quantity', '>', 0);
+                }
+            ])
+            ->where('is_active', '>', 0)
+            ->whereHas('variants', function ($q) {
+                $q->where('quantity', '>', 0);
+            });
+
+        // Lọc danh mục
+        if (!empty($category)) {
+            $productAll->whereIn('category_id', (array) $category);
         }
 
-        if ($request->has('size') && $request->size != '') {
-            $query->whereHas('variants', function ($q) use ($request) {
-                $q->where('size_id', $request->size)->where('quantity', '>', 0);
+        // Lọc size
+        if (!empty($size)) {
+            $productAll->whereHas('variants', function ($q) use ($size) {
+                $q->where('size_id', $size)
+                ->where('quantity', '>', 0);
             });
         }
 
-        if ($request->has('price')) {
-            switch ($request->price) {
-                case 1:
-                    $query->where('price', '<', 100000);
-                    break;
-                case 2:
-                    $query->whereBetween('price', [100000, 200000]);
-                    break;
-                case 3:
-                    $query->whereBetween('price', [200000, 300000]);
-                    break;
-                case 4:
-                    $query->where('price', '>', 300000);
-                    break;
+        // Lọc theo giá
+        if (!empty($price)) {
+            if ($price == 1) {
+                $productAll->where('price', '<', 100000);
+            } elseif ($price == 2) {
+                $productAll->whereBetween('price', [100000, 200000]);
+            } elseif ($price == 3) {
+                $productAll->whereBetween('price', [200000, 300000]);
+            } elseif ($price == 4) {
+                $productAll->where('price', '>', 300000);
             }
         }
 
-        $productAll = $query->paginate(12)->appends(request()->query());
-        $total = $productAll->total();
 
+        $productAll = $productAll->select('id', 'name', 'sale', 'price', 'original_price')
+                                ->paginate(12)
+                                ->appends($request->query());
+
+        $total = $productAll->total();
         $categories = Product_categories::select('id', 'name')->get();
         $sizes = sizes::select('id', 'name')->get();
 
         return view('product', compact('productAll', 'total', 'categories', 'sizes'));
     }
+
 
     public function ProductFeatured()
     {
@@ -158,4 +165,15 @@ class ProductController extends Controller
 
         return view('searchpage', compact('productAll', 'total', 'keyword'));
     }
+
+    // tăng lượt xem
+    // public function detail($id)
+    // {
+    //     $product = Products::findOrFail($id);
+
+    //     $product->increment('views');
+
+    //     return view('product');
+    // }
+
 }

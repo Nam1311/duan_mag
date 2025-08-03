@@ -311,3 +311,41 @@
     top: 14px;
     font-size: 1.2rem;
 }
+.suggestion-list{
+    width: 100%;
+    height: auto;
+}
+.suggestion-list a{
+    text-decoration: none;
+    margin: 10px 0;
+    color: #000000;
+}
+.suggestion-list a:hover{
+    color: #4361ee;
+}
+.suggestion-list a img{
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+.suggestion-card{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.suggestion-card:hover{
+    background: #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.suggestion-card p{
+    font-size: 15px !important;
+}
+.suggestion-card img{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+

@@ -10,10 +10,7 @@ use App\Models\News;
 use App\Models\reviews;
 use App\Models\Product_categories;
 use App\Models\ProductCountDown;
-<<<<<<< HEAD
 use App\Models\Banners;
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -23,7 +20,7 @@ class PageController extends Controller
     public function home()
     {
         $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 30)->take(8)->get();
-        $products_is_featured = Products::with(['images', 'variants'])->where('is_featured', '>', 0)->take(8)->get();
+        $products_is_featured = Products::with(['images', 'variants'])->orderBy('views', 'desc')->take(8)->get();
         $product_categories = Product_categories::all();
         $news = News::where('views', '>', 190)->take(6)->get();
         $product_new = Product_categories::with(['products' => function ($query) {
@@ -47,14 +44,10 @@ class PageController extends Controller
         $activePromotions = ProductCountDown::with('products')
             ->where('status', 'active')
             ->get();
-<<<<<<< HEAD
         $sliders = Banners::where('status', '>', 0)
             ->orderBy('sort_order', 'asc')
             ->orderBy('id', 'desc')
             ->get();
-
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 
         foreach ($activePromotions as $promotion) {
             if ($currentHour >= $promotion->start_hour && $currentHour <= $promotion->end_hour) {
@@ -97,12 +90,8 @@ class PageController extends Controller
             'product_new' => $product_new,
             'flash_sale_products' => $flash_sale_products->unique('id'),
             'countdown' => $countdown,
-<<<<<<< HEAD
             'products_bestseller' => $products_bestseller,
             'sliders' => $sliders
-=======
-            'products_bestseller' => $products_bestseller
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
         ];
 
         return view('home', $data);
@@ -119,6 +108,8 @@ class PageController extends Controller
             ->where('id', '!=', $id)
             ->take(4)
             ->get();
+        $product = Products::findOrFail($id);
+        $product->increment('views');
 
         $reviewDetail = reviews::with('user')->where('product_id', $id)->get();
 
@@ -161,5 +152,9 @@ class PageController extends Controller
 
         ]);
     }
+
+
+
+
 
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\ProductCountDown;
@@ -8,73 +7,40 @@ use Carbon\Carbon;
 
 class CountDownController extends Controller
 {
-    /**
-     * Áp dụng chương trình Countdown nếu đã đến giờ bắt đầu
-     */
-    public function applyCountdown()
+    public function kiem_tra_flashsale()
     {
-        $now = Carbon::now()->format('H:i');
+        $now = Carbon::now()->format('H:i:s');
 
         $countdowns = ProductCountDown::where('status', 'active')
-            ->where('applied', false) // chưa áp dụng
-            ->where('start_hour', '<=', $now) // đã tới giờ bắt đầu
             ->with('products')
             ->get();
+
+        $changed = 0;
 
         foreach ($countdowns as $countdown) {
+            $inTime = $now >= $countdown->start_hour && $now < $countdown->end_hour;
+            $extraSale = floatval($countdown->percent_discount);
+
             foreach ($countdown->products as $product) {
-                $originalSale = floatval($product->sale);
-                $countdownSale = floatval($countdown->percent_discount);
-                $newSale = min($originalSale + $countdownSale, 100);
+                $baseSale = floatval($product->base_sale ?? 0);
+                $newSale = $inTime ? min($baseSale + $extraSale, 100) : $baseSale;
 
-                $product->sale = $newSale;
-                $product->price = round($product->original_price * (1 - $newSale / 100), 2);
-                $product->save();
+                if ($product->sale != $newSale) {
+                    $product->sale = $newSale;
+                    $product->price = round($product->original_price * (1 - $newSale / 100), 2);
+                    $product->save();
+                    $changed++;
+                }
             }
-
-            $countdown->applied = true; // đã áp dụng rồi
-            $countdown->save();
         }
 
         return response()->json([
             'success' => true,
-            'message' => '⏱️ Countdown đã được áp dụng.',
-            'count' => $countdowns->count(),
-            'reload_page' => $countdowns->count() > 0 // reload nếu có countdown mới áp dụng
+            'message' => '⏱ Countdown xử lý xong.',
+            'reload_page' => $changed > 0
         ]);
     }
 
-    /**
-     * Reset chương trình Countdown nếu đã hết giờ
-     */
-    public function resetCountdownSale()
-    {
-        $now = Carbon::now()->format('H:i');
-
-        $expiredCountdowns = ProductCountDown::where('status', 'active')
-            ->where('applied', true) // chỉ reset nếu đã từng áp dụng
-            ->where('end_hour', '<', $now) // đã quá giờ kết thúc
-            ->with('products')
-            ->get();
-
-        foreach ($expiredCountdowns as $countdown) {
-            foreach ($countdown->products as $product) {
-                $productSale = floatval($product->sale);
-                $countdownSale = floatval($countdown->percent_discount);
-
-                $product->sale = max(0, $productSale - $countdownSale);
-                $product->save();
-            }
-
-            $countdown->applied = false; // đánh dấu chưa áp dụng lại
-            // $countdown->status = 'inactive'; // có thể dùng nếu muốn dừng luôn
-            $countdown->save();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => '✅ Countdown đã hết giờ, giá đã reset.',
-            'reload_page' => $expiredCountdowns->count() > 0
-        ]);
-    }
 }
+
+

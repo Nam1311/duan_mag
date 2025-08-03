@@ -1,6 +1,29 @@
 @extends('app')
 
 @section('body')
+    @if (session('success'))
+        <div id="success-toast"
+            style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+    ">
+            <span style="margin-right: 8px;">✔️</span>
+            {{ session('success') }}
+        </div>
+    @endif
+
+
     <div class="user-info-body">
         <div class="user-info-container">
             <div class="user-info-sidebar">
@@ -52,20 +75,21 @@
                                 <div class="user-info-address-list">
                                     <div class="user-info-address-item" data-address-id="1">
                                         <span class="user-info-value">{{ $addresses->address ?? 'Chưa cập nhật' }} /
-                                        {{ $addresses->ward ?? 'Chưa cập nhật' }} /
-                                        {{ $addresses->district ?? 'Chưa cập nhật' }} <br>
-                                        {{ $addresses->province ?? 'Chưa cập nhật' }}</span>
+                                            {{ $addresses->ward ?? 'Chưa cập nhật' }} /
+                                            {{ $addresses->district ?? 'Chưa cập nhật' }} <br>
+                                            {{ $addresses->province ?? 'Chưa cập nhật' }}</span>
                                         <div class="user-info-address-actions">
                                             <button class="user-info-address-edit-btn" data-modal="edit-address"
-                                            data-id="{{ $addresses->id }}" data-address="{{ $addresses->address }}"
-                                            data-ward="{{ $addresses->ward }}" data-district="{{ $addresses->district }}"
-                                            data-province="{{ $addresses->province }}"
-                                            data-is_default="{{ $addresses->is_default }}">
-                                            <i class="fas fa-edit"></i> Sửa
-                                        </button>
-                                                <a href="{{ '/xoaaddress/' . $addresses->id }}"
-                                            class="user-info-address-delete-btn"><i class="fas fa-trash"></i>
-                                            Xóa</a>
+                                                data-id="{{ $addresses->id }}" data-address="{{ $addresses->address }}"
+                                                data-ward="{{ $addresses->ward }}"
+                                                data-district="{{ $addresses->district }}"
+                                                data-province="{{ $addresses->province }}"
+                                                data-is_default="{{ $addresses->is_default }}">
+                                                <i class="fas fa-edit"></i> Sửa
+                                            </button>
+                                            <a href="{{ '/xoaaddress/' . $addresses->id }}"
+                                                class="user-info-address-delete-btn"><i class="fas fa-trash"></i>
+                                                Xóa</a>
                                         </div>
                                     </div>
                                 </div>
@@ -74,17 +98,8 @@
                     </section>
 
                     <section class="user-info-profile-section user-info-orders-section" id="orders-section">
-<<<<<<< HEAD
                         <div class="user-info-section-header">
                             <h2 class="user-info-section-title"><i class="fas fa-shopping-bag"></i> Đơn hàng gần đây</h2>
-=======
-                        <div class="order_title" style="padding: 10px 30px">
-                            <h2 style="" class="user-info-section-title"><i class="fas fa-shopping-bag"></i> Đơn hàng gần đây</h2>
-                        </div>
-                        <hr>
-                        <div class="user-info-section-header">
-                           
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
                             <div class="user-info-order-filter-tags">
                                 <span class="user-info-order-filter-tag active" data-status="all">Tất cả</span>
                                 <span class="user-info-order-filter-tag" data-status="Chờ xử lý">Chờ xác nhận</span>
@@ -97,47 +112,70 @@
                         <div class="user-info-section-content">
                             <div class="user-info-orders-list">
                                 @foreach ($order as $order)
-                                <div class="user-info-order-item" data-status="{{ $order->status }}">
-                                    <div class="user-info-order-header">
-                                        <span class="user-info-order-id">#{{ $order->id }}MAG</span>
-                                        <span class="user-info-order-date">{{ $order->updated_at->format('d-m-Y') }}</span>
-                                          @php
-                                            $statusColors = [
-                                                'Chờ xác nhận' => 'gray',
-                                                'Đã xác nhận' => 'blue',
-                                                'Đang giao hàng' => 'orange',
-                                                'Thành công' => 'green',
-                                                'Đã hủy' => 'red',
-                                            ];
+                                    <div class="user-info-order-item" data-status="{{ $order->status }}">
+                                        <div class="user-info-order-header">
+                                            <span class="user-info-order-id">#{{ $order->id }}MAG</span>
+                                            <span
+                                                class="user-info-order-date">{{ $order->updated_at->format('d-m-Y') }}</span>
+                                            @php
+                                                $statusColors = [
+                                                    'Chờ xác nhận' => 'gray',
+                                                    'Đã xác nhận' => 'blue',
+                                                    'Đang giao hàng' => 'orange',
+                                                    'Thành công' => 'green',
+                                                    'Đã hủy' => 'red',
+                                                ];
 
-                                            $color = $statusColors[$order->status] ?? 'dark';
-                                        @endphp
-                                        <span class="user-info-order-status status-{{ $color }}">
-                                            {{ $order->status }}
-                                        </span>
+                                                $color = $statusColors[$order->status] ?? 'dark';
+                                            @endphp
+                                            <span class="user-info-order-status status-{{ $color }}">
+                                                {{ $order->status }}
+                                            </span>
+                                        </div>
+                                        <div class="user-info-order-details">
+                                            <div class="user-info-order-products">
+                                                {{ $order->orderDetails->pluck('productVariant.product.name')->join(', ') }}
+                                            </div>
+                                            <div class="user-info-order-total">
+                                                {{ number_format($order->total_price, 0, ',', '.') }} đ</div>
+                                        </div>
+                                        <div class="user-info-order-actions">
+                                            <a class="user-info-order-detail-btn"
+                                                href="{{ '/info-ctdh/' . $order->id }}"><i class="fas fa-eye"></i> Xem
+                                                chi tiết</a>
+                                            @php
+                                                $isCompleted = $order->status === 'Thành công';
+                                                $isReviewed = $order->orderDetails->every(function ($detail) {
+                                                    return $detail->productVariant->product
+                                                        ->reviews()
+                                                        ->where('user_id', auth()->id())
+                                                        ->where('product_id', $detail->productVariant->product_id)
+                                                        ->exists();
+                                                });
+                                            @endphp
+
+                                            @if ($isCompleted && !$isReviewed)
+                                                <a href="{{ route('review.form', $order->id) }}"
+                                                    class="user-info-order-review-btn">
+                                                    <i class="fas fa-star"></i> Đánh giá
+                                                </a>
+                                            @endif
+
+                                            @php
+                                                $hideCancelButton = in_array($order->status, [
+                                                    'Đang giao hàng',
+                                                    'Thành công',
+                                                    'Đã hủy',
+                                                ]);
+                                            @endphp
+                                            <a href="{{ '/huydon/' . $order->id }}"
+                                                class="user-info-order-cancel-btn {{ $hideCancelButton ? 'an_huy' : '' }}">
+                                                <i class="fas fa-times"></i> Hủy đơn hàng
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="user-info-order-details">
-                                        <div class="user-info-order-products"> {{ $order->orderDetails->pluck('productVariant.product.name')->join(', ') }}</div>
-                                        <div class="user-info-order-total"> {{ number_format($order->total_price, 0, ',', '.') }} đ</div>
-                                    </div>
-                                    <div class="user-info-order-actions">
-                                        <a class="user-info-order-detail-btn" href="{{ '/info-ctdh/' . $order->id }}"><i class="fas fa-eye"></i> Xem
-                                            chi tiết</a>
-                                             @php
-                                            $hideCancelButton = in_array($order->status, [
-                                                'Đang giao hàng',
-                                                'Thành công',
-                                                'Đã hủy',
-                                            ]);
-                                        @endphp
-                                         <a href="{{ '/huydon/' . $order->id }}"
-                                            class="user-info-order-cancel-btn {{ $hideCancelButton ? 'an_huy' : '' }}">
-                                            <i class="fas fa-times"></i> Hủy đơn hàng
-                                        </a>
-                                    </div>
-                                </div>
-                                 @endforeach
-                                
+                                @endforeach
+
                             </div>
                         </div>
                     </section>
@@ -184,18 +222,18 @@
                         <div class="user-info-form-group">
                             <div class="user-info-input-group">
                                 <label for="personal-fullname" class="user-info-input-label">Họ và tên:</label>
-                                <input type="text" id="personal-fullname" name="fullname" placeholder="{{ $user->name ?? 'Chưa cập nhật' }}"
-                                    class="user-info-input">
+                                <input type="text" id="personal-fullname" name="fullname"
+                                    placeholder="{{ $user->name ?? 'Chưa cập nhật' }}" class="user-info-input">
                             </div>
                             <div class="user-info-input-group">
                                 <label for="personal-email" class="user-info-input-label">Email:</label>
-                                <input type="email" id="personal-email" name="email" placeholder="{{ $user->email ?? 'Chưa cập nhật' }}"
-                                    class="user-info-input">
+                                <input type="email" id="personal-email" name="email"
+                                    placeholder="{{ $user->email ?? 'Chưa cập nhật' }}" class="user-info-input">
                             </div>
                             <div class="user-info-input-group">
                                 <label for="personal-phone" class="user-info-input-label">Số điện thoại:</label>
-                                <input type="tel" id="personal-phone" name="phone" placeholder="0{{ $user->phone ?? 'Chưa cập nhật' }}"
-                                    class="user-info-input">
+                                <input type="tel" id="personal-phone" name="phone"
+                                    placeholder="0{{ $user->phone ?? 'Chưa cập nhật' }}" class="user-info-input">
                             </div>
                         </div>
                         <div class="user-info-form-actions">
@@ -218,17 +256,17 @@
                                 <label for="old-password" class="user-info-input-label">Mật khẩu cũ:</label>
                                 <input type="password" id="old-password" name="old_password"
                                     placeholder="Nhập mật khẩu cũ" class="user-info-input" required>
-                                     @error('old_password')
-                                <div class="error-message" style="color: red;">{{ $message }}</div>
-                            @enderror
+                                @error('old_password')
+                                    <div class="error-message" style="color: red;">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="user-info-input-group">
                                 <label for="new-password" class="user-info-input-label">Mật khẩu mới:</label>
                                 <input type="password" id="new-password" name="password" placeholder="Nhập mật khẩu mới"
                                     class="user-info-input">
-                                    @error('password')
-                                <div class="error-message" style="color: red;">{{ $message }}</div>
-                            @enderror
+                                @error('password')
+                                    <div class="error-message" style="color: red;">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="user-info-input-group">
                                 <label for="password_confirmation" class="user-info-input-label">Xác nhận mật khẩu
@@ -251,7 +289,7 @@
                     <button class="user-info-close-btn" aria-label="Đóng">×</button>
                     <h2 class="user-info-modal-title">Thêm địa chỉ</h2>
                     <form action="{{ '/themaddress/' }}" method="POST" id="add-address-form">
-                         @csrf
+                        @csrf
                         <div class="user-info-form-group">
                             <div class="user-info-input-group">
                                 <label for="add-address-street" class="user-info-input-label">Địa chỉ:</label>
@@ -273,7 +311,7 @@
                                 <input type="text" id="add-address-province" name="province"
                                     placeholder="Nhập tỉnh/thành phố" class="user-info-input">
                             </div>
-                             <div class="user-info-input-group">
+                            <div class="user-info-input-group">
                                 <label class="user-info-input-label">Loại địa chỉ:</label>
                                 <select name="address_type" class="user-info-select edit-address-type">
                                     <option value="1">Chính thức</option>
@@ -295,7 +333,7 @@
                     <button class="user-info-close-btn" aria-label="Đóng">×</button>
                     <h2 class="user-info-modal-title">Chỉnh sửa địa chỉ</h2>
                     <form action="{{ '/suaaddress/' }}" method="POST" id="edit-address-form">
-                         @csrf
+                        @csrf
                         <div class="user-info-form-group">
                             <div class="user-info-input-group">
                                 <label for="edit-address-street" class="user-info-input-label">Địa chỉ:</label>
@@ -336,190 +374,200 @@
         </div>
     </div>
     <script>
+        setTimeout(function() {
+            const toast = document.getElementById('success-toast');
+            if (toast) {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500); // chờ hiệu ứng mờ dần rồi xóa
+            }
+        }, 3000); // 3 giây
         document.addEventListener('DOMContentLoaded', function() {
-    const body = document.body;
+            const body = document.body;
 
-    // ========================
-    // XỬ LÝ MENU TAB BÊN TRÁI
-    // ========================
-    const menuItems = document.querySelectorAll('.user-info-sidebar li');
-    const sections = document.querySelectorAll('.user-info-profile-section');
+            // ========================
+            // XỬ LÝ MENU TAB BÊN TRÁI
+            // ========================
+            const menuItems = document.querySelectorAll('.user-info-sidebar li');
+            const sections = document.querySelectorAll('.user-info-profile-section');
 
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            // 1. Bỏ class 'active' khỏi tất cả các tab
-            menuItems.forEach(i => i.classList.remove('active'));
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // 1. Bỏ class 'active' khỏi tất cả các tab
+                    menuItems.forEach(i => i.classList.remove('active'));
 
-            // 2. Thêm class 'active' vào tab đang click
-            item.classList.add('active');
+                    // 2. Thêm class 'active' vào tab đang click
+                    item.classList.add('active');
 
-            // 3. Ẩn tất cả nội dung
-            sections.forEach(section => section.classList.remove('active'));
+                    // 3. Ẩn tất cả nội dung
+                    sections.forEach(section => section.classList.remove('active'));
 
-            // 4. Hiện phần nội dung tương ứng với tab được click
-            const sectionId = item.dataset.section + '-section'; // ví dụ "orders-section"
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.classList.add('active');
-            }
-        });
-    });
-
-    // ========================
-    // XỬ LÝ MODAL (popup form)
-    // ========================
-
-    // Hàm hiện modal
-    const showModal = (modalId) => {
-        const modal = document.getElementById(`user-info-${modalId}-modal`);
-        if (modal) {
-            modal.classList.add('show');
-            body.style.overflow = 'hidden'; // Ngăn cuộn nền
-        }
-    };
-
-    // Hàm ẩn modal
-    const hideModal = (modalId) => {
-        const modal = document.getElementById(`user-info-${modalId}-modal`);
-        if (modal) {
-            modal.classList.remove('show');
-            body.style.overflow = ''; // Cho cuộn nền lại
-        }
-    };
-
-    // ========================
-    // MỞ MODAL CHỈNH SỬA THÔNG TIN CÁ NHÂN HOẶC ĐỔI MẬT KHẨU
-    // ========================
-    document.querySelectorAll('.user-info-edit-btn[data-modal="personal"], .user-info-password-btn')
-        .forEach(button => {
-            button.addEventListener('click', () => {
-                showModal(button.dataset.modal); // modalId = 'personal' hoặc 'password'
-            });
-        });
-
-    // ========================
-    // MỞ MODAL THÊM ĐỊA CHỈ MỚI (và reset các input)
-    // ========================
-    const addAddressBtn = document.querySelector('.user-info-edit-btn[data-modal="add-address"]');
-    if (addAddressBtn) {
-        addAddressBtn.addEventListener('click', () => {
-            // Reset các input khi mở form
-            document.getElementById('add-address-street').value = '';
-            document.getElementById('add-address-ward').value = '';
-            document.getElementById('add-address-district').value = '';
-            document.getElementById('add-address-province').value = '';
-            showModal('add-address');
-        });
-    }
-
-    // ========================
-    // MỞ MODAL SỬA ĐỊA CHỈ VÀ ĐỔ DỮ LIỆU
-    // ========================
-    document.querySelectorAll('.user-info-address-edit-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            // Đổ dữ liệu vào input
-            document.getElementById('edit-address-id').value = button.dataset.id || '';
-            document.getElementById('edit-address-street').value = button.dataset.address || '';
-            document.getElementById('edit-address-ward').value = button.dataset.ward || '';
-            document.getElementById('edit-address-district').value = button.dataset.district || '';
-            document.getElementById('edit-address-province').value = button.dataset.province || '';
-
-            // Checkbox mặc định
-            const isDefaultCheckbox = document.getElementById('edit-address-is_default');
-            if (isDefaultCheckbox) {
-                isDefaultCheckbox.checked = button.dataset.is_default == "1";
-            }
-
-            // Select radio default
-            document.querySelectorAll('.edit-address-type').forEach(select => {
-                select.value = button.dataset.is_default == "1" ? "1" : "0";
+                    // 4. Hiện phần nội dung tương ứng với tab được click
+                    const sectionId = item.dataset.section + '-section'; // ví dụ "orders-section"
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.classList.add('active');
+                    }
+                });
             });
 
-            showModal('edit-address');
-        });
-    });
+            // ========================
+            // XỬ LÝ MODAL (popup form)
+            // ========================
 
-    // ========================
-    // NÚT ĐÓNG / HỦY MODAL
-    // ========================
-    document.querySelectorAll('.user-info-close-btn, .user-info-cancel-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const modalId = button.dataset.modal || button.closest('.user-info-modal').id
-                .replace('user-info-', '').replace('-modal', '');
-            hideModal(modalId);
-        });
-    });
-
-    // ========================
-    // CLICK RA NGOÀI ĐỂ ĐÓNG MODAL
-    // ========================
-    document.querySelectorAll('.user-info-modal').forEach(modal => {
-        modal.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                const modalId = modal.id.replace('user-info-', '').replace('-modal', '');
-                hideModal(modalId);
-            }
-        });
-    });
-
-    // ========================
-    // XOÁ ĐỊA CHỈ (client-side, không gọi API hay form)
-    // ========================
-    document.querySelectorAll('.user-info-address-delete-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-                const addressItem = button.closest('.user-info-address-item');
-                if (addressItem) {
-                    addressItem.remove(); // chỉ xóa trên giao diện
-                    console.log('Address deleted');
+            // Hàm hiện modal
+            const showModal = (modalId) => {
+                const modal = document.getElementById(`user-info-${modalId}-modal`);
+                if (modal) {
+                    modal.classList.add('show');
+                    body.style.overflow = 'hidden'; // Ngăn cuộn nền
                 }
-            }
-        });
-    });
+            };
 
-    // ========================
-    // XOÁ SẢN PHẨM YÊU THÍCH (client-side)
-    // ========================
-    document.querySelectorAll('.user-info-favorite-remove-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
-                const favoriteItem = button.closest('.user-info-favorite-item');
-                if (favoriteItem) {
-                    favoriteItem.remove(); // chỉ xóa trên giao diện
-                    console.log('Favorite deleted');
+            // Hàm ẩn modal
+            const hideModal = (modalId) => {
+                const modal = document.getElementById(`user-info-${modalId}-modal`);
+                if (modal) {
+                    modal.classList.remove('show');
+                    body.style.overflow = ''; // Cho cuộn nền lại
                 }
+            };
+
+            // ========================
+            // MỞ MODAL CHỈNH SỬA THÔNG TIN CÁ NHÂN HOẶC ĐỔI MẬT KHẨU
+            // ========================
+            document.querySelectorAll('.user-info-edit-btn[data-modal="personal"], .user-info-password-btn')
+                .forEach(button => {
+                    button.addEventListener('click', () => {
+                        showModal(button.dataset.modal); // modalId = 'personal' hoặc 'password'
+                    });
+                });
+
+            // ========================
+            // MỞ MODAL THÊM ĐỊA CHỈ MỚI (và reset các input)
+            // ========================
+            const addAddressBtn = document.querySelector('.user-info-edit-btn[data-modal="add-address"]');
+            if (addAddressBtn) {
+                addAddressBtn.addEventListener('click', () => {
+                    // Reset các input khi mở form
+                    document.getElementById('add-address-street').value = '';
+                    document.getElementById('add-address-ward').value = '';
+                    document.getElementById('add-address-district').value = '';
+                    document.getElementById('add-address-province').value = '';
+                    showModal('add-address');
+                });
             }
-        });
-    });
 
-    // ========================
-    // LỌC ĐƠN HÀNG THEO TRẠNG THÁI
-    // ========================
-    const filterTags = document.querySelectorAll('.user-info-order-filter-tag');
-    const orderItems = document.querySelectorAll('.user-info-order-item');
+            // ========================
+            // MỞ MODAL SỬA ĐỊA CHỈ VÀ ĐỔ DỮ LIỆU
+            // ========================
+            document.querySelectorAll('.user-info-address-edit-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Đổ dữ liệu vào input
+                    document.getElementById('edit-address-id').value = button.dataset.id || '';
+                    document.getElementById('edit-address-street').value = button.dataset.address ||
+                        '';
+                    document.getElementById('edit-address-ward').value = button.dataset.ward || '';
+                    document.getElementById('edit-address-district').value = button.dataset
+                        .district || '';
+                    document.getElementById('edit-address-province').value = button.dataset
+                        .province || '';
 
-    filterTags.forEach(tag => {
-        tag.addEventListener('click', () => {
-            // Xóa active hiện tại
-            filterTags.forEach(t => t.classList.remove('active'));
+                    // Checkbox mặc định
+                    const isDefaultCheckbox = document.getElementById('edit-address-is_default');
+                    if (isDefaultCheckbox) {
+                        isDefaultCheckbox.checked = button.dataset.is_default == "1";
+                    }
 
-            // Thêm active mới
-            tag.classList.add('active');
+                    // Select radio default
+                    document.querySelectorAll('.edit-address-type').forEach(select => {
+                        select.value = button.dataset.is_default == "1" ? "1" : "0";
+                    });
 
-            const selectedStatus = tag.dataset.status;
+                    showModal('edit-address');
+                });
+            });
 
-            // Lọc đơn hàng theo trạng thái
-            orderItems.forEach(item => {
-                const itemStatus = item.dataset.status;
-                if (selectedStatus === 'all' || selectedStatus === itemStatus) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
+            // ========================
+            // NÚT ĐÓNG / HỦY MODAL
+            // ========================
+            document.querySelectorAll('.user-info-close-btn, .user-info-cancel-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const modalId = button.dataset.modal || button.closest('.user-info-modal').id
+                        .replace('user-info-', '').replace('-modal', '');
+                    hideModal(modalId);
+                });
+            });
+
+            // ========================
+            // CLICK RA NGOÀI ĐỂ ĐÓNG MODAL
+            // ========================
+            document.querySelectorAll('.user-info-modal').forEach(modal => {
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        const modalId = modal.id.replace('user-info-', '').replace('-modal', '');
+                        hideModal(modalId);
+                    }
+                });
+            });
+
+            // ========================
+            // XOÁ ĐỊA CHỈ (client-side, không gọi API hay form)
+            // ========================
+            document.querySelectorAll('.user-info-address-delete-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
+                        const addressItem = button.closest('.user-info-address-item');
+                        if (addressItem) {
+                            addressItem.remove(); // chỉ xóa trên giao diện
+                            console.log('Address deleted');
+                        }
+                    }
+                });
+            });
+
+            // ========================
+            // XOÁ SẢN PHẨM YÊU THÍCH (client-side)
+            // ========================
+            document.querySelectorAll('.user-info-favorite-remove-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (confirm(
+                            'Bạn có chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
+                        const favoriteItem = button.closest('.user-info-favorite-item');
+                        if (favoriteItem) {
+                            favoriteItem.remove(); // chỉ xóa trên giao diện
+                            console.log('Favorite deleted');
+                        }
+                    }
+                });
+            });
+
+            // ========================
+            // LỌC ĐƠN HÀNG THEO TRẠNG THÁI
+            // ========================
+            const filterTags = document.querySelectorAll('.user-info-order-filter-tag');
+            const orderItems = document.querySelectorAll('.user-info-order-item');
+
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    // Xóa active hiện tại
+                    filterTags.forEach(t => t.classList.remove('active'));
+
+                    // Thêm active mới
+                    tag.classList.add('active');
+
+                    const selectedStatus = tag.dataset.status;
+
+                    // Lọc đơn hàng theo trạng thái
+                    orderItems.forEach(item => {
+                        const itemStatus = item.dataset.status;
+                        if (selectedStatus === 'all' || selectedStatus === itemStatus) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
             });
         });
-    });
-});
-
     </script>
 @endsection

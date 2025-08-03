@@ -12,21 +12,12 @@
     <link rel="stylesheet" href="{{ asset('/css/admin/caidat.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/hotro.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/khuyenmai.css') }}">
-<<<<<<< HEAD
-=======
-    <link rel="stylesheet" href="{{ asset('/css/admin/orders.css') }}">
-    <link rel="stylesheet" href="{{ asset('/css/admin/products.css') }}">
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlyhinhanh.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlykhachhang.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlykho.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlynguoidung.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlytintuc.css') }}">
-<<<<<<< HEAD
-    {{-- <link rel="stylesheet" href="{{ asset('/css/admin/orders.css') }}"> --}}
-=======
     <link rel="stylesheet" href="{{ asset('/css/admin/binhluan.css') }}">
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic-all/ckeditor.js"></script>
 
@@ -486,8 +477,4 @@
     </script>
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03

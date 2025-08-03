@@ -569,24 +569,18 @@
     }
 
     .dropdown-toggle {
-<<<<<<< HEAD
         display: flex;
         gap: 10px;
         /* align-items: center; */
         justify-content: center;
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
         padding: 8px 12px;
         background-color: #f1f1f1;
         border: 1px solid #ccc;
         cursor: pointer;
     }
-<<<<<<< HEAD
     .dropdown-toggle i{
         margin-top: 4px;
     }
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 
     .dropdown-menu {
         display: none;

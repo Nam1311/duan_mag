@@ -113,27 +113,20 @@
     <link rel="stylesheet" href="{{ asset('css/admin/quanlykhachhang.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
     <div class="acustomermanagement-main-content">
-
-        <!-- Phần tìm kiếm và người dùng -->
         <div class="acustomermanagement-header">
             <div class="acustomermanagement-search-bar">
                 <input type="text" id="searchInput" placeholder="Tìm theo tên, email, mã KH...">
             </div>
 
             <div class="ausermanagement-user-profile">
-                <div class="ausermanagement-notification-bell">
-                    <i class="fas fa-bell"></i>
-                </div>
+                <div class="ausermanagement-notification-bell"><i class="fas fa-bell"></i></div>
                 <div class="ausermanagement-profile-avatar">QT</div>
             </div>
         </div>
 
-        <!-- Tiêu đề -->
         <h1 class="acustomermanagement-page-title">Quản lý khách hàng</h1>
 
-        <!-- Bộ lọc và nút thêm nằm ngay dưới h1 -->
         <div class="acustomermanagement-subheader">
             <div class="acustomermanagement-filter-actions">
                 <select id="activityFilter">
@@ -141,16 +134,22 @@
                     <option value="1">Hoạt động</option>
                     <option value="0">Tạm khóa</option>
                 </select>
-                <button id="addCustomerBtn" class="acustomermanagement-btn acustomermanagement-btn-primary">+ Thêm khách
-                    hàng</button>
+
+                <button id="sendMailBtn" class="acustomermanagement-btn acustomermanagement-btn-secondary">
+                    📧 Gửi tin nhắn
+                </button>
+
+                <button id="addCustomerBtn" class="acustomermanagement-btn acustomermanagement-btn-primary">
+                    + Thêm khách hàng
+                </button>
             </div>
         </div>
-
 
         <div class="acustomermanagement-data-card">
             <table class="acustomermanagement-data-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="checkAll" /></th>
                         <th>ID</th>
                         <th>Tên</th>
                         <th>Email</th>
@@ -164,6 +163,7 @@
                 <tbody id="customerTableBody">
                     @foreach ($customers as $user)
                         <tr>
+                            <td><input type="checkbox" class="user-checkbox" value="{{ $user->id }}"></td>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
@@ -191,59 +191,28 @@
                     @endforeach
                 </tbody>
             </table>
+
             <div class="acustomermanagement-pagination mt-3">
                 {{ $customers->links() }}
             </div>
         </div>
     </div>
 
-    <!-- Modal sửa/xem -->
-    <div class="acustomermanagement-modal" id="customerModal" style="display: none">
+    <!-- Modal gửi tin nhắn -->
+    <div class="acustomermanagement-modal" id="sendMailModal" style="display: none">
         <div class="acustomermanagement-modal-content">
-            <h2 id="modalTitle">Thông tin khách hàng</h2>
-            <input type="hidden" id="customerId">
-
+            <h2>Gửi tin nhắn</h2>
             <div class="acustomermanagement-form-group">
-                <label>Tên:</label>
-                <input type="text" id="modalName" class="modal-input">
+                <label>Chủ đề:</label>
+                <input type="text" id="mailSubject" class="modal-input">
             </div>
-
             <div class="acustomermanagement-form-group">
-                <label>Email:</label>
-                <input type="email" id="modalEmail" class="modal-input">
+                <label>Nội dung:</label>
+                <textarea id="mailContent" class="modal-input" rows="6"></textarea>
             </div>
-
-            <div class="acustomermanagement-form-group">
-                <label>SĐT:</label>
-                <input type="text" id="modalPhone" class="modal-input">
-            </div>
-
-            <div class="acustomermanagement-form-group">
-                <label>Địa chỉ:</label>
-                <input type="text" id="modalAddress" class="modal-input">
-            </div>
-
-            <div class="acustomermanagement-form-group">
-                <label>Trạng thái hoạt động:</label>
-                <select id="modalLocked" class="modal-input">
-                    <option value="1">Hoạt động</option>
-                    <option value="0">Tạm khóa</option>
-                </select>
-            </div>
-
-            <div class="acustomermanagement-form-group">
-                <label>Lý do khóa (nếu có):</label>
-                <input type="text" id="modalLockReason" class="modal-input">
-            </div>
-
-            <div class="acustomermanagement-form-group" id="modalCreatedWrapper" style="display: none;">
-                <label>Ngày tạo:</label>
-                <input type="text" id="modalCreated" class="modal-input" readonly>
-            </div>
-
             <div class="acustomermanagement-modal-footer">
-                <button id="saveCustomerBtn" class="acustomermanagement-btn acustomermanagement-btn-primary">Lưu</button>
-                <button onclick="closeModal()"
+                <button id="sendMailSubmitBtn" class="acustomermanagement-btn acustomermanagement-btn-primary">Gửi</button>
+                <button onclick="closeSendMailModal()"
                     class="acustomermanagement-btn acustomermanagement-btn-secondary">Đóng</button>
             </div>
         </div>
@@ -262,10 +231,10 @@
             const status = activityFilter.value;
 
             Array.from(tableBody.rows).forEach(row => {
-                const id = row.cells[0].innerText.toLowerCase();
-                const name = row.cells[1].innerText.toLowerCase();
-                const email = row.cells[2].innerText.toLowerCase();
-                const isActive = row.cells[4].innerText.includes('Hoạt');
+                const id = row.cells[1].innerText.toLowerCase();
+                const name = row.cells[2].innerText.toLowerCase();
+                const email = row.cells[3].innerText.toLowerCase();
+                const isActive = row.cells[5].innerText.includes('Hoạt');
 
                 const matchSearch = id.includes(keyword) || name.includes(keyword) || email.includes(keyword);
                 const matchStatus = status === "" || (status === "1" && isActive) || (status === "0" && !isActive);
@@ -274,103 +243,79 @@
             });
         }
 
-        document.getElementById("addCustomerBtn").addEventListener("click", () => {
-            openModal();
+        // Check all
+        document.getElementById("checkAll").addEventListener("click", function() {
+            document.querySelectorAll(".user-checkbox").forEach(cb => cb.checked = this.checked);
         });
 
-        function openModal(data = null, viewOnly = false) {
-            const modal = document.getElementById("customerModal");
-            modal.style.display = "flex";
+        // Gửi tin nhắn
+        document.getElementById("sendMailBtn").addEventListener("click", () => {
+            const selected = Array.from(document.querySelectorAll(".user-checkbox:checked")).map(cb => cb.value);
+            if (selected.length === 0) return alert("Vui lòng chọn người nhận.");
+            document.getElementById("sendMailModal").style.display = "flex";
+        });
 
-            document.getElementById("modalTitle").innerText = viewOnly ?
-                "Chi tiết khách hàng" :
-                (data ? "Sửa khách hàng" : "Thêm khách hàng");
-
-            document.getElementById("customerId").value = data?.id || '';
-            document.getElementById("modalName").value = data?.name || '';
-            document.getElementById("modalEmail").value = data?.email || '';
-            document.getElementById("modalPhone").value = data?.phone || '';
-            document.getElementById("modalAddress").value = data?.address || '';
-            document.getElementById("modalLocked").value = data?.is_locked ?? 1;
-            document.getElementById("modalLockReason").value = data?.lock_reason || '';
-            document.getElementById("modalCreated").value = data?.created_at || '';
-
-            document.getElementById("modalCreatedWrapper").style.display = viewOnly ? "block" : "none";
-
-            const inputs = modal.querySelectorAll("input, select");
-            inputs.forEach(input => input.disabled = viewOnly);
-
-            if (data) document.getElementById("modalEmail").disabled = true;
-            document.getElementById("saveCustomerBtn").style.display = viewOnly ? "none" : "inline-block";
+        function closeSendMailModal() {
+            document.getElementById("sendMailModal").style.display = "none";
         }
 
-        function closeModal() {
-            document.getElementById("customerModal").style.display = "none";
-        }
+        document.getElementById("sendMailSubmitBtn").addEventListener("click", () => {
+            const selectedIds = Array.from(document.querySelectorAll(".user-checkbox:checked")).map(cb => cb.value);
+            const subject = document.getElementById("mailSubject").value;
+            const content = document.getElementById("mailContent").value;
+
+            if (!subject || !content) return alert("Vui lòng nhập đủ chủ đề và nội dung");
+
+            fetch(`/admin/send-bulk-mail`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        ids: selectedIds,
+                        subject,
+                        content
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || "Gửi thành công!");
+                    closeSendMailModal();
+                })
+                .catch(() => alert("Gửi thất bại"));
+        });
 
         function viewUser(id) {
             fetch(`/admin/khachhang/${id}`)
                 .then(res => res.json())
-                .then(user => {
-                    openModal(user, true);
+                .then(data => {
+                    openModal(data, true);
                 });
         }
 
         function editUser(id) {
             fetch(`/admin/khachhang/${id}`)
                 .then(res => res.json())
-                .then(user => {
-                    openModal(user, false);
+                .then(data => {
+                    openModal(data, false);
                 });
         }
 
-        document.getElementById("saveCustomerBtn").addEventListener("click", () => {
-            const id = document.getElementById("customerId").value;
-            const data = {
-                name: document.getElementById("modalName").value,
-                email: document.getElementById("modalEmail").value,
-                phone: document.getElementById("modalPhone").value,
-                address: document.getElementById("modalAddress").value,
-                is_locked: document.getElementById("modalLocked").value,
-                lock_reason: document.getElementById("modalLockReason").value
-            };
+        function deleteUser(id) {
+            if (!confirm("Bạn chắc chắn muốn xóa khách hàng này?")) return;
 
-            const url = id ? `/admin/khachhang/${id}` : '/admin/khachhang';
-            const method = id ? 'PUT' : 'POST';
-
-            fetch(url, {
-                    method: method,
+            fetch(`/admin/khachhang/${id}`, {
+                    method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify(data)
+                    }
                 })
                 .then(res => res.json())
                 .then(data => {
-                    alert(data.message || "Thành công!");
+                    alert(data.message);
                     location.reload();
-                })
-                .catch(err => {
-                    alert("Lỗi khi lưu!");
-                    console.error(err);
                 });
-        });
-
-        function deleteUser(id) {
-            if (confirm("Bạn có chắc muốn xoá khách hàng này không?")) {
-                fetch(`/admin/khachhang/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert(data.message);
-                        location.reload();
-                    });
-            }
         }
     </script>
 @endsection

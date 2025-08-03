@@ -186,7 +186,6 @@
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
-<<<<<<< HEAD
                     @foreach ($donhangganday as $donhangganday)
                         <tbody>
                             <tr>
@@ -201,8 +200,7 @@
                             </tr>
                         </tbody>
                     @endforeach
-=======
-                <tbody>
+                {{-- <tbody>
     @foreach ($donhangganday as $don)
         <tr>
             <td>#DH-{{ $don->id }}</td>
@@ -215,10 +213,7 @@
             </td>
         </tr>
     @endforeach
-</tbody>
-
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
-
+</tbody> --}}
                 </table>
             </div>
 

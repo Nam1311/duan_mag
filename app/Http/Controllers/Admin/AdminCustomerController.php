@@ -3,118 +3,113 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BulkNotificationMail;
 
 class AdminCustomerController extends Controller
 {
-    // Danh sách khách hàng (role = user, không bị xóa)
+    // Hiển thị danh sách khách hàng
     public function index(Request $request)
     {
         $query = User::where('role', 'user');
 
-        // Tìm kiếm theo tên, email, id
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%")
-                  ->orWhere('id', $search);
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%')
+                  ->orWhere('id', $request->search);
             });
         }
 
-        // Lọc theo trạng thái hoạt động (is_locked)
         if ($request->has('status') && $request->status !== '') {
             $query->where('is_locked', $request->status);
         }
 
-        // Không hiển thị khách hàng đã bị xóa mềm
-        $customers = $query->orderByDesc('created_at')->paginate(10);
+        $customers = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.quanlykhachhang', compact('customers'));
     }
 
-    // Lấy thông tin chi tiết khách hàng
+    // Xem chi tiết 1 khách hàng (dùng cho modal)
     public function show($id)
     {
-        $user = User::where('role', 'user')->findOrFail($id);
+        $user = User::findOrFail($id);
         return response()->json($user);
     }
 
-    // Thêm khách hàng mới
+    // Thêm mới khách hàng
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users',
-            'phone'     => 'nullable|string|max:20',
-            'address'   => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'phone'    => 'nullable|string',
+            'address'  => 'nullable|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $validated['role'] = 'user';
+        $validated['is_active'] = 1;
+        $validated['is_locked'] = 1;
 
-        $user = new User();
-        $user->name       = $request->name;
-        $user->email      = $request->email;
-        $user->phone      = $request->phone;
-        $user->address    = $request->address;
-        $user->role       = 'user';
-        $user->is_active  = 1;
-        $user->is_locked  = 1;
-        $user->password   = bcrypt('12345678'); // Mặc định password
-        $user->save();
+        $user = User::create($validated);
 
-        return response()->json(['message' => 'Thêm khách hàng thành công!']);
+        return response()->json(['message' => 'Thêm khách hàng thành công!', 'user' => $user]);
     }
 
     // Cập nhật thông tin khách hàng
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'user')->findOrFail($id);
+        $user = User::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name'        => 'required|string|max:255',
-            'phone'       => 'nullable|string|max:20',
-            'address'     => 'nullable|string|max:255',
-            'is_locked'   => 'required|boolean',
+            'phone'       => 'nullable|string',
+            'address'     => 'nullable|string',
+            'is_locked'   => 'required|in:0,1',
             'lock_reason' => 'nullable|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $user->update($validated);
 
-        $user->name         = $request->name;
-        $user->phone        = $request->phone;
-        $user->address      = $request->address;
-        $user->is_locked    = $request->is_locked;
-        $user->lock_reason  = $request->is_locked == 0 ? $request->lock_reason : null;
-        $user->save();
-
-        return response()->json(['message' => 'Cập nhật thành công!']);
+        return response()->json(['message' => 'Cập nhật thành công!', 'user' => $user]);
     }
 
-    // Xóa mềm khách hàng
+    // Xoá khách hàng
     public function destroy($id)
     {
-        $user = User::where('role', 'user')->findOrFail($id);
-        $user->delete(); // Xóa mềm
+        $user = User::findOrFail($id);
+        $user->delete();
 
-        return response()->json(['message' => 'Xoá khách hàng thành công!']);
+        return response()->json(['message' => 'Đã xoá khách hàng.']);
     }
 
-    // Khóa / Mở khóa tài khoản
-    public function lockToggle(Request $request, $id)
+    // Đổi trạng thái khoá/mở tài khoản
+    public function lockToggle($id)
     {
-        $user = User::where('role', 'user')->findOrFail($id);
-
-        $user->is_locked = $request->is_locked;
-        $user->lock_reason = $request->is_locked == 0 ? $request->lock_reason : null;
+        $user = User::findOrFail($id);
+        $user->is_locked = !$user->is_locked;
         $user->save();
 
-        return response()->json(['message' => 'Cập nhật trạng thái hoạt động thành công!']);
+        return response()->json(['message' => 'Đã cập nhật trạng thái tài khoản.']);
+    }
+
+    // Gửi mail hàng loạt
+    public function sendBulkMail(Request $request)
+    {
+        $request->validate([
+            'ids'     => 'required|array',
+            'subject' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
+        $users = User::whereIn('id', $request->ids)->get();
+
+        foreach ($users as $user) {
+           Mail::to($user->email)->send(new BulkNotificationMail($request->subject, $request->content));
+        }
+
+        return response()->json(['message' => 'Đã gửi tin nhắn đến người dùng.']);
     }
 }

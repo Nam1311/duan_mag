@@ -108,10 +108,6 @@
                                             <i class="fab fa-google logins-google-icon logins-social-icon"></i>
                                             <span>Google</span>
                                         </a>
-                                        <a href="{{ route('login.facebook') }}" class="logins-social-btn logins-facebook" onclick="loginWithFacebook()">
-                                            <i class="fab fa-facebook-f logins-facebook-icon logins-social-icon"></i>
-                                            <span>Facebook</span>
-                                        </a>
                                     </div>
                                 </div>
 
@@ -294,11 +290,11 @@
             toggleIcon.classList.toggle('fa-eye-slash');
         }
 
-       
-      
 
 
-        
+
+
+
         // Validation helpers
         function validateEmail(email) {
             const re =

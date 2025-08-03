@@ -231,6 +231,31 @@
     grid-template-columns: 1fr;
     gap: 1rem;
 }
+.user-info-order-review-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #facc15; /* Màu vàng tươi */
+    color: #fff;
+    padding: 8px 14px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.user-info-order-review-btn i {
+    color: #fff;
+}
+
+.user-info-order-review-btn:hover {
+    background-color: #eab308; /* Vàng đậm hơn khi hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
 
 @media (min-width: 768px) {
     .ctdh-totals-grid {
