@@ -81,7 +81,7 @@
             <ul>
                 <li><a href="{{asset('/')}}">Trang chủ</a></li>
                 <li><a href="{{asset('/products')}}">Sản phẩm</a></li>
-                <li><a href="{{asset('/about')}}">Về chúng tôi</a></li>
+                <li><a href="{{asset('/about')}}">Thử đồ</a></li>
                 <li><a href="{{asset('/contact')}}">Liên hệ</a></li>
                 <li><a href="{{asset('/news')}}">Tin tức</a></li>
             </ul>

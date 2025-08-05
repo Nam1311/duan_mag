@@ -110,7 +110,9 @@
                 @foreach ($products_sale as $product )
                     <li class="item" style="background-color: white; border-radius: 7px;">
                         <div class="item-img">
-                            <span class="item-giam">-{{ $product->sale }}%</span>
+                            @if($product->sale > 0)
+                                <span class="item-giam">-{{ $product->sale }}%</span>
+                            @endif
                             <div class="item-icon" id="addToCartBtn"><i class="fa-solid fa-cart-shopping"></i></div>
                             <a href="{{ asset('/detail/' . $product->id) }}">
                                 <img src="{{ asset($product->images->first()->path ?? '/img/default.jpg') }}" alt="">
@@ -214,7 +216,10 @@
                             <div class="col l-3 m-6 c-6">
                                 <div class="item">
                                 <div class="item-img">
-                                    <span class="item-giam">-{{ $product->sale }}%</span>
+                                    @if($product->sale > 0)
+                                        <span class="item-giam">-{{ $product->sale }}%</span>
+                                    @endif
+
                                     <div class="item-icon">
                                         <i class="fa-solid fa-cart-shopping"></i>
                                     </div>
@@ -266,7 +271,9 @@
                     <div class="col l-3 m-6 c-6 ">
                         <div class="item">
                             <div class="item-img">
-                                <span class="item-giam">-{{ $products_bestseller->sale }}%</span>
+                                @if($product->sale > 0)
+                                    <span class="item-giam">-{{ $product->sale }}%</span>
+                                @endif
                                 <div class="item-icon">
                                     <i class="fa-solid fa-cart-shopping"></i>
                                 </div>
@@ -315,7 +322,9 @@
                     <div class="col l-3 m-6 c-6 ">
                         <div class="item">
                             <div class="item-img">
-                                <span class="item-giam">-{{ $products_is_featured->sale }}%</span>
+                                @if($product->sale > 0)
+                                    <span class="item-giam">-{{ $product->sale }}%</span>
+                                @endif
                                 <div class="item-icon">
                                     <i class="fa-solid fa-cart-shopping"></i>
                                 </div>
