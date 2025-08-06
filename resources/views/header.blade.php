@@ -84,80 +84,22 @@
                 <li class="nav-item">
                     <a href="{{asset('/try-on')}}">Thử đồ
                     <span class="tag-with-ai">với AI</span></a>
-                    <span id="ai-label" class="ai-label">Phòng thử đồ Online. <br> <a style="font-weight: 700; color: white" href="/try-on">Trải nghiệm ngay !</a></span>
+                    <span id="ai-label" class="ai-label">Phòng thử đồ Online.
+                        <a style="font-weight: 700; color: white" href="/try-on"> Trải nghiệm ngay !</a>
+                        <div class="icon-ai">
+                            <img src="{{ asset('/img/icon_ai.png') }}" alt="">
+                        </div>
+                    </span>
                 </li>
                 <li><a href="{{asset('/contact')}}">Liên hệ</a></li>
                 <li><a href="{{asset('/news')}}">Tin tức</a></li>
             </ul>
         </div>
        <style>
-    .nav-item {
-        position: relative;
-        display: inline-block;
-    }
-    .tag-with-ai{
-        background-color: rgb(0, 0, 0);
-        font-size: 11px;
-        font-weight: 600;
-        padding: 5px;
-        color: white
-    }
-    .ai-label {
-        position: absolute;
-        top: 30px; /* Kept from user-provided code */
-        left: 50%;
-        transform: translateX(-50%);
-        color: #ffffff; /* White text for contrast */
-        background-color: #1a1a1a; /* Dark gray-black for modern black theme */
-        padding: 8px 12px;
-        border-radius: 7px;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Slightly darker shadow for depth */
-        animation: swing 1.5s ease-in-out infinite;
-        transition: opacity 0.5s ease;
-        z-index: 1000;
-        white-space: nowrap;
-    }
 
-    /* Speech bubble tail pointing upward */
-    .ai-label::after {
-        content: '';
-        position: absolute;
-        top: -8px; /* Place tail at the top */
-        left: 50%; /* Kept from user-provided code */
-        transform: translateX(-50%);
-        border: 4px solid transparent;
-        border-bottom-color: #1a1a1a; /* Matches the dark gray-black background */
-    }
-    @keyframes swing {
-        0% {
-            transform: translateX(-50%) rotate(5deg);
-        }
-        50% {
-            transform: translateX(-50%) rotate(-5deg);
-        }
-        100% {
-            transform: translateX(-50%) rotate(5deg);
-        }
-    }
-
-    .ai-label.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const aiLabel = document.getElementById('ai-label');
-        if (aiLabel) {
-            setTimeout(() => {
-                aiLabel.classList.add('hidden');
-            }, 15000); // Hide after 10 seconds
-        }
-    });
-</script>
+
         <div class="user">
             <div class="favourite-container">
                 <a href="{{asset('/wishlist')}}"><i class="fa fa-heart" style="color: red; font-size: 26px;"></i></a>

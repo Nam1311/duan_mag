@@ -49,21 +49,20 @@
                 <img src="{{ asset('/img/sale.webp') }}" alt="">
             </div>
 
-            <div class="count-down">
-                <p id="countdown-start-label" style="color: green; display: none;">Bắt đầu sau:</p>
+             <div class="count-down">
                 <p id="countdown-label" style="color: red;">Kết thúc sau:</p>
                 <p id="flash-sale-start" style="display: none; color: green;">Flash Sale bắt đầu lúc 8h hàng ngày</p>
 
                 <div class="box-time">
-                    <div class="time time-hour" id="countdown-hour">00</div>
+                    <div class="time time-hour" id="countdown-hour">{{ $countdown['hours'] }}</div>
                     <div class="time-bottom">Giờ</div>
                 </div>
                 <div class="box-time">
-                    <div class="time time-minute" id="countdown-minute">00</div>
+                    <div class="time time-minute" id="countdown-minute">{{ $countdown['minutes'] }}</div>
                     <div class="time-bottom">Phút</div>
                 </div>
                 <div class="box-time">
-                    <div class="time time-second" id="countdown-second">00</div>
+                    <div class="time time-second" id="countdown-second">{{ $countdown['seconds'] }}</div>
                     <div class="time-bottom">Giây</div>
                 </div>
             </div>

@@ -32,20 +32,13 @@
         }
 
         .user-info-sidebar {
-<<<<<<< HEAD
-            width: 250px;
-=======
             /* width: 250px; */
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
             background: var(--user-info-white);
             border-radius: var(--user-info-border-radius);
             box-shadow: var(--user-info-box-shadow);
             border: 1px solid var(--user-info-light-gray);
             padding: 1rem;
-<<<<<<< HEAD
-=======
             height: 100%;
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
         }
 
         .user-info-sidebar ul {
@@ -266,14 +259,6 @@
             gap: 1rem;
         }
 
-<<<<<<< HEAD
-        @media (min-width: 768px) {
-            .user-info-orders-list {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
 
         .user-info-order-item {
             border: 1px solid var(--user-info-light-gray);
@@ -728,35 +713,3 @@
                 justify-content: center;
             }
         }
-<<<<<<< HEAD
-
-
-        .status-gray    { background-color: #adb5bd; color: #fff; }     /* Chờ xác nhận */
-.status-blue    { background-color: #3b82f6; color: #fff; }     /* Đã xác nhận */
-.status-orange  { background-color: #f97316; color: #fff; }     /* Đang giao hàng */
-.status-green   { background-color: #22c55e; color: #fff; }     /* Thành công */
-.status-red     { background-color: #ef4444; color: #fff; }     /* Đã hủy */
-.status-purple  { background-color: #a855f7; color: #fff; }     /* Hoàn hàng */
-.status-dark    { background-color: #334155; color: #fff; }     /* Không xác định */
-
-
-.user-info-select {
-    width: 100%;
-    padding: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-top: 8px;
-    background-color: #fff;
-    cursor: pointer;
-}
-
-.user-info-select:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-
-=======
->>>>>>> 502fab33ec1a3ef13986297172dcfab8924c3e03
