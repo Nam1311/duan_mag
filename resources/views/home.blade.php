@@ -271,8 +271,8 @@
                     <div class="col l-3 m-6 c-6 ">
                         <div class="item">
                             <div class="item-img">
-                                @if($product->sale > 0)
-                                    <span class="item-giam">-{{ $product->sale }}%</span>
+                                @if($products_bestseller->sale > 0)
+                                    <span class="item-giam">-{{ $products_bestseller->sale }}%</span>
                                 @endif
                                 <div class="item-icon">
                                     <i class="fa-solid fa-cart-shopping"></i>
@@ -322,8 +322,8 @@
                     <div class="col l-3 m-6 c-6 ">
                         <div class="item">
                             <div class="item-img">
-                                @if($product->sale > 0)
-                                    <span class="item-giam">-{{ $product->sale }}%</span>
+                                @if($products_is_featured->sale > 0)
+                                    <span class="item-giam">-{{ $products_is_featured->sale }}%</span>
                                 @endif
                                 <div class="item-icon">
                                     <i class="fa-solid fa-cart-shopping"></i>
