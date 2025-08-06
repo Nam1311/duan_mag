@@ -14,6 +14,7 @@ use App\Models\Banners;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class PageController extends Controller
 {
@@ -155,9 +156,4 @@ class PageController extends Controller
 
         ]);
     }
-
-
-
-
-
 }

@@ -5,16 +5,16 @@
         <div class="index-progress-bar"></div>
         <div class="index-slider-track-container">
             <div class="index-slider-track">
-                @foreach ($sliders as $slider)
-                    <div class="index-slide active" style="background-image: url('{{asset($slider->image)}}');">
-                        <div class="index-slide-overlay"></div>
-                        <div class="index-slide-content">
-                            <span class="season-tag"></span>
-                            <h1 class="index-slide-title">{{$slider->title}}</h1>
-                            <p class="index-slide-description">{{$slider->description}}</p>
-                            <a href="{{$slider->link}}" class="shop-btn">{{$slider->cta_text}}</a>
-                        </div>
+                @foreach ($sliders as $slider )
+                <div class="index-slide active" style="background-image: url('{{asset($slider->image)}}');">
+                    <div class="index-slide-overlay"></div>
+                    <div class="index-slide-content">
+                        <span class="season-tag"></span>
+                        <h1 class="index-slide-title">{{$slider->title}}</h1>
+                        <p class="index-slide-description">{{$slider->description}}</p>
+                        <a href="{{$slider->link}}" class="shop-btn">{{$slider->cta_text}}</a>
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
@@ -53,7 +53,7 @@
                 <p id="countdown-label" style="color: red;">Kết thúc sau:</p>
                 <p id="flash-sale-start" style="display: none; color: green;">Flash Sale bắt đầu lúc 8h hàng ngày</p>
 
-                <div class="box-time">
+                <div class="box-time ">
                     <div class="time time-hour" id="countdown-hour">{{ $countdown['hours'] }}</div>
                     <div class="time-bottom">Giờ</div>
                 </div>
@@ -106,33 +106,33 @@
                         </div>
                     </li>
                 @empty
-
-                    @foreach ($products_sale as $product)
-                        <li class="item" style="background-color: white; border-radius: 7px;">
-                            <div class="item-img">
-                                @if($product->sale > 0)
-                                    <span class="item-giam">-{{ $product->sale }}%</span>
-                                @endif
-                                <div class="item-icon" id="addToCartBtn"><i class="fa-solid fa-cart-shopping"></i></div>
-                                <a href="{{ asset('/detail/' . $product->id) }}">
-                                    <img src="{{ asset($product->images->first()->path ?? '/img/default.jpg') }}" alt="">
-                                </a>
-                                <div class="item-buy-now">
-                                    <a class="a-buy-now" href="">Mua ngay</a>
-                                </div>
-                                <div class="item-name item-name-sale">
-                                    <h3>
-                                        <a href="{{ asset('/detail/' . $product->id) }}">{{ $product->name }}</a>
-                                    </h3>
-                                </div>
-                                <div class="item-price item-price-sales">
-                                    <span style="color: red; padding-right: 10px;">
-                                        {{ number_format($product->price, 0, ',', '.') }}đ
-                                    </span>
-                                    <span><del>{{ number_format($product->original_price, 0, ',', '.') }}đ</del></span>
-                                </div>
-                        </li>
-                    @endforeach
+                @foreach ($products_sale as $product )
+                    <li class="item" style="background-color: white; border-radius: 7px;">
+                        <div class="item-img">
+                            @if($product->sale > 0)
+                                <span class="item-giam">-{{ $product->sale }}%</span>
+                            @endif
+                            <div class="item-icon" id="addToCartBtn"><i class="fa-solid fa-cart-shopping"></i></div>
+                            <a href="{{ asset('/detail/' . $product->id) }}">
+                                <img src="{{ asset($product->images->first()->path ?? '/img/default.jpg') }}" alt="">
+                            </a>
+                            <div class="item-buy-now">
+                                <a class="a-buy-now" href="">Mua ngay</a>
+                            </div>
+                        </div>
+                        <div class="item-name item-name-sale">
+                            <h3>
+                                <a href="{{ asset('/detail/' . $product->id) }}">{{ $product->name }}</a>
+                            </h3>
+                        </div>
+                        <div class="item-price item-price-sales">
+                            <span style="color: red; padding-right: 10px;">
+                                {{ number_format($product->price , 0, ',', '.') }}đ
+                            </span>
+                            <span><del>{{ number_format($product->original_price, 0, ',', '.') }}đ</del></span>
+                        </div>
+                    </li>
+                @endforeach
                 @endforelse
             </ul>
         </div>
@@ -178,7 +178,7 @@
                 @endforeach
             </ul>
         </div>
-    </section>
+     </section>
 
     {{-- ds sp mới --}}
     <section class="new-design">
@@ -187,7 +187,7 @@
                 <h2 class="section-title" style="text-align: center">Sản phẩm mới</h2>
 
             </div>
-            <div class="tab-header">
+            <div class="tab-header" >
                 {{-- load hết danh mục ra đây --}}
                 <ul class="tabs" style="justify-content: center">
 
@@ -197,68 +197,65 @@
                         </li>
                     @endforeach
                 </ul>
-                {{--
-                <hr style="max-width: 60% auto"> --}}
+                {{-- <hr style="max-width: 60% auto"> --}}
             </div>
 
             <div class="tab-content">
                 @foreach ($product_new as $index => $category)
+                <div id="tab{{ $loop->iteration }}" class="tab-item {{ $index == 0 ? 'active' : '' }}">
+                    <div class="breard" style="display: flex; justify-content:space-between; align-item: center; padding: 20px 0;">
+                        <h3 style="text-align: center;">Các thiết kế mới được M A G cập nhật liên tục và đa dạng mẫu mã</h3>
+                        <a class="see-all" href="/products?category[]={{ $category->id }}" style="color: black; text-decoration: none;">
+                            Xem tất cả <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    {{-- load dssp --}}
+                    <div class="row product-list-n-d">
+                        @forelse ($category->products as $product)
+                            <div class="col l-3 m-6 c-6">
+                                <div class="item">
+                                <div class="item-img">
+                                    @if($product->sale > 0)
+                                        <span class="item-giam">-{{ $product->sale }}%</span>
+                                    @endif
 
-                    <div id="tab{{ $loop->iteration }}" class="tab-item {{ $index == 0 ? 'active' : '' }}">
-                        <div class="breard"
-                            style="display: flex; justify-content:space-between; align-item: center; padding: 20px 0;">
-                            <h3 style="text-align: center;">Các thiết kế mới được M A G cập nhật liên tục và đa dạng mẫu mã</h3>
-                            <a class="see-all" href="/products?category[]={{ $category->id }}"
-                                style="color: black; text-decoration: none;">
-                                Xem tất cả <i class="fa fa-arrow-right" aria-hidden="true"></i>
-                            </a>
-                        </div>
-                        {{-- load dssp --}}
-                        <div class="row product-list-n-d">
-                            @forelse ($category->products as $product)
-                                <div class="col l-3 m-6 c-6">
-                                    <div class="item">
-                                        <div class="item-img">
-                                            @if($product->sale > 0)
-                                                <span class="item-giam">-{{ $product->sale }}%</span>
-                                            @endif
+                                    <div class="item-icon">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </div>
 
-                                            <div class="item-icon">
-                                                <i class="fa-solid fa-cart-shopping"></i>
-                                            </div>
-                                            <a href="{{asset('/detail/' . $product->id)}}">
-                                                <img src="{{ asset($product->images->first()->path) }}" alt="{{ $product->name }}">
-                                            </a>
-                                            <div class="item-buy-now">
-                                                <a class="a-buy-now" href="">Mua ngay</a>
-                                            </div>
-                                        </div>
-                                        <div class="item-name">
-                                            <h3>
-                                                <a href="{{asset('/detail/' . $product->id)}}">
-                                                    {{ $product->name }}
-                                                </a>
-                                            </h3>
-                                        </div>
-                                        <div class="item-price">
-                                            <span style="color: red;padding-right: 10px;">
-                                                {{ number_format($product->price, 0, ',', '.') }}đ
-                                            </span>
-                                            <span><del>{{ number_format($product->original_price, 0, ',', '.') }}đ</del></span>
-                                        </div>
+                                    <a href="{{asset('/detail/'. $product->id)}}">
+                                        <img src="{{ asset($product->images->first()->path) }}" alt="{{ $product->name }}">
+                                    </a>
+                                    <div class="item-buy-now ">
+                                        <a class="a-buy-now" href="">Mua ngay</a>
                                     </div>
                                 </div>
-                            @empty
-                                <p style="padding: 10px;">Chưa có sản phẩm</p>
-                            @endforelse
-                        </div>
+                                <div class="item-name">
+                                    <h3>
+                                        <a href="{{asset('/detail/'. $product->id)}}">
+                                            {{ $product->name }}
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="item-price">
+                                    <span style="color: red;padding-right: 10px;">
+                                        {{ number_format($product->price , 0, ',', '.') }}đ
+                                    </span>
+                                    <span><del>{{ number_format($product->original_price, 0, ',', '.') }}đ</del></span>
+                                </div>
+                            </div>
+                            </div>
+                        @empty
+                            <p style="padding: 10px;">Chưa có sản phẩm</p>
+                        @endforelse
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
     </section>
 
-    <!-- san pham bán chạy -->
+     <!-- san pham bán chạy -->
     <section class="product-new">
         <div style="padding: 0px 7px">
             <h2 class="section-title">Sản phẩm bán chạy</h2>
@@ -297,7 +294,7 @@
                             </div>
                             <div class="item-price">
                                 <span style="color: red;padding-right: 10px;">
-                                    {{ number_format($products_bestseller->price, 0, ',', '.') }}đ
+                                    {{ number_format($products_bestseller->price , 0, ',', '.') }}đ
                                 </span>
                                 <span><del>{{ number_format($products_bestseller->original_price, 0, ',', '.') }}đ</del></span>
                             </div>
@@ -335,8 +332,7 @@
                                     <img src="{{ asset($products_is_featured->images->first()->path) }}"
                                         alt="{{ $products_is_featured->name }}">
                                 </a>
-                                <span class="item-view" style="">{{$products_is_featured->views}} <i class="fa fa-eye"
-                                        aria-hidden="true"></i></span>
+                                <span class="item-view" style="">{{$products_is_featured->views}} <i class="fa fa-eye" aria-hidden="true"></i></span>
                                 <div class="item-buy-now">
                                     <a class="a-buy-now" href="">Mua ngay</a>
                                 </div>
@@ -350,7 +346,7 @@
                             </div>
                             <div class="item-price">
                                 <span style="color: red;padding-right: 10px;">
-                                    {{ number_format($products_is_featured->price, 0, ',', '.') }}đ
+                                    {{ number_format($products_is_featured->price , 0, ',', '.') }}đ
                                 </span>
                                 <span><del>{{ number_format($products_is_featured->original_price, 0, ',', '.') }}đ</del></span>
                             </div>
@@ -401,8 +397,7 @@
                             <h2 class="text">Tận hưởng ưu đãi mua sắm hằng ngày</h2>
 
                             <div style="display: flex; align-item:center; justify-content: center; gap: 10px  ">
-                                <input class="input-email" style="width: 300px; height: 41px; padding: 10px; border: none;"
-                                    type="text" placeholder="Nhập email nhận ưu đãi ">
+                                <input class="input-email" style="width: 300px; height: 41px; padding: 10px; border: none;" type="text" placeholder="Nhập email nhận ưu đãi ">
                                 <button class="btn-log">Gửi</button>
                             </div>
 
@@ -447,28 +442,30 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const cartIcons = document.querySelectorAll('.item-icon');
+            const cartIcons = document.querySelectorAll('.item-buy-now');
+
             cartIcons.forEach(icon => {
                 icon.addEventListener('click', (e) => {
                     e.preventDefault();
 
                     const productLink = icon.closest('.item').querySelector('a');
-                    const href = productLink.getAttribute('href');
-                    const productId = href.split('/').pop();
+                    if (!productLink) return;
 
-                    addToCart(productId);
+                    const href = productLink.getAttribute('href');
+                    const productId = href.split('/').pop(); // e.g. /detail/10 => 10
+
+                    BuyInHome(productId);
                 });
             });
         });
 
-        function addToCart(productId) {
+        // mua ở trang chủ
+        function BuyInHome(productId) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch('/cart/add', {
+            fetch('/cart/add/home', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -481,66 +478,71 @@
                     product_id: productId
                 })
             })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Đã xảy ra lỗi');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect; // chuyển tới thanh toán nếu thành công
+                } else {
+                    alert(data.message || 'Thêm sản phẩm thành công');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert(error.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+            });
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lấy tất cả các biểu tượng giỏ hàng
+            const cartIcons = document.querySelectorAll('.item-icon');
+            cartIcons.forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.preventDefault(); // Ngăn hành vi mặc định nếu có
+
+                    // Lấy ID sản phẩm từ liên kết chi tiết sản phẩm
+                    const productLink = icon.closest('.item').querySelector('a');
+                    const href = productLink.getAttribute('href');
+                    const productId = href.split('/').pop(); // Lấy ID từ URL (ví dụ: /detail/1 -> 1)
+
+                    // Gửi yêu cầu thêm vào giỏ hàng
+                    addToCart(productId);
+                });
+            });
+        });
+
+        function addToCart(productId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Vì trang chủ không có lựa chọn biến thể, giả định số lượng là 1 và biến thể mặc định
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    product_variant_id: null, // Sẽ xử lý ở backend
+                    quantity: 1,
+                    product_id: productId // Thêm product_id để backend xử lý
+                })
+            })
                 .then(response => response.json())
                 .then(data => {
-                    // alert(data.message);
-                    const toast = Toastify({
-                        text: `
-                                <div class="toastify-content">
-                                    <div class="toast-icon">✓</div>
-                                    <div class="toast-message">${data.message}</div>
-                                    <button class="toast-close">×</button>
-                                </div>
-                            `,
-                        duration: 3000,
-                        close: false,
-                        gravity: "top",
-                        position: "right",
-                        // stopOnFocus: true,
-                        className: "custom-toast success",
-                        escapeMarkup: false
-                    });
-
-                    toast.showToast();
-
-                    // Đợi DOM render xong mới gán sự kiện
-                    setTimeout(() => {
-                        const toastElement = document.querySelector('.custom-toast');
-                        const closeBtn = toastElement?.querySelector('.toast-close');
-
-                        if (closeBtn) {
-                            closeBtn.addEventListener('click', function () {
-                                // Áp dụng hiệu ứng fade-out
-                                toastElement.style.animation = 'fade-out 0.4s forwards';
-
-                                // Xoá khỏi DOM sau khi animation kết thúc
-                                toastElement.addEventListener('animationend', function () {
-                                    toastElement.remove();
-                                });
-                            });
-                        }
-                    }, 10); // Chờ DOM khởi tạo xong
-
-                    // Gọi hàm cập nhật số lượng giỏ hàng
-                    updateCartCount();
+                    alert(data.message); // Hiển thị thông báo từ server
                 })
                 .catch(error => {
                     console.error('Lỗi:', error);
                     alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
-                });
-        }
-
-        function updateCartCount() {
-            fetch('/cart/count')
-                .then(response => response.json())
-                .then(data => {
-                    const cartBadge = document.querySelector('.cart-badge');
-                    if (cartBadge) {
-                        cartBadge.textContent = data.count;
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi lấy số lượng giỏ hàng:', error);
                 });
         }
     </script>

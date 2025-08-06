@@ -303,6 +303,112 @@
     <script src="{{asset('main.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/js/lightslider.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartIcons = document.querySelectorAll('.item-buy-now');
+
+        cartIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                const productLink = icon.closest('.item').querySelector('a');
+                if (!productLink) return;
+
+                const href = productLink.getAttribute('href');
+                const productId = href.split('/').pop(); // e.g. /detail/10 => 10
+
+                BuyInHome(productId);
+            });
+        });
+    });
+
+    // mua ở trang chủ
+    function BuyInHome(productId) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/cart/add/home', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                product_variant_id: null,
+                quantity: 1,
+                product_id: productId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Đã xảy ra lỗi');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.redirect) {
+                window.location.href = data.redirect; // chuyển tới thanh toán nếu thành công
+            } else {
+                alert(data.message || 'Thêm sản phẩm thành công');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            alert(error.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy tất cả các biểu tượng giỏ hàng
+        const cartIcons = document.querySelectorAll('.item-icon');
+        cartIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.preventDefault(); // Ngăn hành vi mặc định nếu có
+
+                // Lấy ID sản phẩm từ liên kết chi tiết sản phẩm
+                const productLink = icon.closest('.item').querySelector('a');
+                const href = productLink.getAttribute('href');
+                const productId = href.split('/').pop(); // Lấy ID từ URL (ví dụ: /detail/1 -> 1)
+
+                // Gửi yêu cầu thêm vào giỏ hàng
+                addToCart(productId);
+            });
+        });
+    });
+
+    function addToCart(productId) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // Vì trang chủ không có lựa chọn biến thể, giả định số lượng là 1 và biến thể mặc định
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                product_variant_id: null, // Sẽ xử lý ở backend
+                quantity: 1,
+                product_id: productId // Thêm product_id để backend xử lý
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Hiển thị thông báo từ server
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+            });
+    }
+</script>
+<script src="{{ asset('/js/detail.js') }}"></script>
 <script>
     // Xử lý sắp xếp sản phẩm
     const sortButton = document.getElementById('sortButton');

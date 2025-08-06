@@ -160,6 +160,10 @@ Route::get('/get-variant-quantity', [PageController::class, 'getVariantQuantity'
 
 // cart
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+// mua ở trang chủ
+Route::post('/cart/add/home', [CartController::class, 'BuyInHome']);
+
+
 Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
 // lưu session
 Route::post('/cart/session-add', [CartController::class, 'storeSessionCart']);
@@ -405,5 +409,4 @@ Route::post('/admin/reports/filter', [AdminBaocaoController::class, 'filter'])->
 Route::post('/admin/send-bulk-mail', [AdminCustomerController::class, 'sendBulkMail']);
 Route::get('/review/{order}', [ReviewController::class, 'create'])->name('review.form');
 Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review.store');
-
 

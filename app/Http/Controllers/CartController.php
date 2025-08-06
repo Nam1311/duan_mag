@@ -166,6 +166,91 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Thêm vào giỏ hàng thành công']);
     }
+
+    // mua ở trang chủ
+    public function BuyInHome(Request $request)
+    {
+        $validated = $request->validate([
+            'product_variant_id' => 'nullable|integer|exists:product_variants,id',
+            'quantity' => 'required|integer|min:1',
+            'product_id' => 'nullable|integer|exists:products,id',
+        ]);
+
+        $productVariantId = $validated['product_variant_id'];
+
+        // Nếu không có product_variant_id, lấy biến thể đầu tiên theo product_id
+        if (!$productVariantId) {
+            $productId = $validated['product_id'];
+            $variant = product_variants::where('product_id', $productId)
+                ->where('quantity', '>', 0) // chỉ lấy biến thể còn hàng
+                ->orderBy('id') // ưu tiên biến thể đầu tiên còn hàng
+                ->first();
+
+            if (!$variant) {
+                return response()->json([
+                    'message' => 'Sản phẩm này hiện không còn biến thể nào còn hàng'
+                ], 422);
+            }
+
+            $productVariantId = $variant->id;
+        } else {
+            $variant = product_variants::find($productVariantId);
+        }
+
+        $variant = product_variants::find($productVariantId);
+        if (!$variant || $variant->quantity < 1) {
+            return response()->json([
+                'message' => 'Sản phẩm đã hết hàng'
+            ], 422);
+        }
+
+        $quantity = $validated['quantity'];
+
+        if (Auth::check()) {
+            $userId = Auth::id();
+
+            // Đồng bộ giỏ hàng từ session vào DB nếu có
+            $sessionCart = collect(Session::get('cart', []))
+                ->filter(fn($i) => !empty($i['product_variant_id']))
+                ->all();
+            foreach ($sessionCart as $item) {
+                $this->upsertCartItem($userId, $item['product_variant_id'], $item['quantity']);
+            }
+            Session::forget('cart');
+
+            $this->upsertCartItem($userId, $productVariantId, $quantity);
+        } else {
+            // Ghi lại vào session
+            $cart = Session::get('cart', []);
+            $exists = false;
+
+            foreach ($cart as &$item) {
+                if ($item['product_variant_id'] == $productVariantId) {
+                    $item['quantity'] += $quantity;
+                    $exists = true;
+                    break;
+                }
+            }
+
+            if (!$exists) {
+                $cart[] = [
+                    'product_variant_id' => $productVariantId,
+                    'quantity' => $quantity
+                ];
+            }
+
+            Session::put('cart', $cart);
+        }
+
+        // Lưu dữ liệu thanh toán session
+        $this->createDirectCheckoutData($variant, $quantity);
+
+        return response()->json([
+            'redirect' => route('payment.show')
+        ]);
+    }
+
+
     private function upsertCartItem(int $userId, ?int $productVariantId, int $quantity): void
     {
         $cartItem = Cart::firstOrNew([

@@ -46,11 +46,7 @@
 <body>
 
     @include('header')
-    <a href="{{route('tryon.form')}}">
-        <div class="avatar2" id="avatar2">
-            <i class="fas fa-robot"></i>
-        </div>
-    </a>
+
     <div class="avatar" id="avatar">
         <i class="fas fa-robot"></i>
     </div>
@@ -83,7 +79,7 @@
             if (aiLabel) {
                 setTimeout(() => {
                     aiLabel.classList.add('hidden');
-                }, 15000); // Hide after 10 seconds
+                }, 5000); // Hide after 10 seconds
             }
         });
     </script>
@@ -237,9 +233,12 @@
             const secondEl = document.getElementById('countdown-second');
             const flashSaleStart = document.getElementById('flash-sale-start');
             const countdownLabel = document.getElementById('countdown-label');
-            const boxTime = document.getElementById('box-times');
+            const boxTimes = document.querySelectorAll('.box-time');
 
-
+            // Nếu thiếu phần tử → dừng
+            if (!hourEl || !minuteEl || !secondEl || !flashSaleStart || !countdownLabel || boxTimes.length === 0) {
+                return;
+            }
 
             let hours = parseInt(hourEl.textContent);
             let minutes = parseInt(minuteEl.textContent);
@@ -261,7 +260,7 @@
                         // Hết giờ: hiện thông báo Flash Sale bắt đầu
                         flashSaleStart.style.display = 'block';
                         countdownLabel.style.display = 'none';
-                        boxTime.style.display = "none";
+                        // boxTimes.forEach(box => box.style.display = 'none');
                         return;
                     }
                 }
