@@ -12,6 +12,7 @@ class Bill extends Mailable
     use Queueable, SerializesModels;
 
     public Order $order;
+    public float $productsTotal;
 
     /**
      * Create a new message instance.
@@ -19,6 +20,7 @@ class Bill extends Mailable
     public function __construct(Order $order)
     {
         $this->order = $order;
+        $this->productsTotal = $order->total_price - 40000 + ($order->voucherDiscount ?? 0);
     }
 
     /**
@@ -26,12 +28,17 @@ class Bill extends Mailable
      */
     public function build()
     {
+        $publicUrl = route('orders.public.show', $this->order->order_code);
+
         return $this
-            ->subject("Hóa đơn đơn hàng #{$this->order->id}")
+            ->subject("Hóa đơn đơn hàng #{$this->order->order_code}")
             ->markdown('emails.bill')
             ->with([
                 'order' => $this->order,
                 'details' => $this->order->orderDetails,
+                'productsTotal' => $this->productsTotal,
+                'publicUrl' => $publicUrl
+
             ]);
     }
 }

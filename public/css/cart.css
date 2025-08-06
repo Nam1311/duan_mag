@@ -14,7 +14,17 @@
      color: var(--gh-cart-text);
      line-height: 1.6;
  }
+.gh-cart-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Điều chỉnh theo thiết kế của bạn */
+    gap: 20px;
+}
 
+
+.gh-cart-item {
+    margin-bottom: 10px; /* Tạo khoảng cách giữa các sản phẩm */
+    order: initial !important; /* Đảm bảo không thay đổi thứ tự */
+}
  .gh-cart-container {
      width: 90%;
      max-width: 1400px;
@@ -34,8 +44,9 @@
  .gh-cart-items-container {
      background: var(--gh-cart-white);
      border-radius: var(--gh-cart-border-radius);
-     padding: 30px;
+     /* padding: 30px; */
      box-shadow: var(--gh-cart-shadow);
+     display: block; /* Sử dụng block thay vì grid để giữ thứ tự tự nhiên */
  }
 
  .gh-cart-items-header {
@@ -105,7 +116,7 @@
  }
 
 
- 
+
 
 
 
@@ -179,7 +190,7 @@
  .gh-cart-summary {
      background: var(--gh-cart-white);
      border-radius: var(--gh-cart-border-radius);
-     padding: 30px;
+     /* padding: 30px; */
      box-shadow: var(--gh-cart-shadow);
      height: fit-content;
      position: sticky;
@@ -378,179 +389,232 @@
      transform: translateY(-3px);
      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
  }
-/* Giỏ hàng rỗng */
-.cart-items {
-            padding: 60px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: #fcfcfc;
-        }
 
-        .empty-cart-icon {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+ /* Giỏ hàng rỗng */
+ .cart-items {
+     padding: 60px 40px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+     background: #fcfcfc;
+ }
 
-        .cart-icon-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #f5f5f5;
-            opacity: 0.8;
-            animation: pulse 3s ease-in-out infinite;
-        }
+ .empty-cart-icon {
+     position: relative;
+     width: 100px;
+     height: 100px;
+     margin-bottom: 40px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+ }
 
-        .cart-icon {
-            font-size: 90px;
-            color: #333;
-            position: relative;
-            z-index: 2;
-            animation: float 4s ease-in-out infinite;
-        }
+ .cart-icon-bg {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     border-radius: 50%;
+     background: #f5f5f5;
+     opacity: 0.8;
+     animation: pulse 3s ease-in-out infinite;
+ }
 
-        .cart-title {
-            font-size: 36px;
-            font-weight: 700;
-            color: #222;
-            margin-bottom: 20px;
-            letter-spacing: -0.5px;
-        }
+ .cart-icon {
+     font-size: 90px;
+     color: #333;
+     position: relative;
+     z-index: 2;
+     animation: float 4s ease-in-out infinite;
+ }
 
-        .cart-message {
-            font-size: 18px;
-            color: #666;
-            max-width: 500px;
-            margin-bottom: 40px;
-            line-height: 1.7;
-        }
+ .cart-title {
+     font-size: 36px;
+     font-weight: 700;
+     color: #222;
+     margin-bottom: 20px;
+     letter-spacing: -0.5px;
+ }
 
-        .continue-btn {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 18px 50px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
+ .cart-message {
+     font-size: 18px;
+     color: #666;
+     max-width: 500px;
+     margin-bottom: 40px;
+     line-height: 1.7;
+ }
 
-        .continue-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 100%;
-            background: #333;
-            transition: width 0.5s ease;
-            z-index: -1;
-        }
+ .continue-btn {
+     background: #000;
+     color: white;
+     border: none;
+     padding: 18px 50px;
+     font-size: 18px;
+     font-weight: 600;
+     border-radius: 50px;
+     cursor: pointer;
+     transition: all 0.4s ease;
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     position: relative;
+     overflow: hidden;
+     z-index: 1;
+     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+ }
 
-        .continue-btn:hover::before {
-            width: 100%;
-        }
+ .continue-btn::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 0;
+     height: 100%;
+     background: #333;
+     transition: width 0.5s ease;
+     z-index: -1;
+ }
 
-        .continue-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-        }
+ .continue-btn:hover::before {
+     width: 100%;
+ }
 
-        .continue-btn:active {
-            transform: translateY(0);
-        }
+ .continue-btn:hover {
+     transform: translateY(-4px);
+     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+ }
 
-        .decoration-elements {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
+ .continue-btn:active {
+     transform: translateY(0);
+ }
 
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid #f0f0f0;
-        }
+ .decoration-elements {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     pointer-events: none;
+     z-index: 0;
+ }
 
-        .circle-1 {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 10%;
-            animation: float 8s ease-in-out infinite;
-        }
+ .circle {
+     position: absolute;
+     border-radius: 50%;
+     border: 1px solid #f0f0f0;
+ }
 
-        .circle-2 {
-            width: 50px;
-            height: 50px;
-            bottom: 30%;
-            right: 15%;
-            animation: float 6s ease-in-out infinite reverse;
-        }
+ .circle-1 {
+     width: 80px;
+     height: 80px;
+     top: 20%;
+     left: 10%;
+     animation: float 8s ease-in-out infinite;
+ }
 
-        .circle-3 {
-            width: 30px;
-            height: 30px;
-            top: 40%;
-            right: 20%;
-            animation: float 5s ease-in-out infinite;
-        }
+ .circle-2 {
+     width: 50px;
+     height: 50px;
+     bottom: 30%;
+     right: 15%;
+     animation: float 6s ease-in-out infinite reverse;
+ }
 
-        .dashed-line {
-            position: absolute;
-            width: 120px;
-            height: 1px;
-            border-top: 1px dashed #ddd;
-            transform: rotate(45deg);
-            top: 30%;
-            right: 25%;
-        }
+ .circle-3 {
+     width: 30px;
+     height: 30px;
+     top: 40%;
+     right: 20%;
+     animation: float 5s ease-in-out infinite;
+ }
 
-     @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
+ .dashed-line {
+     position: absolute;
+     width: 120px;
+     height: 1px;
+     border-top: 1px dashed #ddd;
+     transform: rotate(45deg);
+     top: 30%;
+     right: 25%;
+ }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.7;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.9;
-            }
-            100% {
-                transform: scale(0.95);
-                opacity: 0.7;
-            }
-        }
+ .gh-cart-select {
+     padding: 8px 12px;
+     border: 1px solid #ccc;
+     border-radius: 4px;
+     background-color: #fff;
+     font-size: 14px;
+     color: #333;
+     cursor: pointer;
+     transition: border-color 0.3s ease;
+     -webkit-appearance: none;
+     -moz-appearance: none;
+     appearance: none;
+     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="5"><path d="M0 0l5 5 5-5z" fill="%23333"/></svg>');
+     background-repeat: no-repeat;
+     background-position: right 10px center;
+     padding-right: 30px;
+     min-width: 100px;
+     /* Đảm bảo ô chọn không quá hẹp */
+ }
+
+ .gh-cart-select:hover {
+     border-color: #888;
+ }
+
+ .gh-cart-select:focus {
+     outline: none;
+     border-color: #007bff;
+     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+ }
+
+ .gh-cart-select option {
+     background-color: #fff;
+     color: #333;
+ }
+
+ .gh-cart-select option:checked {
+     background-color: #007bff;
+     color: #fff;
+ }
+
+ /* Sắp xếp form nếu cần */
+ form {
+     display: flex;
+     gap: 10px;
+     align-items: center;
+ }
+
+ @keyframes float {
+     0% {
+         transform: translateY(0px);
+     }
+
+     50% {
+         transform: translateY(-15px);
+     }
+
+     100% {
+         transform: translateY(0px);
+     }
+ }
+
+ @keyframes pulse {
+     0% {
+         transform: scale(0.95);
+         opacity: 0.7;
+     }
+
+     50% {
+         transform: scale(1.05);
+         opacity: 0.9;
+     }
+
+     100% {
+         transform: scale(0.95);
+         opacity: 0.7;
+     }
+ }
+
  /* Responsive */
  @media (max-width: 1200px) {
      .gh-cart-container {

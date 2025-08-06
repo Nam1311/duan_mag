@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\NewAdminController;
 
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\LoginController;
@@ -165,17 +166,19 @@ Route::post('/cart/session-add', [CartController::class, 'storeSessionCart']);
 // voucher
 Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
 // xóa và tăng số lượng
-Route::get('/cart/remove/{variantId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::delete('/cart/remove/{variantId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::put('/cart/update/{variantId}', [CartController::class, 'updateQuantity'])->name('cart.update');
-
+// Đếm số lượng sản phẩm trong giỏ hàng
+Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 // update variant
-
+Route::put('/cart/update-variant/{variantId}', [CartController::class, 'updateVariant'])->name('cart.updateVariant');
 // thanh toán
 Route::post('/checkout-direct', [CartController::class, 'checkoutDirect'])->name('checkout.direct');
 Route::get('/payment', [CartController::class, 'proceedToCheckout'])->name('payment.add');
 Route::get('/showpayment', [PaymentController::class, 'showPayment'])->name('payment.show');
 Route::post('/paymentstore', [PaymentController::class, 'paymentStore'])->name('payment.store');
 Route::get('/payment/result', [PaymentController::class, 'result'])->name('payment.result');
+Route::get('/order/{order_code}', [OrderController::class, 'showPublic'])->name('orders.public.show');
 // momo payment
 // Route::get('/payment/momo/return', [PaymentController::class, 'momoReturn'])->name('payment.momo.return');
 // Route::post('/payment/momo/ipn', [PaymentController::class, 'momoIPN'])->name('payment.momo.ipn');

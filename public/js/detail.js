@@ -131,7 +131,46 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
             .then(res => res.json())
-            .then(resp => alert(resp.message))
+            .then(resp => {
+                const toast = Toastify({
+                    text: `
+                    <div class="toastify-content">
+                        <div class="toast-icon">✓</div>
+                        <div class="toast-message">${resp.message}</div>
+                        <button class="toast-close">×</button>
+                    </div>
+                `,
+                    duration: 3000,
+                    close: false,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    className: "custom-toast success",
+                    escapeMarkup: false
+                });
+
+                toast.showToast();
+
+                // Đợi DOM render xong mới gán sự kiện
+                setTimeout(() => {
+                    const toastElement = document.querySelector('.custom-toast');
+                    const closeBtn = toastElement?.querySelector('.toast-close');
+
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', function () {
+                            // Áp dụng hiệu ứng fade-out
+                            toastElement.style.animation = 'fade-out 0.4s forwards';
+
+                            // Xoá khỏi DOM sau khi animation kết thúc
+                            toastElement.addEventListener('animationend', function () {
+                                toastElement.remove();
+                            });
+                        });
+                    }
+                }, 10); // Chờ DOM khởi tạo xong
+                updateCartCount();
+
+            })
             .catch(err => { console.error(err); alert('Lỗi khi thêm giỏ hàng'); });
 
     });
@@ -150,11 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Vui lòng chọn màu và kích thước trước khi thanh toán.');
             return;
         }
-        
+
         const quantity = parseInt(document.getElementById('quantity').value, 10) || 1;
         const productId = document.getElementById('product-id').value;
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
+
         // Gửi yêu cầu kiểm tra và thanh toán
         fetch('/checkout-direct', {
             method: 'POST',
@@ -168,18 +207,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 product_id: productId
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            } else if (data.error) {
-                alert(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Đã xảy ra lỗi khi xử lý thanh toán');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    const toast = Toastify({
+                        text: `
+        <div class="toastify-content">
+            <div class="toast-icon">✓</div>
+            <div class="toast-message">${data.error}</div>
+            <button class="toast-close">×</button>
+        </div>
+    `,
+                        duration: 3000,
+                        close: false,
+                        gravity: "top",
+                        position: "right",
+                        // stopOnFocus: true,
+                        className: "custom-toast success",
+                        escapeMarkup: false
+                    });
+
+                    toast.showToast();
+
+                    // Đợi DOM render xong mới gán sự kiện
+                    setTimeout(() => {
+                        const toastElement = document.querySelector('.custom-toast');
+                        const closeBtn = toastElement?.querySelector('.toast-close');
+
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', function () {
+                                // Áp dụng hiệu ứng fade-out
+                                toastElement.style.animation = 'fade-out 0.4s forwards';
+
+                                // Xoá khỏi DOM sau khi animation kết thúc
+                                toastElement.addEventListener('animationend', function () {
+                                    toastElement.remove();
+                                });
+                            });
+                        }
+                    }, 10); // Chờ DOM khởi tạo xong
+
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi xử lý thanh toán');
+            });
     });
     // document.getElementById('btnAddCheckout').addEventListener('click', () => {
 
