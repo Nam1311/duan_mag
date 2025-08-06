@@ -1,510 +1,442 @@
-      :root {
-        --primary-color: #4f46e5;
-        --secondary-color: #f9fafb;
-        --success-color: #22c55e;
-        --danger-color: #ef4444;
-        --light-color: #ffffff;
-        --border-color: #e5e7eb;
-        --text-color: #374151;
-        --text-muted: #6b7280;
-        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Inter", sans-serif;
-      }
-
-      body {
-        background-color: var(--secondary-color);
-        color: var(--text-color);
-      }
-
-      .areports-container {
-        display: flex;
-        min-height: 100vh;
-      }
-
-      .areports-sidebar {
-        width: 280px;
-        background-color: var(--light-color);
-        padding: 1rem 0;
-        box-shadow: var(--shadow-sm);
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        transition: width 0.3s ease;
-      }
-
-      .areports-sidebar-header {
-        padding: 0 1rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 1rem;
-      }
-
-      .areports-sidebar-header h2 {
-        color: var(--primary-color);
-        font-size: 1.25rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .areports-sidebar-header h2 i {
-        font-size: 1.5rem;
-      }
-
-      .areports-sidebar-section {
-        margin-bottom: 1.5rem;
-        padding: 0 1rem;
-      }
-
-      .areports-sidebar-section h3 {
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-      }
-
-      .areports-sidebar-item {
-        padding: 0.5rem 0.75rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.15rem;
-        transition: all 0.2s ease;
-        color: var(--text-color);
-        text-decoration: none;
-        font-weight: 500;
-      }
-
-      .areports-sidebar-item i {
-        width: 1.5rem;
-        text-align: center;
-        font-size: 1rem;
-      }
-
-      .areports-sidebar-item:hover {
-        background-color: var(--secondary-color);
-        color: var(--primary-color);
-        transform: translateX(0.25rem);
-      }
-
-      .areports-sidebar-item.areports-active {
-        background-color: rgba(79, 70, 229, 0.1);
-        color: var(--primary-color);
-        font-weight: 600;
-      }
-
-      .areports-main-content {
-        flex: 1;
-        padding: 1.5rem;
-        background-color: var(--secondary-color);
-      }
-
-      .areports-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-
-      .areports-search-bar {
-        display: flex;
-        align-items: center;
-        background-color: var(--light-color);
-        border-radius: 0.5rem;
-        padding: 0.5rem 1rem;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: var(--shadow-sm);
-        transition: all 0.2s ease;
-      }
-
-      .areports-search-bar:hover {
-        box-shadow: var(--shadow-md);
-      }
-
-      .areports-search-bar input {
-        border: none;
-        outline: none;
-        flex: 1;
-        padding: 0.5rem;
-        font-size: 0.9rem;
-        background: transparent;
-      }
-
-      .areports-search-bar i {
-        color: var(--text-muted);
-        margin-right: 0.5rem;
-      }
-
-      .areports-user-profile {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .areports-notification-bell {
-        position: relative;
-        font-size: 1.25rem;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: color 0.2s ease;
-      }
-
-      .areports-notification-bell:hover {
-        color: var(--primary-color);
-      }
-
-      .areports-profile-avatar {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-      }
-
-      .areports-page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-color);
-        margin-bottom: 0.5rem;
-      }
-
-      .areports-page-subtitle {
-        color: var(--primary-color);
-        font-size: 1rem;
-        font-style: italic;
-        margin-bottom: 1.5rem;
-      }
-
-      .areports-chart-card {
-        background-color: var(--light-color);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1rem;
-      }
-
-      .areports-chart-container {
-        height: 300px;
-        position: relative;
-      }
-
-      .areports-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .areports-summary-card {
-        background-color: var(--light-color);
-        border-radius: 0.5rem;
-        padding: 0.75rem;
-        box-shadow: var(--shadow-sm);
-        text-align: center;
-      }
-
-      .areports-summary-card h4 {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .areports-summary-card p {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-color);
-      }
-
-      .areports-filter-container {
-        display: flex;
-        gap: 0.75rem; /* Giảm từ 1rem */
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-        align-items: flex-end; /* Căn chỉnh nút với trường nhập */
-        background-color: var(--light-color); /* Thêm nền nhẹ */
-        padding: 0.75rem; /* Thêm padding */
-        border-radius: 0.5rem;
-        box-shadow: var(--shadow-sm);
-      }
-
-      .areports-filter-group {
-        display: flex;
-        flex-direction: column;
-        min-width: 150px; /* Đảm bảo kích thước tối thiểu */
-      }
-
-      .areports-filter-group label {
-        font-size: 0.9rem; /* Tăng từ 0.85rem */
-        font-weight: 600; /* Tăng độ đậm */
-        color: var(--text-color); /* Đổi màu cho rõ ràng */
-        margin-bottom: 0.3rem; /* Giảm từ 0.25rem */
-      }
-
-      .areports-filter-group input,
-      .areports-filter-group select {
-        padding: 0.4rem; /* Giảm từ 0.5rem */
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        background-color: var(--secondary-color); /* Nền nhẹ */
-      }
-
-      .areports-filter-group input:hover,
-      .areports-filter-group select:hover {
-        border-color: var(--primary-color);
-      }
-
-      .areports-filter-group input:focus,
-      .areports-filter-group select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-        background-color: var(--light-color); /* Đổi nền khi focus */
-      }
-
-      .areports-btn {
-        padding: 0.6rem 1.2rem; /* Tăng từ 0.5rem 1rem */
-        border-radius: 0.375rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        cursor: pointer;
-        border: none;
-        transition: all 0.2s ease;
-      }
-
-      .areports-btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-      }
-
-      .areports-btn-primary:hover {
-        background-color: #4338ca;
-        transform: scale(1.05); /* Thêm hiệu ứng phóng to */
-      }
-
-      .areports-report-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 1.5rem;
-        background: var(--light-color);
-        box-shadow: var(--shadow-sm);
-        border-radius: 0.5rem;
-        overflow: hidden;
-      }
-
-      .areports-report-table th,
-      .areports-report-table td {
-        padding: 0.75rem;
-        text-align: left;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .areports-report-table th {
-        background: var(--secondary-color);
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-      }
-
-      .areports-report-table td {
-        font-size: 0.9rem;
-      }
-
-      .areports-report-table tr {
-        display: none;
-      }
-
-      .areports-report-table tr.visible {
-        display: table-row;
-      }
-
-      .areports-report-table tr:hover {
-        background: rgba(79, 70, 229, 0.05);
-      }
-
-      .areports-pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 0.75rem;
-      }
-
-      .areports-pagination-btn {
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        background: var(--light-color);
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .areports-pagination-btn:hover {
-        background: var(--primary-color);
-        color: white;
-      }
-
-      .areports-pagination-btn.active {
-        background: var(--primary-color);
-        color: white;
-        font-weight: 600;
-      }
-
-      /* Modal Styles */
-      .areports-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .areports-modal-content {
-        background-color: var(--light-color);
-        padding: 1.5rem;
-        border-radius: 0.75rem;
-        width: 100%;
-        max-width: 500px;
-        box-shadow: var(--shadow-md);
-      }
-
-      .areports-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-
-      .areports-modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-color);
-      }
-
-      .areports-modal-close {
-        cursor: pointer;
-        font-size: 1.25rem;
-        color: var(--text-muted);
-      }
-
-      .areports-modal-close:hover {
-        color: var(--primary-color);
-      }
-
-      .areports-modal-form-group {
-        margin-bottom: 0.75rem;
-      }
-
-      .areports-modal-form-group label {
-        display: block;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-bottom: 0.5rem;
-      }
-
-      .areports-modal-form-group input,
-      .areports-modal-form-group select {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        font-size: 0.9rem;
-        outline: none;
-      }
-
-      .areports-modal-form-group input:focus,
-      .areports-modal-form-group select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-      }
-
-      @media (max-width: 1024px) {
-        .areports-sidebar {
-          width: 80px;
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #f9fafb;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --light-color: #ffffff;
+            --border-color: #e5e7eb;
+            --text-color: #374151;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
 
-        .areports-sidebar-header h2 span,
-        .areports-sidebar-item span,
-        .areports-sidebar-section h3 {
-          display: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
-        .areports-sidebar-item {
-          justify-content: center;
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
         }
 
-        .areports-chart-container {
-          height: 250px;
-        }
-      }
-
-      @media (max-width: 768px) {
         .areports-container {
-          flex-direction: column;
+            display: flex;
+            min-height: 100vh;
         }
 
-        .areports-sidebar {
-          width: 100%;
-          height: auto;
-          position: relative;
+        .adbl-sidebar {
+            width: 280px;
+            background-color: var(--light-color);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .adbl-sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .adbl-sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--text-muted);
+            border-radius: 4px;
+        }
+
+        .adbl-sidebar::-webkit-scrollbar-track {
+            background-color: var(--secondary-color);
+        }
+
+        .adbl-sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .adbl-sidebar-header h2 {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .adbl-sidebar-header h2 i {
+            font-size: 1.5rem;
+        }
+
+        .adbl-sidebar-section {
+            margin-bottom: 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .adbl-sidebar-section h3 {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .adbl-sidebar-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .adbl-sidebar-item i {
+            width: 1.5rem;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .adbl-sidebar-item:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateX(0.25rem);
+        }
+
+        .adbl-sidebar-item.adbl-active {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
         .areports-main-content {
-          padding: 0.75rem;
+            flex: 1;
+            padding: 1.5rem;
+            background-color: var(--secondary-color);
+        }
+
+        .areports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .areports-search-bar {
-          max-width: 100%;
+            display: flex;
+            align-items: center;
+            background-color: var(--light-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .areports-search-bar:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .areports-search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+
+        .areports-search-bar i {
+            color: var(--text-muted);
+            margin-right: 0.5rem;
+        }
+
+        .areports-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .areports-notification-bell {
+            position: relative;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .areports-notification-bell:hover {
+            color: var(--primary-color);
+        }
+
+        .areports-profile-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .areports-page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .areports-page-subtitle {
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
         }
 
         .areports-summary {
-          grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .areports-summary-card {
+            background-color: var(--light-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .areports-summary-card h4 {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .areports-summary-card p {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .areports-filter-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            background-color: var(--light-color);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .areports-filter-form {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .areports-filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+
+        .areports-filter-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.3rem;
+        }
+
+        .areports-filter-group input,
+        .areports-filter-group select {
+            padding: 0.4rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background-color: var(--secondary-color);
+        }
+
+        .areports-filter-group input:hover,
+        .areports-filter-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .areports-filter-group input:focus,
+        .areports-filter-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+            background-color: var(--light-color);
+        }
+
+        .areports-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .areports-btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .areports-btn-primary:hover {
+            background-color: #4338ca;
+            transform: scale(1.05);
         }
 
         .areports-report-table {
-          display: block;
-          overflow-x: auto;
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: var(--light-color);
+            box-shadow: var(--shadow-sm);
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
 
         .areports-report-table th,
         .areports-report-table td {
-          min-width: 120px;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .areports-chart-container {
-          height: 200px;
+        .areports-report-table th {
+            background: var(--secondary-color);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .areports-filter-container {
-          flex-direction: column; /* Xếp dọc trên màn hình nhỏ */
-          align-items: stretch;
-          gap: 0.5rem; /* Giảm gap */
+        .areports-report-table td {
+            font-size: 0.9rem;
         }
 
-        .areports-filter-group {
-          min-width: 100%; /* Chiếm toàn bộ chiều rộng */
+        .areports-report-table thead tr {
+            display: table-row; /* Ensure thead rows are always visible */
         }
-      }
+
+        .areports-report-table tbody tr {
+            display: none; /* Only hide tbody rows for pagination */
+        }
+
+        .areports-report-table tbody tr.visible {
+            display: table-row;
+        }
+
+        .areports-report-table tr:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .areports-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .areports-pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--light-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .areports-pagination-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .areports-pagination-btn.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .adbl-sidebar {
+                width: 80px;
+            }
+            .adbl-sidebar-header h2 span,
+            .adbl-sidebar-item span,
+            .adbl-sidebar-section h3 {
+                display: none;
+            }
+            .adbl-sidebar-item {
+                justify-content: center;
+            }
+            .adbl-sidebar-item i {
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .areports-container {
+                flex-direction: column;
+            }
+            .adbl-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                overflow-y: visible;
+            }
+            .areports-main-content {
+                padding: 0.75rem;
+            }
+            .areports-search-bar {
+                max-width: 100%;
+            }
+            .areports-summary {
+                grid-template-columns: 1fr;
+            }
+            .areports-report-table {
+                display: block;
+                overflow-x: auto;
+            }
+            .areports-report-table th,
+            .areports-report-table td {
+                min-width: 120px;
+            }
+            .areports-filter-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            .areports-filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .areports-filter-group {
+                min-width: 100%;
+            }
+        }

@@ -20,7 +20,10 @@ class PageController extends Controller
     public function home()
     {
         $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 30)->take(8)->get();
-        $products_is_featured = Products::with(['images', 'variants'])->orderBy('views', 'desc')->take(8)->get();
+        $products_is_featured = Products::with(['images', 'variants'])
+            ->orderBy('views', 'desc')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count','views')
+            ->take(8)->get();
         $product_categories = Product_categories::all();
         $news = News::where('views', '>', 190)->take(6)->get();
         $product_new = Product_categories::with(['products' => function ($query) {
