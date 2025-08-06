@@ -84,7 +84,9 @@
                                     <div class="logins-password-container">
                                         <input type="password" name="password" id="login-password"
                                             placeholder="Mật khẩu của bạn">
-                                        <button type="button" class="logins-toggle-password">
+                                        <button type="button" class="logins-toggle-password"  
+                                            onclick="togglePassword('login-password')">
+                                        
                                             <i class="far fa-eye"></i>
                                         </button>
                                     </div>
@@ -160,7 +162,7 @@
                                     <div class="logins-password-container">
                                         <input type="password" name="password" id="register-password"
                                             placeholder="Tạo mật khẩu mạnh">
-                                        <button type="submit" class="logins-toggle-password"
+                                        <button type="button" class="logins-toggle-password"
                                             onclick="togglePassword('register-password')">
                                             <i class="far fa-eye"></i>
                                         </button>
@@ -279,6 +281,7 @@
                 }
             });
         });
+        
         // Toggle password visibility
         function togglePassword(fieldId) {
             const passwordField = document.getElementById(fieldId);

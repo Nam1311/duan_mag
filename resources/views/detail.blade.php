@@ -77,7 +77,7 @@
                             <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
                         </button>
                         <button class="buy-button-detail" id="btnAddCheckout">
-                            <i  class="fas fa-bolt"></i> MUA
+                            <i class="fas fa-bolt"></i> MUA
                         </button>
 
                         {{-- Place to store variant id --}}
@@ -266,15 +266,33 @@
             </div>
         </div>
     </section>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script>
         window.routes = {
             addToCart: "{{ route('cart.add') }}"
         };
+
+        function updateCartCount() {
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.querySelector('.cart-badge');
+                    if (cartBadge) {
+                        cartBadge.textContent = data.count;
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy số lượng giỏ hàng:', error);
+                });
+        }
     </script>
     <script src="{{ asset('/js/detail.js') }}"></script>
 @endsection
-    {{-- <script src="{{ asset('/js/detail.js') }}"></script> --}}
-    {{-- <script src="/js/detail.js"></script>
+{{--
+<script src="{{ asset('/js/detail.js') }}"></script> --}}
+{{--
+<script src="/js/detail.js"></script>
 
 
 @endsection --}}

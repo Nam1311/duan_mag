@@ -1,189 +1,232 @@
 @extends('app')
 
 @section('body')
-    {{-- <link rel="stylesheet" href="{{asset('/css/cart.css')}}"> --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="/css/cart.css">
-
     <div class="gh-cart-root">
         <main class="gh-cart-container">
             <div class="gh-cart-layout">
-                <div class="gh-cart-items-container">
-                    @if($cartItems->isEmpty())
-                         <div class="cart-items">
-                            <div class="empty-cart-icon">
-                                <div class="cart-icon-bg"></div>
-                                <i class="fas fa-shopping-cart cart-icon"></i>
-                            </div>
-                            <h1 class="cart-title">Giỏ hàng của bạn đang trống</h1>
-                            <p class="cart-message">
-                                Chưa có sản phẩm nào trong giỏ hàng của bạn. Hãy khám phá cửa hàng và thêm những sản phẩm yêu thích vào giỏ hàng để bắt đầu mua sắm!
-                            </p>
-                            <a href="{{route('home')}}">
-                                <button class="continue-btn">
-                                <i class="fas fa-arrow-right"></i> Tiếp tục mua sắm
-                            </button>
-                            </a>
-                        </div>
-                    @else
-                        <div class="gh-cart-items-header">
-                            <h2 class="gh-cart-items-title">Sản phẩm</h2>
-                            <span class="gh-cart-item-count">{{ $cartItems->count() }} sản phẩm</span>
-                        </div>
-
-                        @foreach ($cartItems as $item)
-                            @php
-                                $variant = $item->productVariant;
-                                $product = $variant->product;
-                                $color = $variant->color;
-                                $size = $variant->size;
-                                $img = $variant->product->thumbnail;
-                                $stock = $variant->quantity;
-
-
-                            @endphp
-                            <div class="gh-cart-item">
-                                <img src="{{  $img?->path }}" alt="" class="gh-cart-item-image">
-                                <div class="gh-cart-item-details">
-                                    <h3 class="gh-cart-item-title">{{ $product->name }}</h3>
-                                    @php
-                                        $variant = $item->productVariant;
-                                        $product = $variant->product;
-                                        $availableVariants = \App\Models\product_variants::with(['color', 'size'])
-                                            ->where('product_id', $product->id)
-                                            ->where('quantity', '>', 0)
-                                            ->get();
-
-                                        $availableColors = $availableVariants->pluck('color')->unique('id');
-                                        $availableSizes = $availableVariants->pluck('size')->unique('id');
-                                    @endphp
-
-                                     <div class="gh-cart-item-variant">
-                                        <form action="{{ route('cart.update', $variant->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-
-                                            {{-- Màu --}}
-                                            <select name="color_id" class="gh-cart-select" onchange="this.form.submit()">
-                                                @foreach ($availableColors as $c)
-                                                    <option value="{{ $c->id }}" {{ $c->id == $variant->color_id ? 'selected' : '' }}>
-                                                        {{ $c->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            {{-- Size --}}
-                                            <select name="size_id" class="gh-cart-select" onchange="this.form.submit()">
-                                                @foreach ($availableSizes as $s)
-                                                    <option value="{{ $s->id }}" {{ $s->id == $variant->size_id ? 'selected' : '' }}>
-                                                        {{ $s->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            {{-- Quantity giữ nguyên --}}
-                                            <input type="hidden" name="quantity" value="{{ $item->quantity }}">
-                                        </form>
-
-                                    </div>
-
-
-
-                                    <a href="{{route('cart.remove', $variant->id)}}">
-                                        <button class="gh-cart-remove-item">
-                                            <i class="fas fa-trash-alt"></i> Xóa
-                                        </button>
-                                    </a>
-                                </div>
-                                <div class="gh-cart-item-price">
-                                    {{ number_format($variant->price ?? $product->price ?? 0, 0, ',', '.') }}đ
-                                </div>
-                                <div class="gh-cart-quantity-control">
-                                    <form action="{{ route('cart.update', $variant->id) }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
-                                        <button type="submit" class="gh-cart-quantity-btn minus" {{ $item->quantity <= 1 ? 'disabled' : '' }}>−</button>                                    
-                                    </form>
-                                    <input type="number" value="{{ $item->quantity }}" min="1" max="{{ $stock }}"readonly class="gh-cart-quantity-input" readonly>
-                                    <form action="{{ route('cart.update', $variant->id) }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="quantity" value="{{ min($item->quantity + 1, $stock) }}">
-                                        <button type="submit" class="gh-cart-quantity-btn plus"  {{ $item->quantity >= $stock ? 'disabled' : '' }}>+</button>
-                                    </form>
-                                </div>
-                            </div>
-                        @endforeach
-                    @endif
-
-
-                </div>
-
-                <div class="gh-cart-summary">
-                    <h3 class="gh-cart-summary-title">Tóm tắt đơn hàng</h3>
-                    @if (session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
-                    <div class="gh-cart-summary-row">
-                        <span class="gh-cart-summary-label">Tạm tính</span>
-                        <span class="gh-cart-summary-value">{{ number_format($subtotal, 0, ',', '.') }}đđ</span>
-                    </div>
-
-                    <div class="gh-cart-summary-row">
-                        <span class="gh-cart-summary-label">Giảm giá</span>
-                        <span
-                            class="gh-cart-summary-value gh-cart-discount-value">-{{ number_format($voucherDiscount, 0, ',', '.') }}đ</span>
-                    </div>
-
-                    <div class="gh-cart-summary-row">
-                        <span class="gh-cart-summary-label">Phí vận chuyển</span>
-                        <span class="gh-cart-summary-value">{{ number_format($shippingFee, 0, ',', '.') }}đ</span>
-                    </div>
-
-                    
-
-                    @if (Auth::check())
-                          @if (!empty($availableVouchers))
-                            <form action="{{ route('cart.applyVoucher') }}" method="POST">
-                                @csrf
-                                <select name="voucher_code" onchange="this.form.submit()" class="gh-cart-voucher-select-field">
-                                    <option value="">-- Chọn mã giảm giá --</option>
-                                    @foreach ($availableVouchers as $voucher)
-                                        <option value="{{ $voucher->code }}">
-                                            {{ $voucher->code }} - 
-                                            {{ $voucher->value_type == 'percent' ? $voucher->discount_amount . '%' : number_format($voucher->discount_amount, 0, ',', '.') . 'đ' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </form>
-                    
-                        @endif
-                     @else
-                    <div class="gh-cart-voucher-box">
-                        <h1 class="gh-cart-summary-label">Vui lòng <a href="{{route('showlogin')}}">đăng nhập</a> để sử dụng Voucher</h1>
-                    </div>
-                    @endif
-                  
-
-
-                    <div class="gh-cart-summary-row gh-cart-total-row">
-                        <span class="gh-cart-summary-label">Tổng cộng</span>
-                        <span class="gh-cart-summary-value">{{ number_format($total, 0, ',', '.') }}đ</span>
-                    </div>
-
-                    <a href="{{route('payment.add')}}"><button class="gh-cart-checkout-btn">
-                            <i class="fas fa-lock"></i> Thanh toán an toàn
-                        </button></a>
-
-                    <a href="{{route('home')}}" class="gh-cart-continue-shopping">
-                        <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
-                    </a>
-                </div>
+                @include('cart._items')
+                @include('cart._summary')
             </div>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            // Cập nhật số lượng
+            $(document).on('click', '.gh-cart-quantity-btn', function () {
+                var button = $(this);
+                var variantId = button.data('variant-id');
+                var isPlus = button.hasClass('plus');
+                var input = button.siblings('.gh-cart-quantity-input');
+                var currentQuantity = parseInt(input.val());
+                var newQuantity = isPlus ? currentQuantity + 1 : currentQuantity - 1;
+                if (newQuantity < 1) return;
+
+                var scrollPosition = $(window).scrollTop();
+                $.ajax({
+                    url: '/cart/update/' + variantId,
+                    method: 'PUT',
+                    data: { quantity: newQuantity },
+                    success: function (response) {
+                        $('.gh-cart-items-container').html(response.items_html);
+                        $('.gh-cart-summary').html(response.summary_html);
+                        $(window).scrollTop(scrollPosition);
+                    },
+                    error: function (xhr) {
+                        const toast = Toastify({
+                            text: `
+                                        <div class="toastify-content">
+                                            <div class="toast-icon">✓</div>
+                                            <div class="toast-message">${xhr.responseJSON?.error}</div>
+                                            <button class="toast-close">×</button>
+                                        </div>
+                                    `,
+                            duration: 3000,
+                            close: false,
+                            gravity: "top",
+                            position: "right",
+                            // stopOnFocus: true,
+                            className: "custom-toast success",
+                            escapeMarkup: false
+                        });
+
+                        toast.showToast();
+
+                        // Đợi DOM render xong mới gán sự kiện
+                        setTimeout(() => {
+                            const toastElement = document.querySelector('.custom-toast');
+                            const closeBtn = toastElement?.querySelector('.toast-close');
+
+                            if (closeBtn) {
+                                closeBtn.addEventListener('click', function () {
+                                    // Áp dụng hiệu ứng fade-out
+                                    toastElement.style.animation = 'fade-out 0.4s forwards';
+
+                                    // Xoá khỏi DOM sau khi animation kết thúc
+                                    toastElement.addEventListener('animationend', function () {
+                                        toastElement.remove();
+                                    });
+                                });
+                            }
+                        }, 10); // Chờ DOM khởi tạo xong
+                        // alert(xhr.responseJSON?.error || 'Có lỗi xảy ra khi cập nhật số lượng.');
+                    }
+                });
+            });
+
+            // Thay đổi size/color
+            $(document).on('change', '.gh-cart-select', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                var variantId = form.data('variant-id');
+                var scrollPosition = $(window).scrollTop();
+                var $item = form.closest('.gh-cart-item');
+                var index = $item.data('index');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        $('.gh-cart-items-container').html(response.items_html);
+                        $('.gh-cart-summary').html(response.summary_html);
+                        $(window).scrollTop(scrollPosition);
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                        const toast = Toastify({
+                            text: `
+                                        <div class="toastify-content">
+                                            <div class="toast-icon">✓</div>
+                                            <div class="toast-message">${xhr.responseJSON?.error}</div>
+                                            <button class="toast-close">×</button>
+                                        </div>
+                                    `,
+                            duration: 3000,
+                            close: false,
+                            gravity: "top",
+                            position: "right",
+                            // stopOnFocus: true,
+                            className: "custom-toast success",
+                            escapeMarkup: false
+                        });
+
+                        toast.showToast();
+
+                        // Đợi DOM render xong mới gán sự kiện
+                        setTimeout(() => {
+                            const toastElement = document.querySelector('.custom-toast');
+                            const closeBtn = toastElement?.querySelector('.toast-close');
+
+                            if (closeBtn) {
+                                closeBtn.addEventListener('click', function () {
+                                    // Áp dụng hiệu ứng fade-out
+                                    toastElement.style.animation = 'fade-out 0.4s forwards';
+
+                                    // Xoá khỏi DOM sau khi animation kết thúc
+                                    toastElement.addEventListener('animationend', function () {
+                                        toastElement.remove();
+                                    });
+                                });
+                            }
+                        }, 10); // Chờ DOM khởi tạo xong
+                        // alert(xhr.responseJSON?.error || 'Có lỗi xảy ra khi thay đổi biến thể.');
+                    }
+                });
+            });
+
+            // Xóa sản phẩm
+            $(document).on('click', '.gh-cart-remove-item', function () {
+                var variantId = $(this).data('variant-id');
+                var scrollPosition = $(window).scrollTop();
+                $.ajax({
+                    url: '/cart/remove/' + variantId,
+                    method: 'DELETE',
+                    success: function (response) {
+                        $('.gh-cart-items-container').html(response.items_html);
+                        $('.gh-cart-summary').html(response.summary_html);
+                        $(window).scrollTop(scrollPosition);
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                        alert('Có lỗi xảy ra khi xóa sản phẩm: ' + (xhr.responseJSON?.error || 'Không xác định'));
+                    }
+                });
+            });
+
+            // Áp dụng voucher
+            $(document).on('change', '.gh-cart-voucher-select-field', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                var scrollPosition = $(window).scrollTop();
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        $('.gh-cart-items-container').html(response.items_html);
+                        $('.gh-cart-summary').html(response.summary_html);
+                        if (response.message) {
+
+
+                            const toast = Toastify({
+                                text: `
+                            <div class="toastify-content">
+                                <div class="toast-icon">✓</div>
+                                <div class="toast-message">${response.message}</div>
+                                <button class="toast-close">×</button>
+                            </div>
+                        `,
+                                duration: 2000,
+                                close: false,
+                                gravity: "top",
+                                position: "right",
+                                // stopOnFocus: true,
+                                className: "custom-toast success",
+                                escapeMarkup: false
+                            });
+
+                            toast.showToast();
+
+                            // Đợi DOM render xong mới gán sự kiện
+                            setTimeout(() => {
+                                const toastElement = document.querySelector('.custom-toast');
+                                const closeBtn = toastElement?.querySelector('.toast-close');
+
+                                if (closeBtn) {
+                                    closeBtn.addEventListener('click', function () {
+                                        // Áp dụng hiệu ứng fade-out
+                                        toastElement.style.animation = 'fade-out 0.4s forwards';
+
+                                        // Xoá khỏi DOM sau khi animation kết thúc
+                                        toastElement.addEventListener('animationend', function () {
+                                            toastElement.remove();
+                                        });
+                                    });
+                                }
+                            }, 10);
+                        }
+
+
+
+                        $(window).scrollTop(scrollPosition);
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                        alert(xhr.responseJSON?.error || 'Có lỗi xảy ra khi áp dụng voucher.');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

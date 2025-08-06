@@ -71,11 +71,11 @@ class CartController extends Controller
                 session()->forget('applied_voucher');
             }
         }
-
         $shippingFee = 40000;
         $total = $subtotal - $voucherDiscount + $shippingFee;
+        $data = $this->getCartData();
 
-        return view('Cart', compact('cartItems', 'subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers'));
+        return view('Cart', compact('cartItems', 'subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers'), $data);
     }
     public function storeSessionCart(Request $request)
     {
@@ -164,7 +164,7 @@ class CartController extends Controller
             Session::put('cart', $cart);
         }
 
-        return response()->json(['message' => 'Sản phẩm đã được thêm vào giỏ hàng thành công']);
+        return response()->json(['message' => 'Thêm vào giỏ hàng thành công']);
     }
     private function upsertCartItem(int $userId, ?int $productVariantId, int $quantity): void
     {
@@ -175,33 +175,40 @@ class CartController extends Controller
         $cartItem->quantity = ($cartItem->exists ? $cartItem->quantity : 0) + $quantity;
         $cartItem->save();
     }
+
+
+    public function getCartCount()
+    {
+        if (auth()->check()) {
+            $cartCount = Cart::where('user_id', auth()->id())->count('product_variant_id');
+        } else {
+            $cart = session()->get('cart', []);
+            $cartCount = count($cart);
+        }
+        return response()->json(['count' => $cartCount]);
+    }
     public function applyVoucher(Request $request)
     {
-        $vouCherCode = $request->input('voucher_code');
-
-        $voucher = Voucher::where('code', $vouCherCode)->first();
-        if (!$voucher) {
-            session()->forget('applied_voucher');
-            return redirect()->route('cart.view')->with('error', 'Mã giảm giá không tồn tại.');
-        }
-
-        if (Auth::check()) {
-            $userId = Auth::id();
-            $hasUsed = Order::where('user_id', $userId)
-                ->where('voucher_id', $voucher->id)
-                ->exists();
-            if ($hasUsed) {
-                return redirect()->route('cart.view')->with('error', 'Bạn đã sử dụng mã giảm giá này rồi.');
+        if (!Auth::check()) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Vui lòng đăng nhập để sử dụng Voucher.'], 403);
             }
-        } else {
             return redirect()->route('cart.view')->with('error', 'Vui lòng đăng nhập để sử dụng Voucher.');
-
         }
 
-        if ($voucher->expiration_date < now() || $voucher->start_date > now() || $voucher->quantity <= 0) {
-            return redirect()->route('cart.view')->with('error', 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+        $vouCherCode = $request->input('voucher_code');
+        if (empty($vouCherCode)) {
+            session()->forget('applied_voucher');
+            $data = $this->getCartData();
+            if ($request->ajax()) {
+                return response()->json([
+                    'items_html' => view('cart._items', $data)->render(),
+                    'summary_html' => view('cart._summary', $data)->render(),
+                    'message' => 'Đã xóa mã giảm giá.',
+                ]);
+            }
+            return redirect()->route('cart.view')->with('success', 'Đã xóa mã giảm giá.');
         }
-
 
         $voucher = Voucher::where('code', $vouCherCode)
             ->where('expiration_date', '>=', now())
@@ -209,13 +216,35 @@ class CartController extends Controller
             ->where('quantity', '>', 0)
             ->first();
 
-        if ($voucher) {
-            session()->put('applied_voucher', $vouCherCode);
-            session()->put('applied_voucher_id', $voucher->id);
-            return redirect()->route('cart.view')->with('success', 'Áp dụng mã giảm giá thành công!');
-        } else {
+        if (!$voucher) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'], 422);
+            }
             return redirect()->route('cart.view')->with('error', 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
         }
+
+        $userId = Auth::id();
+        $hasUsed = Order::where('user_id', $userId)
+            ->where('voucher_id', $voucher->id)
+            ->exists();
+        if ($hasUsed) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Bạn đã sử dụng mã giảm giá này rồi.'], 422);
+            }
+            return redirect()->route('cart.view')->with('error', 'Bạn đã sử dụng mã giảm giá này rồi.');
+        }
+
+        session()->put('applied_voucher', $vouCherCode);
+        session()->put('applied_voucher_id', $voucher->id);
+        $data = $this->getCartData();
+        if ($request->ajax()) {
+            return response()->json([
+                'items_html' => view('cart._items', $data)->render(),
+                'summary_html' => view('cart._summary', $data)->render(),
+                'message' => 'Áp dụng mã giảm giá thành công!',
+            ]);
+        }
+        return redirect()->route('cart.view')->with('success', 'Áp dụng mã giảm giá thành công!');
     }
     public function removeFromCart($variantId)
     {
@@ -226,9 +255,17 @@ class CartController extends Controller
             $cart = array_filter($cart, function ($item) use ($variantId) {
                 return $item['product_variant_id'] != $variantId;
             });
-            Session::put('cart', $cart);
+            Session::put('cart', array_values($cart));
         }
-        return redirect()->back();
+
+        $data = $this->getCartData();
+        if (request()->ajax()) {
+            return response()->json([
+                'items_html' => view('cart._items', $data)->render(),
+                'summary_html' => view('cart._summary', $data)->render(),
+            ]);
+        }
+        return redirect()->route('cart.view');
     }
     public function updateQuantity($variantId, Request $request)
     {
@@ -236,6 +273,14 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
         $quantity = $validated['quantity'];
+        $variant = product_variants::find($variantId);
+        if (!$variant || $variant->quantity < $quantity) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Số lượng không đủ hoặc sản phẩm không tồn tại.'], 422);
+            }
+            return redirect()->route('cart.view')->with('error', 'Số lượng không đủ hoặc sản phẩm không tồn tại.');
+        }
+
         if (Auth::check()) {
             $cartItem = Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->first();
             if ($cartItem) {
@@ -252,60 +297,70 @@ class CartController extends Controller
             }
             Session::put('cart', $cart);
         }
+
+        $data = $this->getCartData();
+        if ($request->ajax()) {
+            return response()->json([
+                'items_html' => view('cart._items', $data)->render(),
+                'summary_html' => view('cart._summary', $data)->render(),
+            ]);
+        }
         return redirect()->route('cart.view');
     }
-    // public function updateVariant($variantId, Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'color_id' => 'required|exists:colors,id',
-    //         'size_id' => 'required|exists:sizes,id',
-    //         'quantity' => 'required|integer|min:1',
-    //     ]);
-    //     $oldVariant = product_variants::find($variantId);
-    //     $newVariant = product_variants::where('product_id', $oldVariant->product_id)
-    //         ->where('color_id', $validated['color_id'])
-    //         ->where('size_id', $validated['size_id'])
-    //         ->first();
+    public function updateVariant($variantId, Request $request)
+    {
+        $validated = $request->validate([
+            'color_id' => 'required|exists:colors,id',
+            'size_id' => 'required|exists:sizes,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+        $oldVariant = product_variants::find($variantId);
+        if (!$oldVariant) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Biến thể cũ không tồn tại.'], 422);
+            }
+            return redirect()->route('cart.view')->with('error', 'Biến thể cũ không tồn tại.');
+        }
 
-    //     // Kiểm tra tồn tại và còn hàng
-    //     if (!$newVariant) {
-    //         return back()->with('error', 'Biến thể không tồn tại.');
+        $newVariant = product_variants::where('product_id', $oldVariant->product_id)
+            ->where('color_id', $validated['color_id'])
+            ->where('size_id', $validated['size_id'])
+            ->first();
 
-    //     }
+        if (!$newVariant || $newVariant->quantity < $validated['quantity']) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Vui lòng giảm số lượng'], 422);
+            }
+            return redirect()->route('cart.view')->with('error', 'Biến thể không tồn tại hoặc hết hàng.');
+        }
 
-    //     if ($newVariant->quantity < 1) {
-    //         return redirect()->route('cart.view')->with('error', 'Cái này hết hàng rồi!!!');
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->delete();
+            $cartItem = Cart::firstOrNew([
+                'user_id' => Auth::id(),
+                'product_variant_id' => $newVariant->id,
+            ]);
+            $cartItem->quantity = $validated['quantity'];
+            $cartItem->save();
+        } else {
+            $cart = Session::get('cart', []);
+            $cart = array_filter($cart, fn($item) => $item['product_variant_id'] != $variantId);
+            $cart[] = [
+                'product_variant_id' => $newVariant->id,
+                'quantity' => $validated['quantity'],
+            ];
+            Session::put('cart', $cart);
+        }
 
-    //     }
-    //     if (Auth::check()) {
-    //         // Xóa biến thể cũ
-    //         Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->delete();
-
-    //         // Tạo biến thể mới
-    //         $cartItem = Cart::firstOrNew([
-    //             'user_id' => Auth::id(),
-    //             'product_variant_id' => $newVariant->id,
-    //         ]);
-    //         $cartItem->quantity = $validated['quantity'];
-    //         $cartItem->save();
-    //     } else {
-    //         // Lấy cart từ session
-    //         $cart = Session::get('cart', []);
-
-    //         // Xóa variant cũ
-    //         $cart = array_filter($cart, fn($item) => $item['product_variant_id'] != $variantId);
-
-    //         // Thêm variant mới
-    //         $cart[] = [
-    //             'product_variant_id' => $newVariant->id,
-    //             'quantity' => $validated['quantity'],
-    //         ];
-
-    //         Session::put('cart', $cart);
-    //     }
-    //     return redirect()->route('cart.view')->with('success', 'Đã cập nhật biến thể sản phẩm!');
-
-    // }
+        $data = $this->getCartData();
+        if ($request->ajax()) {
+            return response()->json([
+                'items_html' => view('cart._items', $data)->render(),
+                'summary_html' => view('cart._summary', $data)->render(),
+            ]);
+        }
+        return redirect()->route('cart.view');
+    }
 
 
     public function proceedToCheckout(Request $request)
@@ -500,6 +555,66 @@ class CartController extends Controller
         ]);
     }
 
+    private function getCartData()
+    {
+        if (auth()->check()) {
+            $cartItems = Cart::where('user_id', auth()->id())
+                ->with('productVariant.product.thumbnail')
+                ->orderBy('id', 'asc') // Sử dụng id của cart item để giữ thứ tự
+                ->get();
+            $subtotal = $cartItems->sum(function ($item) {
+                return $item->productVariant->product->price * $item->quantity;
+            });
+            $availableVouchers = Voucher::where('quantity', '>', 0)
+                ->where('start_date', '<=', now())
+                ->where('expiration_date', '>=', now())
+                ->get();
+        } else {
+            $sessionCart = session()->get('cart', []);
+            $cartItems = collect($sessionCart)
+                ->map(function ($item) {
+                    $variant = product_variants::with('product.thumbnail')->find($item['product_variant_id']);
+                    if ($variant) {
+                        return (object) [
+                            'id' => $item['id'] ?? $item['product_variant_id'], // Thêm id duy nhất
+                            'productVariant' => $variant,
+                            'quantity' => $item['quantity'],
+                        ];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->values(); // Giữ thứ tự từ session
+            $subtotal = $cartItems->sum(function ($item) {
+                return $item->productVariant->product->price * $item->quantity;
+            });
+            $availableVouchers = null;
+        }
+
+        $appliedVoucherCode = session()->get('applied_voucher');
+        $voucherDiscount = 0;
+        if ($appliedVoucherCode) {
+            $voucher = Voucher::where('code', $appliedVoucherCode)
+                ->where('expiration_date', '>=', now())
+                ->where('start_date', '<=', now())
+                ->where('quantity', '>', 0)
+                ->first();
+            if ($voucher) {
+                if ($voucher->value_type == 'fixed') {
+                    $voucherDiscount = $voucher->discount_amount;
+                } elseif ($voucher->value_type == 'percent') {
+                    $voucherDiscount = $subtotal * ($voucher->discount_amount / 100);
+                }
+            } else {
+                session()->forget('applied_voucher');
+            }
+        }
+
+        $shippingFee = 40000;
+        $total = $subtotal - $voucherDiscount + $shippingFee;
+
+        return compact('cartItems', 'subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers', 'appliedVoucherCode');
+    }
 }
 
 

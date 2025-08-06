@@ -14,6 +14,177 @@ body {
     display: none;
 }
 
+
+
+
+/* CẢI TIẾN CSS CHO TOAST ĐẸP HƠN */
+.custom-toast {
+    position: fixed !important;
+    top: 20px !important; /* Thay đổi từ % sang px để ổn định hơn */
+    right: 1rem !important;
+    left: auto !important;
+    max-width: 380px;
+    min-width: 300px;
+    z-index: 9999 !important;
+    border-radius: 12px !important; /* Bo góc lớn hơn */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15) !important; /* Đổ bóng đậm hơn */
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    color: #333 !important;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: toast-in-right 0.5s, fade-out 0.5s 2.5s; /* Hiệu ứng xuất hiện và tự động ẩn */
+}
+
+/* Hiệu ứng xuất hiện */
+@keyframes toast-in-right {
+    from { 
+        transform: translateX(100%); 
+        opacity: 0;
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng biến mất */
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Container nội dung */
+.toastify-content {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Biểu tượng */
+.toast-icon {
+    margin-right: 15px;
+    font-size: 22px;
+    min-width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Nội dung thông báo */
+.toast-message {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.5;
+    padding-right: 10px;
+}
+
+/* Nút đóng */
+.toast-close {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #333;
+    transform: scale(1.05);
+}
+
+/* Thanh tiến trình */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    transform-origin: left;
+    animation: progress 3s linear forwards; /* 3s tương ứng duration */
+}
+
+@keyframes progress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* MÀU SẮC THEO LOẠI THÔNG BÁO */
+.custom-toast.success {
+    border-left: 5px solid #333;
+}
+.custom-toast.success .toast-icon {
+    color: #333;
+}
+.custom-toast.success .toast-progress {
+    background-color: rgba(76, 175, 80, 0.3);
+}
+
+.custom-toast.error {
+    border-left: 5px solid #F44336;
+}
+.custom-toast.error .toast-icon {
+    color: #F44336;
+}
+.custom-toast.error .toast-progress {
+    background-color: rgba(244, 67, 54, 0.3);
+}
+
+.custom-toast.warning {
+    border-left: 5px solid #FF9800;
+}
+.custom-toast.warning .toast-icon {
+    color: #FF9800;
+}
+.custom-toast.warning .toast-progress {
+    background-color: rgba(255, 152, 0, 0.3);
+}
+
+.custom-toast.info {
+    border-left: 5px solid #2196F3;
+}
+.custom-toast.info .toast-icon {
+    color: #2196F3;
+}
+.custom-toast.info .toast-progress {
+    background-color: rgba(33, 150, 243, 0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .custom-toast {
+        max-width: 90%;
+        right: 50% !important;
+        transform: translateX(50%) !important;
+        top: 10px !important;
+    }
+    
+    @keyframes toast-in-right {
+        from { 
+            transform: translateX(50%) translateY(-20px); 
+            opacity: 0;
+        }
+        to { 
+            transform: translateX(50%) translateY(0); 
+            opacity: 1;
+        }
+    }
+}
+
 .nav-top {
     width: 100%;
     height: 80px;
