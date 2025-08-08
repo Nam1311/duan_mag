@@ -190,7 +190,8 @@
             const sliderConfigs = [
                 { selector: '.product-list', item: 5 },
                 { selector: '.list-cat', item: 5 },
-                { selector: '.product-list-sale', item: 3, auto: true, speed: 1000, pause: 5000 }
+                { selector: '.product-list-sale', item: 3, auto: true, speed: 1000, pause: 5000 },
+                { selector: '.product-recommend', item: 4, auto: false, speed: 1000, pause: 5000, controls: false }
             ];
 
             sliderConfigs.forEach(config => {

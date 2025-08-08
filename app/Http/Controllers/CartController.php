@@ -114,7 +114,10 @@ class CartController extends Controller
 
         if (!$productVariantId) {
             $productId = $validated['product_id'];
-            $variant = product_variants::where('product_id', $productId)->first();
+            $variant = product_variants::where('product_id', $productId)
+                ->where('quantity', '>', 0) // chỉ lấy biến thể còn hàng
+                ->orderBy('id') // ưu tiên biến thể đầu tiên còn hàng
+                ->first();
             if ($variant) {
                 $productVariantId = $variant->id;
             } else {

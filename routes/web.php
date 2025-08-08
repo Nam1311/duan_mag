@@ -410,3 +410,4 @@ Route::post('/admin/send-bulk-mail', [AdminCustomerController::class, 'sendBulkM
 Route::get('/review/{order}', [ReviewController::class, 'create'])->name('review.form');
 Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review.store');
 
+// Route::get('/', [PageController::class, 'homepage'])->name('homepage');

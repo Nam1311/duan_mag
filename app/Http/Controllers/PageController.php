@@ -11,10 +11,13 @@ use App\Models\reviews;
 use App\Models\Product_categories;
 use App\Models\ProductCountDown;
 use App\Models\Banners;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+
 
 class PageController extends Controller
 {
@@ -86,6 +89,30 @@ class PageController extends Controller
             }
         }
 
+        $recommendedProducts = [];
+
+        if (Auth::check()) {
+            // Lấy đơn hàng gần nhất
+            $latestOrder = Order::with(['orderDetails.productVariant.product.category'])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->first();
+
+            if ($latestOrder && $latestOrder->orderDetails->isNotEmpty()) {
+                $firstDetail = $latestOrder->orderDetails->first();
+                $product = $firstDetail->productVariant->product ?? null;
+
+                if ($product && $product->category) {
+                    $categoryId = $product->category->id;
+
+                    $recommendedProducts = Products::where('category_id', $categoryId)
+                        ->where('id', '!=', $product->id)
+                        ->with('images')
+                        ->get();
+                }
+            }
+        }
+
         $data = [
             'products_sale' => $products_sale,
             'product_categories' => $product_categories,
@@ -95,7 +122,8 @@ class PageController extends Controller
             'flash_sale_products' => $flash_sale_products->unique('id'),
             'countdown' => $countdown,
             'products_bestseller' => $products_bestseller,
-            'sliders' => $sliders
+            'sliders' => $sliders,
+            'recommendedProducts' => $recommendedProducts,
         ];
 
         return view('home', $data);

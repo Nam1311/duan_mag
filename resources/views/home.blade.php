@@ -76,7 +76,7 @@
 
         <div class="product-sale-box">
             <div class="product-sale-banner">
-                <img src="{{ asset('/img/Ảnh chụp màn hình 2025-05-24 230355.png') }}" alt="">
+                <img src="{{ asset('/img/banner-sale.png') }}" alt="">
             </div>
 
             <ul class="row product-list-sale">
@@ -163,7 +163,7 @@
 
 
     <!-- load danh muc -->
-    <section class="section-cat" style="padding-bottom: 10px; background-color: white; position: relative; z-index: 10;">
+    <section class="section-cat" style="padding-bottom: 10px; background-color: white; position: relative;">
         <div class=" grid wide container">
             <h2 class="section-title" style="margin-bottom: 10px;">Danh mục</h2>
             <ul class="list-cat">
@@ -179,6 +179,52 @@
             </ul>
         </div>
      </section>
+     @if (Auth::check() && isset($recommendedProducts) && count($recommendedProducts) > 0)
+        <section class="product-recommends">
+            <div style="padding: 0px 0px">
+                <h2 class="section-title">Sản phẩm dành cho bạn</h2>
+            </div>
+            {{-- <div class="grid wide container"> --}}
+                <ul class="row product_featured product-recommend">
+                    @foreach ($recommendedProducts as $product)
+                        {{-- <div class="col l-3 m-6 c-6 "> --}}
+                            <li class="item">
+                                <div class="item-img">
+                                    @if($product->sale > 0)
+                                        <span class="item-giam">-{{ $product->sale }}%</span>
+                                    @endif
+                                    <div class="item-icon">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </div>
+
+                                    <a href="{{ asset('/detail/' . $product->id) }}">
+                                        <img src="{{ asset($product->images->first()->path ?? 'images/default.jpg') }}"
+                                            alt="{{ $product->name }}">
+                                    </a>
+                                    <div class="item-buy-now" id="btnAddCheckout">
+                                        <a class="a-buy-now" href="">Mua ngay</a>
+                                    </div>
+                                </div>
+                                <div class="item-name">
+                                    <h3>
+                                        <a href="{{ asset('/detail/' . $product->id) }}">
+                                            {{ $product->name }}
+                                        </a>
+                                    </h3>
+                                </div>
+                                <div class="item-price">
+                                    <span style="color: red;padding-right: 10px;">
+                                        {{ number_format($product->price , 0, ',', '.') }}đ
+                                    </span>
+                                    <span><del>{{ number_format($product->original_price, 0, ',', '.') }}đ</del></span>
+                                </div>
+                            </li>
+                        {{-- </div> --}}
+                    @endforeach
+                </ul>
+            {{-- </div> --}}
+        </section>
+    @endif
 
     {{-- ds sp mới --}}
     <section class="new-design">
