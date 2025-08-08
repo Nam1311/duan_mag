@@ -931,8 +931,9 @@ header>.nav-top>.nav-pc>ul>li>a {
     justify-content: center;
     align-items: center;
 }
-/* .product-sale-box>.product-sale-banner>img{
+/* .product-sale-banner img{
     width: 100%;
+    height: auto;
 } */
 
 .product-sale>.header-product-sale {

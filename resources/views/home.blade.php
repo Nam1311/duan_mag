@@ -76,7 +76,7 @@
 
         <div class="product-sale-box">
             <div class="product-sale-banner">
-                <img src="{{ asset('/img/banner-sale.png') }}" alt="">
+                <img src="{{ asset('/img/Ảnh chụp màn hình 2025-05-24 230355.png') }}" alt="">
             </div>
 
             <ul class="row product-list-sale">
