@@ -43,7 +43,7 @@ use League\Uri\Contracts\UserInfoInterface;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminBaocaoController;
 use App\Http\Controllers\ReviewController;
-
+use App\Http\Controllers\Admin\AdminSettingController;
 
 
 Route::get('about', function () {
@@ -411,3 +411,6 @@ Route::get('/review/{order}', [ReviewController::class, 'create'])->name('review
 Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review.store');
 
 // Route::get('/', [PageController::class, 'homepage'])->name('homepage');
+
+Route::get('/admin/caidat', [AdminSettingController::class, 'index']);
+Route::post('/admin/settings/update', [AdminSettingController::class, 'update'])->name('admin.settings.update');

@@ -79,7 +79,7 @@
                 <img src="{{ asset('/img/Ảnh chụp màn hình 2025-05-24 230355.png') }}" alt="">
             </div>
 
-            <ul class="row product-list-sale">
+            <ul class="product-list-sale">
                 @forelse ($flash_sale_products as $product)
                     <li class="item" style="background-color: white; border-radius: 7px;">
                         <div class="item-img">
