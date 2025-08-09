@@ -112,6 +112,8 @@ Route::middleware('auth')->group(function () {
     // Route::get('/user/orders/{order}', [UserOrderController::class, 'show'])->name('user.order.details')->middleware('auth');
 });
 
+Route::post('/reviews/reply', [PageController::class, 'reply'])->name('reviews.reply');
+
 
 
 Route::get('products', function () {

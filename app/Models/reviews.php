@@ -25,11 +25,13 @@ class reviews extends Model
     {
         return $this->belongsTo(Products::class);
     }
+    
+public function replies()
+{
+    return $this->hasMany(reviews::class, 'parent_id')->with('user', 'replies');
+}
 
-    public function replies()
-    {
-        return $this->hasMany(reviews::class, 'parent_id')->with('user');
-    }
+
 
     public function parent()
     {
@@ -38,5 +40,10 @@ class reviews extends Model
         public function children()
     {
         return $this->hasMany(reviews::class, 'parent_id');
+    }
+     // Replies đệ quy, lấy replies con sâu hơn
+    public function nestedReplies()
+    {
+        return $this->replies()->with('nestedReplies', 'user');
     }
 }

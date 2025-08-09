@@ -26,7 +26,7 @@ class PageController extends Controller
         $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 30)->take(8)->get();
         $products_is_featured = Products::with(['images', 'variants'])
             ->orderBy('views', 'desc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count','views')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'views')
             ->take(8)->get();
         $product_categories = Product_categories::all();
         $news = News::where('views', '>', 190)->take(6)->get();
@@ -143,7 +143,15 @@ class PageController extends Controller
         $product = Products::findOrFail($id);
         $product->increment('views');
 
-        $reviewDetail = reviews::with('user')->where('product_id', $id)->get();
+$reviewDetail = reviews::with([
+    'user', 
+    'replies.user',           // load user của reply
+    'replies.replies.user'    // load reply của reply (2 cấp)
+])
+->where('product_id', $id)
+->whereNull('parent_id')
+->orderBy('created_at', 'desc')
+->get();
 
         $data = [
             'product_detail' => $product_detail,
@@ -155,7 +163,34 @@ class PageController extends Controller
 
         return view('detail', $data);
     }
+// ReviewController.php
+ public function reply(Request $request)
+    {
+        $request->validate([
+            'parent_id' => 'required|exists:reviews,id',
+            'comment' => 'required|string|max:1000',
+        ]);
 
+        $userId = Auth::id();
+        if (!$userId) {
+            return redirect()->back()->withErrors('Bạn cần đăng nhập để gửi phản hồi.');
+        }
+
+        $parentReview = reviews::findOrFail($request->parent_id);
+
+        reviews::create([
+            'product_id' => $parentReview->product_id,
+            'parent_id' => $request->parent_id,
+            'user_id' => $userId,
+            'comment' => $request->comment,
+            'rating' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Phản hồi của bạn đã được gửi thành công!');
+    }
+
+
+    
     public function getVariantQuantity(Request $request)
     {
         $productId = (int) $request->query('product_id');

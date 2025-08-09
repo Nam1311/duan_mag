@@ -792,3 +792,401 @@
           font-size: 16px;
       }
   }
+
+
+
+  
+
+
+
+
+
+  /* mạnh làm bình luận */
+          :root {
+            --detaill-primary-color: #ee4d2d;
+            --detaill-secondary-color: #f5f5f5;
+            --detaill-text-color: #333;
+            --detaill-light-text: #767676;
+            --detaill-border-color: #e8e8e8;
+            --detaill-star-color: #ffc107;
+            --detaill-like-color: #4267B2;
+            --detaill-reply-color: #4CAF50;
+            --detaill-avatar-colors: #ff7675, #74b9ff, #55efc4, #ffeaa7, #a29bfe, #fd79a8, #fdcb6e;
+        }
+
+        /* Review Card */
+        .detaill-review-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .detaill-review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Review Header */
+        .detaill-review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .detaill-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Avatar color variations */
+        .detaill-user-avatar:nth-child(7n+1) { background-color: #ff7675; }
+        .detaill-user-avatar:nth-child(7n+2) { background-color: #74b9ff; }
+        .detaill-user-avatar:nth-child(7n+3) { background-color: #55efc4; }
+        .detaill-user-avatar:nth-child(7n+4) { background-color: #ffeaa7; color: #333; }
+        .detaill-user-avatar:nth-child(7n+5) { background-color: #a29bfe; }
+        .detaill-user-avatar:nth-child(7n+6) { background-color: #fd79a8; }
+        .detaill-user-avatar:nth-child(7n+7) { background-color: #fdcb6e; color: #333; }
+
+        .detaill-user-info {
+            flex: 1;
+        }
+
+        .detaill-username {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--detaill-text-color);
+        }
+
+        .detaill-review-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .detaill-rating-stars {
+            display: flex;
+            align-items: center;
+            color: var(--detaill-star-color);
+            font-size: 14px;
+        }
+
+        .detaill-rating-stars i {
+            margin-right: 2px;
+        }
+
+        .detaill-rating-stars i.detaill-active {
+            color: var(--detaill-star-color);
+        }
+
+        .detaill-rating-value {
+            font-weight: 600;
+            margin-left: 5px;
+            color: var(--detaill-text-color);
+        }
+
+        .detaill-review-date {
+            font-size: 13px;
+            color: var(--detaill-light-text);
+        }
+
+        /* Review Content */
+        .detaill-review-content {
+            margin-bottom: 15px;
+        }
+
+        .detaill-review-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--detaill-text-color);
+            margin-bottom: 15px;
+        }
+
+        /* Review Footer */
+        .detaill-review-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--detaill-border-color);
+            flex-wrap: wrap;
+        }
+
+        .detaill-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--detaill-light-text);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px 15px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .detaill-action-btn i {
+            font-size: 14px;
+        }
+
+        .detaill-like-btn:hover {
+            color: var(--detaill-like-color);
+            background: rgba(66, 103, 178, 0.1);
+        }
+
+        .detaill-reply-btn:hover {
+            color: var(--detaill-reply-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .detaill-view-replies-btn:hover {
+            color: var(--detaill-primary-color);
+            background: rgba(238, 77, 45, 0.1);
+        }
+
+        /* Reply Form Styles (separate for each) */
+        .detaill-reply-form {
+            display: none;
+            margin-top: 15px;
+            animation: detaill-fadeIn 0.3s ease;
+        }
+
+        .detaill-reply-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--detaill-border-color);
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            transition: border 0.2s;
+        }
+
+        .detaill-reply-form textarea:focus {
+            outline: none;
+            border-color: var(--detaill-primary-color);
+            box-shadow: 0 0 0 2px rgba(238, 77, 45, 0.1);
+        }
+
+        .detaill-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .detaill-cancel-btn, .detaill-submit-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .detaill-cancel-btn {
+            background: var(--detaill-secondary-color);
+            border: 1px solid var(--detaill-border-color);
+            color: var(--detaill-light-text);
+        }
+
+        .detaill-cancel-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .detaill-submit-btn {
+            background: var(--detaill-primary-color);
+            color: white;
+            border: none;
+        }
+
+        .detaill-submit-btn:hover {
+            background: #e63c1e;
+        }
+
+        /* Review Replies Section */
+        .detaill-review-replies {
+            margin-top: 20px;
+            padding-left: 20px;
+            border-left: 2px solid var(--detaill-border-color);
+            animation: detaill-fadeIn 0.3s ease;
+        }
+
+        .detaill-reply-item {
+            background: var(--detaill-secondary-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .detaill-reply-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .detaill-reply-header .detaill-user-avatar {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .detaill-reply-name {
+            font-weight: 600;
+            margin-right: 10px;
+            color: var(--detaill-text-color);
+        }
+
+        .detaill-reply-date {
+            color: var(--detaill-light-text);
+        }
+
+        .detaill-reply-text {
+            font-size: 14px;
+            color: var(--detaill-text-color);
+            line-height: 1.5;
+        }
+
+        /* Nested Replies */
+        .detaill-nested-replies {
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 2px solid var(--detaill-border-color);
+        }
+
+        .detaill-reply-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .detaill-reply-to-reply-btn:hover {
+            color: var(--detaill-reply-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .detaill-collapse-replies {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .detaill-collapse-replies-btn {
+            color: var(--detaill-light-text);
+        }
+
+        .detaill-collapse-replies-btn:hover {
+            color: var(--detaill-primary-color);
+        }
+
+        /* Animations */
+        @keyframes detaill-fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .detaill-review-card {
+                padding: 15px;
+            }
+            
+            .detaill-review-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detaill-user-avatar {
+                margin-bottom: 10px;
+            }
+            
+            .detaill-review-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .detaill-review-actions {
+                gap: 8px;
+            }
+            
+            .detaill-review-replies {
+                padding-left: 10px;
+            }
+            
+            .detaill-reply-form textarea {
+                min-height: 60px;
+                padding: 10px;
+            }
+            
+            .detaill-cancel-btn, .detaill-submit-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .detaill-review-card {
+                padding: 12px;
+            }
+            
+            .detaill-user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            .detaill-username {
+                font-size: 15px;
+            }
+            
+            .detaill-review-text {
+                font-size: 14px;
+            }
+            
+            .detaill-action-btn {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+            
+            .detaill-reply-form textarea {
+                min-height: 50px;
+                font-size: 14px;
+            }
+        }
+
+
+        /* 
+         */
+.alert {
+  padding: 12px 20px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
+}
