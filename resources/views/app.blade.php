@@ -261,7 +261,7 @@
                         // Hết giờ: hiện thông báo Flash Sale bắt đầu
                         flashSaleStart.style.display = 'block';
                         countdownLabel.style.display = 'none';
-                        // boxTimes.forEach(box => box.style.display = 'none');
+                        boxTimes.forEach(box => box.style.display = 'none');
                         return;
                     }
                 }
