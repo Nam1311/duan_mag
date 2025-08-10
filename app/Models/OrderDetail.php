@@ -9,7 +9,7 @@ class OrderDetail extends Model
     protected $fillable = ['order_id', 'product_variant_id', 'quantity', 'unit_price'];
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class,'address');
     }
 
     public function productVariant()

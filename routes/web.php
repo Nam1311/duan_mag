@@ -278,6 +278,7 @@ Route::delete('/admin/orders/{id}', [AdminOrderController::class, 'softDelete'])
 Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 
 
+
 Route::post('/admin/countdown', [PromotionController::class, 'store'])->name('admin.countdown.store');
 // Route::get('/admin/countdown', [PromotionController::class, 'index']);
 Route::get('/admin/countdown', [PromotionController::class, 'index'])->name('admin.countdown.index');

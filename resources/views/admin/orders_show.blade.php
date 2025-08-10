@@ -1,6 +1,37 @@
 @extends('admin.app')
 
 @section('admin.body')
+    <style>
+        @media print {
+            .aorders-header, .aorders-actions, .aorders-toast, .aorders-sidebar-item {
+                display: none !important;
+            }
+            .aorders-main-content {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+            .aorders-data-card {
+                border: none;
+                box-shadow: none;
+            }
+            .aorders-page-title, .aorders-page-subtitle {
+                text-align: center;
+            }
+            .aorders-order-details, .aorders-order-items {
+                page-break-inside: avoid;
+            }
+            .aorders-data-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .aorders-data-table th, .aorders-data-table td {
+                border: 1px solid #000;
+                padding: 8px;
+            }
+        }
+    </style>
+
     <div class="aorders-main-content">
         <div class="aorders-header">
             <div class="aorders-search-bar">
@@ -19,7 +50,6 @@
             Thông tin chi tiết về đơn hàng và sản phẩm
         </p>
 
-        <!-- Hiển thị thông báo thành công hoặc lỗi -->
         @if (session('success'))
             <div class="aorders-toast aorders-toast-success show">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -35,42 +65,27 @@
             <div class="aorders-order-details">
                 <h2>Thông tin đơn hàng</h2>
                 <p><strong>Mã đơn:</strong> #DH-{{ $order->id }}</p>
-                <p><strong>Khách hàng:</strong> {{ $order->user->name ?? ($order->address_details['receiver_name'] ?? ($order->address->receiver_name ?? 'Không xác định')) }}</p>
-                <p><strong>Ngày đặt:</strong> {{ $order->created_at->format('d-m-y ') }}</p>
+                <p><strong>Khách hàng:</strong> 
+                    {{ !empty($order->address_details['receiver_name']) ? $order->address_details['receiver_name'] : ($order->name ?? ($order->user->name ?? 'Không xác định')) }}
+                </p>
+                <p><strong>Ngày đặt:</strong> {{ $order->created_at->format('d-m-Y') }}</p>
                 <p><strong>Trạng thái:</strong> 
                     <span class="aorders-status-badge {{ $order->status == 'Đã hủy' ? 'aorders-status-inactive' : 'aorders-status-active' }}">
                         {{ $order->status }}
                     </span>
                 </p>
+                <p><strong>Số điện thoại:</strong> 
+                    {{ !empty($order->address_details['phone']) ? $order->address_details['phone'] : ($order->phone ?? ($order->user->phone ?? 'N/A')) }}
+                </p>
                 @if ($order->address_details && $order->address_details['province_name'] !== 'Không xác định')
-                    <!-- Hiển thị địa chỉ từ API nếu API hoạt động -->
-                    <p><strong>Số điện thoại:</strong> {{ $order->address_details['phone'] ?? 'N/A' }}</p>
                     <p><strong>Địa chỉ:</strong> 
                         {{ $order->address_details['address'] . ', ' . 
                            $order->address_details['ward_name'] . ', ' . 
                            $order->address_details['district_name'] . ', ' . 
                            $order->address_details['province_name'] }}
                     </p>
-                @elseif ($order->address && $order->address->address && $order->address->ward && $order->address->district && $order->address->province)
-                    <!-- Hiển thị địa chỉ từ $order->address nếu không có API -->
-                    <p><strong>Số điện thoại:</strong> {{ $order->address->phone ?? 'N/A' }}</p>
-                    <p><strong>Địa chỉ:</strong> 
-                        {{ $order->address->address . ', ' . 
-                           $order->address->ward . ', ' . 
-                           $order->address->district . ', ' . 
-                           $order->address->province }}
-                    </p>
-                @elseif ($order->user && $order->user->defaultAddress && $order->user->defaultAddress->address)
-                    <!-- Hiển thị địa chỉ mặc định của user nếu có -->
-                    <p><strong>Số điện thoại:</strong> {{ $order->user->defaultAddress->phone ?? 'N/A' }}</p>
-                    <p><strong>Địa chỉ:</strong> 
-                        {{ $order->user->defaultAddress->address . ', ' . 
-                           $order->user->defaultAddress->ward . ', ' . 
-                           $order->user->defaultAddress->district . ', ' . 
-                           $order->user->defaultAddress->province }}
-                    </p>
                 @else
-                    <!-- Ẩn thông tin địa chỉ nếu không có dữ liệu -->
+                    <p><strong>Địa chỉ:</strong> {{ $order->address ?? 'Không xác định' }}</p>
                 @endif
             </div>
 
@@ -96,8 +111,8 @@
                                         style="width: 50px; height: 50px; object-fit: cover;">
                                 </td>
                                 <td>{{ $detail->productVariant->product->name ?? 'Không xác định' }}</td>
-                                <td>{{ $detail->productVariant->size->name ?? 'N/A' }}</td>
-                                <td>{{ $detail->productVariant->color->name ?? 'N/A' }}</td>
+                                <td>{{ $detail->productVariant->size ? $detail->productVariant->size->name : 'N/A' }}</td>
+                                <td>{{ $detail->productVariant->color ? $detail->productVariant->color->name : 'N/A' }}</td>
                                 <td>{{ $detail->quantity }}</td>
                                 <td>{{ number_format($detail->productVariant->product->price ?? 0, 0, ',', '.') }}đ</td>
                             </tr>
@@ -114,16 +129,15 @@
 
             <div class="aorders-actions">
                 <a href="{{ route('admin.orders.index') }}" class="aorders-btn aorders-btn-primary">Quay lại</a>
+                <button onclick="window.print()" class="aorders-btn aorders-btn-primary">In</button>
             </div>
 
-            <!-- Toast thông báo -->
             <div class="aorders-toast" id="toast"></div>
         </div>
 
         <script src="/js/app.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                // Xử lý active sidebar
                 const sidebarItems = document.querySelectorAll(".aorders-sidebar-item");
                 sidebarItems.forEach((item) => {
                     item.addEventListener("click", function(e) {
@@ -133,41 +147,10 @@
                     });
                 });
 
-                // Xử lý modal
-                window.openEditModal = function(orderId, currentStatus, customer, total, date) {
-                    const modal = document.getElementById("editOrderModal");
-                    const statusSelect = document.getElementById("orderStatus");
-                    const orderIdInput = document.getElementById("orderId");
-                    const form = document.getElementById("editOrderForm");
-                    document.getElementById("modalOrderId").textContent = orderId;
-                    document.getElementById("modalCustomer").textContent = customer;
-                    document.getElementById("modalTotal").textContent = total;
-                    document.getElementById("modalDate").textContent = date;
-                    orderIdInput.value = orderId.replace('#DH-', '');
-                    statusSelect.value = currentStatus;
-                    form.action = `/admin/orders/${orderIdInput.value}`;
-                    modal.classList.add("show");
-                };
-
-                window.closeEditModal = function() {
-                    const modal = document.getElementById("editOrderModal");
-                    modal.classList.remove("show");
-                };
-
-                // Xử lý xóa đơn hàng
-                window.deleteOrder = function(orderId) {
-                    if (confirm("Bạn có chắc muốn xóa đơn hàng này?")) {
-                        window.location.href = `/admin/orders/${orderId.replace('#DH-', '')}/delete`;
-                    }
-                };
-
-                // Xử lý toast
-                function showToast(message, type) {
-                    const toast = document.getElementById("toast");
-                    toast.innerHTML = message;
-                    toast.className = `aorders-toast aorders-toast-${type} show`;
-                    setTimeout(() => toast.classList.remove("show"), 3000);
-                }
+                const toasts = document.querySelectorAll('.aorders-toast.show');
+                toasts.forEach(toast => {
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                });
             });
         </script>
     </div>
