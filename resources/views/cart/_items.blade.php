@@ -16,8 +16,7 @@
 </style>
 <div class="gh-cart-items-container gh-cart2">
     <div class="ghcart3">
-
-
+        <!-- Debug: Số lượng items: {{ $cartItems->count() }} -->
         @if($cartItems->isEmpty())
             <div class="cart-items">
                 <div class="empty-cart-icon">
@@ -54,12 +53,20 @@
                         ->get();
                     $availableColors = $availableVariants->pluck('color')->unique('id');
                     $availableSizes = $availableVariants->pluck('size')->unique('id');
-                    $cartItemId = $item->id ?? $variant->id; // Sử dụng id duy nhất
+                    // Tạo cart ID nhất quán để giữ vị trí khi update variant
+                    $cartItemId = 'cart-item-' . $index . '-' . $product->id;
                 @endphp
                 <div class="gh-cart-item" data-cart-id="{{ $cartItemId }}" data-index="{{ $index }}">
-                    <img src="{{ $img?->path }}" alt="" class="gh-cart-item-image">
+                    <div class="gh-cart-item-checkbox-wrapper">
+                        <input type="checkbox" class="gh-cart-item-checkbox" data-variant-id="{{ $variant->id }}">
+                    </div>
+                    <a href="/detail/{{ $product->id }}" class="gh-cart-item-image-link">
+                        <img src="{{ $img?->path }}" alt="" class="gh-cart-item-image">
+                    </a>
                     <div class="gh-cart-item-details">
-                        <h3 class="gh-cart-item-title">{{ $product->name }}</h3>
+                        <a href="/detail/{{ $product->id }}" class="gh-cart-item-title-link">
+                            <h3 class="gh-cart-item-title">{{ $product->name }}</h3>
+                        </a>
                         <div class="gh-cart-item-variant">
                             <form action="{{ route('cart.updateVariant', $variant->id) }}" method="POST"
                                 data-variant-id="{{ $variant->id }}" data-cart-id="{{ $cartItemId }}">

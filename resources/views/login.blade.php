@@ -221,9 +221,9 @@
                             <form class="logins-forgot-form" action="{{ route('password.update') }}" method="POST">
                                 @csrf
                                 <div class="logins-input-group">
-                                    <label for="account">EMAIL HOẶC SỐ ĐIỆN THOẠI</label>
-                                    <input type="text" name="email" id="account" placeholder="Nhập email hoặc số điện thoại đăng ký">
-                                    @error('account')
+                                    <label for="forgot-email">EMAIL</label>
+                                    <input type="email" name="email" id="forgot-email" value="{{ old('email', '') }}" placeholder="Nhập email đăng ký của bạn">
+                                    @error('email')
                                         <p class="logins-error-message">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -244,6 +244,78 @@
     </div>
 
     <script>
+        // Kiểm tra xem có lỗi validation nào và xác định tab nào cần hiển thị
+        @if($errors->any())
+            console.log('Errors detected:', {!! json_encode($errors->all()) !!});
+            console.log('Session form_type:', @json(session('form_type')));
+            
+            @php
+                $formType = session('form_type', 'login');
+            @endphp
+            
+            @if($formType === 'register')
+                // Nếu có lỗi đăng ký, chuyển về tab đăng ký
+                console.log('Switching to register tab');
+                document.addEventListener('DOMContentLoaded', function() {
+                    switchToTab('register');
+                });
+            @elseif($formType === 'forgot')
+                // Nếu có lỗi quên mật khẩu, chuyển về tab quên mật khẩu
+                console.log('Switching to forgot tab');
+                document.addEventListener('DOMContentLoaded', function() {
+                    switchToTab('forgot');
+                });
+            @else
+                // Nếu có lỗi đăng nhập, giữ nguyên tab đăng nhập (mặc định)
+                console.log('Switching to login tab');
+                document.addEventListener('DOMContentLoaded', function() {
+                    switchToTab('login');
+                });
+            @endif
+        @else
+            console.log('No errors detected');
+        @endif
+
+        // Function để chuyển tab
+        function switchToTab(target) {
+            // Xóa active khỏi tất cả nav items
+            document.querySelectorAll('.logins-nav-item').forEach(nav => {
+                nav.classList.remove('logins-active');
+            });
+            
+            // Kích hoạt tab được chọn
+            const targetNav = document.querySelector(`.logins-nav-item[data-target="${target}"]`);
+            if (targetNav) {
+                targetNav.classList.add('logins-active');
+            }
+            
+            // Ẩn tất cả form content
+            document.querySelectorAll('.logins-form-content').forEach(form => {
+                form.classList.remove('logins-active');
+            });
+            
+            // Hiện form được chọn
+            const targetForm = document.getElementById(target);
+            if (targetForm) {
+                targetForm.classList.add('logins-active');
+            }
+            
+            // Update form header
+            const header = document.querySelector('.logins-form-header');
+            if (header) {
+                if (target === 'login') {
+                    header.querySelector('h2').textContent = 'Đăng nhập tài khoản';
+                    header.querySelector('p').textContent = 'Nhập thông tin của bạn để truy cập vào hệ thống';
+                } else if (target === 'register') {
+                    header.querySelector('h2').textContent = 'Tạo tài khoản mới';
+                    header.querySelector('p').textContent = 'Điền thông tin để đăng ký tài khoản';
+                } else if (target === 'forgot') {
+                    header.querySelector('h2').textContent = 'Khôi phục mật khẩu';
+                    header.querySelector('p').textContent = 'Vui lòng cung cấp thông tin để khôi phục mật khẩu';
+                }
+            }
+        }
+
         document.querySelectorAll('.logins-nav-item, .logins-action-link').forEach(item => {
             item.addEventListener('click', function (e) {
                 e.preventDefault();

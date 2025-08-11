@@ -243,6 +243,11 @@ class CartController extends Controller
             }
 
             Session::put('cart', $cart);
+            \Log::info('Added to session cart:', [
+                'variant_id' => $productVariantId,
+                'quantity' => $quantity,
+                'session_cart' => $cart
+            ]);
         }
 
         // Lưu dữ liệu thanh toán session
@@ -355,6 +360,38 @@ class CartController extends Controller
         }
         return redirect()->route('cart.view');
     }
+
+    public function removeMultiple(Request $request)
+    {
+        $validated = $request->validate([
+            'variant_ids' => 'required|array',
+            'variant_ids.*' => 'integer|exists:product_variants,id',
+        ]);
+
+        $variantIds = $validated['variant_ids'];
+
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())
+                ->whereIn('product_variant_id', $variantIds)
+                ->delete();
+        } else {
+            $cart = Session::get('cart', []);
+            $cart = array_filter($cart, function ($item) use ($variantIds) {
+                return !in_array($item['product_variant_id'], $variantIds);
+            });
+            Session::put('cart', array_values($cart));
+        }
+
+        $data = $this->getCartData();
+        if ($request->ajax()) {
+            return response()->json([
+                'items_html' => view('cart._items', $data)->render(),
+                'summary_html' => view('cart._summary', $data)->render(),
+                'message' => 'Đã xóa ' . count($variantIds) . ' sản phẩm khỏi giỏ hàng',
+            ]);
+        }
+        return redirect()->route('cart.view')->with('success', 'Đã xóa ' . count($variantIds) . ' sản phẩm khỏi giỏ hàng');
+    }
     public function updateQuantity($variantId, Request $request)
     {
         $validated = $request->validate([
@@ -395,59 +432,124 @@ class CartController extends Controller
         }
         return redirect()->route('cart.view');
     }
-    public function updateVariant($variantId, Request $request)
+    public function updateVariant(Request $request, $variantId)
     {
-        $validated = $request->validate([
-            'color_id' => 'required|exists:colors,id',
-            'size_id' => 'required|exists:sizes,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-        $oldVariant = product_variants::find($variantId);
-        if (!$oldVariant) {
-            if ($request->ajax()) {
-                return response()->json(['error' => 'Biến thể cũ không tồn tại.'], 422);
-            }
-            return redirect()->route('cart.view')->with('error', 'Biến thể cũ không tồn tại.');
-        }
-
-        $newVariant = product_variants::where('product_id', $oldVariant->product_id)
-            ->where('color_id', $validated['color_id'])
-            ->where('size_id', $validated['size_id'])
-            ->first();
-
-        if (!$newVariant || $newVariant->quantity < $validated['quantity']) {
-            if ($request->ajax()) {
-                return response()->json(['error' => 'Vui lòng giảm số lượng'], 422);
-            }
-            return redirect()->route('cart.view')->with('error', 'Biến thể không tồn tại hoặc hết hàng.');
-        }
-
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->delete();
-            $cartItem = Cart::firstOrNew([
-                'user_id' => Auth::id(),
-                'product_variant_id' => $newVariant->id,
+        try {
+            \Log::info('Raw request data:', ['data' => $request->all()]);
+            \Log::info('Request headers:', ['headers' => $request->headers->all()]);
+            \Log::info('Variant ID from URL:', ['variantId' => $variantId]);
+            
+            $validated = $request->validate([
+                'color_id' => 'required|integer|exists:colors,id',
+                'size_id' => 'required|integer|exists:sizes,id',
+                'quantity' => 'required|integer|min:1',
             ]);
-            $cartItem->quantity = $validated['quantity'];
-            $cartItem->save();
-        } else {
-            $cart = Session::get('cart', []);
-            $cart = array_filter($cart, fn($item) => $item['product_variant_id'] != $variantId);
-            $cart[] = [
-                'product_variant_id' => $newVariant->id,
-                'quantity' => $validated['quantity'],
-            ];
-            Session::put('cart', $cart);
-        }
+            
+            \Log::info('Validated data:', ['validated' => $validated]);
+            
+            $oldVariant = product_variants::find($variantId);
+            if (!$oldVariant) {
+                if ($request->ajax()) {
+                    return response()->json(['error' => 'Biến thể cũ không tồn tại.'], 422);
+                }
+                return redirect()->route('cart.view')->with('error', 'Biến thể cũ không tồn tại.');
+            }
 
-        $data = $this->getCartData();
-        if ($request->ajax()) {
-            return response()->json([
-                'items_html' => view('cart._items', $data)->render(),
-                'summary_html' => view('cart._summary', $data)->render(),
-            ]);
+            $newVariant = product_variants::where('product_id', $oldVariant->product_id)
+                ->where('color_id', $validated['color_id'])
+                ->where('size_id', $validated['size_id'])
+                ->first();
+
+            if (!$newVariant) {
+                if ($request->ajax()) {
+                    return response()->json(['error' => 'Không tìm thấy biến thể với màu sắc và kích thước này.'], 422);
+                }
+                return redirect()->route('cart.view')->with('error', 'Không tìm thấy biến thể với màu sắc và kích thước này.');
+            }
+
+            if ($newVariant->quantity < $validated['quantity']) {
+                if ($request->ajax()) {
+                    return response()->json(['error' => 'Chỉ còn ' . $newVariant->quantity . ' sản phẩm. Vui lòng giảm số lượng.'], 422);
+                }
+                return redirect()->route('cart.view')->with('error', 'Không đủ số lượng trong kho.');
+            }
+
+            if (Auth::check()) {
+                // Lấy cart item cũ để giữ nguyên vị trí
+                $oldCartItem = Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->first();
+                
+                if ($oldCartItem) {
+                    // Kiểm tra xem variant mới đã tồn tại trong cart chưa
+                    $existingNewCartItem = Cart::where('user_id', Auth::id())
+                        ->where('product_variant_id', $newVariant->id)
+                        ->first();
+                    
+                    if ($existingNewCartItem && $existingNewCartItem->id !== $oldCartItem->id) {
+                        // Nếu variant mới đã tồn tại, cộng dồn số lượng và xóa item cũ
+                        $existingNewCartItem->quantity += $validated['quantity'];
+                        $existingNewCartItem->save();
+                        $oldCartItem->delete();
+                    } else {
+                        // Nếu variant mới chưa tồn tại, chỉ cập nhật variant_id của item cũ
+                        $oldCartItem->product_variant_id = $newVariant->id;
+                        $oldCartItem->quantity = $validated['quantity'];
+                        $oldCartItem->save();
+                    }
+                }
+            } else {
+                $cart = Session::get('cart', []);
+                $oldItemIndex = null;
+                
+                // Tìm vị trí của item cũ
+                foreach ($cart as $index => $item) {
+                    if ($item['product_variant_id'] == $variantId) {
+                        $oldItemIndex = $index;
+                        break;
+                    }
+                }
+                
+                if ($oldItemIndex !== null) {
+                    // Kiểm tra xem variant mới đã tồn tại chưa
+                    $existingNewItemIndex = null;
+                    foreach ($cart as $index => $item) {
+                        if ($item['product_variant_id'] == $newVariant->id && $index !== $oldItemIndex) {
+                            $existingNewItemIndex = $index;
+                            break;
+                        }
+                    }
+                    
+                    if ($existingNewItemIndex !== null) {
+                        // Nếu variant mới đã tồn tại, cộng dồn số lượng và xóa item cũ
+                        $cart[$existingNewItemIndex]['quantity'] += $validated['quantity'];
+                        unset($cart[$oldItemIndex]);
+                        $cart = array_values($cart); // Reindex array
+                    } else {
+                        // Nếu variant mới chưa tồn tại, chỉ cập nhật variant_id của item cũ
+                        $cart[$oldItemIndex]['product_variant_id'] = $newVariant->id;
+                        $cart[$oldItemIndex]['quantity'] = $validated['quantity'];
+                    }
+                    
+                    Session::put('cart', $cart);
+                }
+            }
+
+            $data = $this->getCartData();
+            if ($request->ajax()) {
+                return response()->json([
+                    'items_html' => view('cart._items', $data)->render(),
+                    'summary_html' => view('cart._summary', $data)->render(),
+                    'message' => 'Đã cập nhật',
+                ]);
+            }
+            return redirect()->route('cart.view')->with('success', 'Đã cập nhật biến thể sản phẩm');
+            
+        } catch (\Exception $e) {
+            \Log::error('Cart update variant error: ' . $e->getMessage());
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
+            }
+            return redirect()->route('cart.view')->with('error', 'Có lỗi xảy ra khi cập nhật biến thể.');
         }
-        return redirect()->route('cart.view');
     }
 
 

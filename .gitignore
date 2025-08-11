@@ -19,6 +19,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/python/venv
 Homestead.json
 Homestead.yaml
 npm-debug.log

@@ -19,6 +19,9 @@ class LoginController extends Controller
     }
     public function login(Request $request)
     {
+        // Đánh dấu đây là form login
+        session(['form_type' => 'login']);
+        
         $request->validate([
             'email' => 'required',
             'password' => 'required|string|min:8',
@@ -45,12 +48,16 @@ class LoginController extends Controller
                 ])->withInput();
             }
             if (Auth::user()->is_locked == 0) {
-        Auth::logout();
+                Auth::logout();
 
-        return back()->withErrors([
-            'email' => 'Tài khoản của bạn đã bị khóa.',
-        ])->withInput();
-    }
+                return back()->withErrors([
+                    'email' => 'Tài khoản của bạn đã bị khóa.',
+                ])->withInput();
+            }
+
+            // Đồng bộ giỏ hàng từ session vào database ngay sau khi đăng nhập
+            \Log::info('Starting cart sync after login for user: ' . Auth::id());
+            $this->syncCartFromSession();
 
             return redirect()->route('home');
         }
@@ -63,6 +70,9 @@ class LoginController extends Controller
 
     public function register(Request $request)
     {
+        // Đánh dấu đây là form register
+        session(['form_type' => 'register']);
+        
         $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email',
@@ -103,7 +113,7 @@ class LoginController extends Controller
         }
 
 
-        return redirect()->route('home')->with(
+        return redirect()->route('showlogin')->with(
             'status',
             'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.'
         );
@@ -118,29 +128,11 @@ class LoginController extends Controller
         return redirect()->route('showlogin');
     }
 
-    protected function authenticated(Request $request, $user)
-    {
-        // Lấy giỏ hàng từ session
-        $sessionCart = session()->get('cart', []);
-
-        // Đồng bộ với database
-        foreach ($sessionCart as $item) {
-            $cartItem = \App\Models\Cart::firstOrNew([
-                'user_id' => $user->id,
-                'product_variant_id' => $item['product_variant_id'],
-            ]);
-            $cartItem->quantity += $item['quantity'];
-            $cartItem->save();
-        }
-
-        // Xóa giỏ hàng trong session
-        session()->forget('cart');
-
-        return redirect('/');
-    }
-
     public function ForgotPassword(Request $request)
     {
+        // Đánh dấu đây là form forgot password
+        session(['form_type' => 'forgot']);
+        
         $request->validate([
             'email' => 'required|email',
         ], [
@@ -193,5 +185,75 @@ class LoginController extends Controller
         $user->save();
 
         return redirect()->route('showlogin')->with('status', 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập.');
+    }
+
+    /**
+     * Đồng bộ giỏ hàng từ session vào database khi user đăng nhập
+     */
+    private function syncCartFromSession()
+    {
+        if (!Auth::check()) {
+            \Log::info('Cart sync failed: User not authenticated');
+            return;
+        }
+
+        $sessionCart = session()->get('cart', []);
+        \Log::info('Session cart data:', ['cart' => $sessionCart]);
+        
+        if (empty($sessionCart)) {
+            \Log::info('Cart sync skipped: Session cart is empty');
+            return;
+        }
+
+        $userId = Auth::id();
+        $syncedCount = 0;
+
+        foreach ($sessionCart as $item) {
+            \Log::info('Processing cart item:', ['item' => $item]);
+            
+            if (empty($item['product_variant_id']) || empty($item['quantity'])) {
+                \Log::warning('Skipping invalid cart item:', ['item' => $item]);
+                continue;
+            }
+
+            // Kiểm tra xem sản phẩm đã có trong giỏ hàng database chưa
+            $existingCartItem = \App\Models\Cart::where('user_id', $userId)
+                ->where('product_variant_id', $item['product_variant_id'])
+                ->first();
+
+            if ($existingCartItem) {
+                // Nếu đã có, cộng thêm số lượng
+                $oldQuantity = $existingCartItem->quantity;
+                $existingCartItem->quantity += $item['quantity'];
+                $existingCartItem->save();
+                \Log::info('Updated existing cart item:', [
+                    'variant_id' => $item['product_variant_id'],
+                    'old_quantity' => $oldQuantity,
+                    'added_quantity' => $item['quantity'],
+                    'new_quantity' => $existingCartItem->quantity
+                ]);
+            } else {
+                // Nếu chưa có, tạo mới
+                \App\Models\Cart::create([
+                    'user_id' => $userId,
+                    'product_variant_id' => $item['product_variant_id'],
+                    'quantity' => $item['quantity'],
+                ]);
+                \Log::info('Created new cart item:', [
+                    'variant_id' => $item['product_variant_id'],
+                    'quantity' => $item['quantity']
+                ]);
+            }
+            $syncedCount++;
+        }
+
+        // Xóa giỏ hàng trong session sau khi đồng bộ
+        session()->forget('cart');
+        
+        \Log::info('Cart sync completed:', [
+            'user_id' => $userId,
+            'total_items' => count($sessionCart),
+            'synced_items' => $syncedCount
+        ]);
     }
 }

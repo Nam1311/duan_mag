@@ -173,6 +173,7 @@ Route::post('/cart/session-add', [CartController::class, 'storeSessionCart']);
 Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
 // xóa và tăng số lượng
 Route::delete('/cart/remove/{variantId}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::delete('/cart/remove-multiple', [CartController::class, 'removeMultiple'])->name('cart.removeMultiple');
 Route::put('/cart/update/{variantId}', [CartController::class, 'updateQuantity'])->name('cart.update');
 // Đếm số lượng sản phẩm trong giỏ hàng
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');

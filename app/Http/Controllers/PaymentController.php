@@ -108,6 +108,9 @@ class PaymentController extends Controller
         $order->user_id = Auth::id() ?? null;
         $order->voucher_id = $voucherId;
         $order->total_price = $total;
+        $order->total = $subtotal; // Tổng tiền trước khi áp dụng voucher và phí ship
+        $order->total_final = $total; // Tổng tiền cuối cùng sau khi áp dụng voucher và phí ship
+        $order->ship_price = $shippingFee; // Phí vận chuyển
         $order->status_payment = 'Chờ xử lý';
         $order->payment_methods = $request->payment;
         $order->status = 'Chờ xác nhận';
@@ -115,6 +118,7 @@ class PaymentController extends Controller
 
         if (Auth::check()) {
             $user = Auth::user();
+            $order->name = $user->name; // Tên người đặt hàng
             if (!$user->phone && $request->filled('phone')) {
                 $user->phone = $request->phone;
                 $user->save();
@@ -137,6 +141,8 @@ class PaymentController extends Controller
             $address->ward = $request->ward;
             $address->address = $request->address;
             $address->save();
+            
+            $order->name = $request->fullname; // Tên người đặt hàng khi chưa đăng nhập
             $order->phone = $request->phone;
             $order->address = $request->address . ', ' . $request->ward . ', ' . $request->district . ', ' . $request->city;
             $order->address_id = $address->id;

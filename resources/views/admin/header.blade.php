@@ -23,7 +23,7 @@
     </div>
     <div class="adbl-sidebar-section">
         <h3>Nội dung</h3>
-        <a href="{{ asset('/admin/quanlytintuc') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlytintuc*') ? 'adbl-active' : '' }}"><i class="fas fa-newspaper"></i><span>Tin tức</span></a>
+        <a href="{{ asset('/admin/news') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlytintuc*') ? 'adbl-active' : '' }}"><i class="fas fa-newspaper"></i><span>Tin tức</span></a>
         <a href="{{ asset('/admin/comments') }}" class="adbl-sidebar-item {{ request()->is('admin/comments*') ? 'adbl-active' : '' }}"><i class="fas fa-comments"></i><span>Bình luận</span></a>
     </div>
     <div class="adbl-sidebar-section">

@@ -30,6 +30,7 @@
      max-width: 1400px;
      margin: 10px auto;
      padding: 0 20px;
+     box-sizing: border-box;
  }
 
  /* Cart Layout */
@@ -38,6 +39,14 @@
      grid-template-columns: 1fr 380px;
      gap: 30px;
      padding-bottom: 80px;
+     max-width: 100%;
+     overflow-x: hidden;
+ }
+
+ .gh-cart-items-section {
+     display: flex;
+     flex-direction: column;
+     gap: 0;
  }
 
  /* Cart Items */
@@ -47,6 +56,9 @@
      /* padding: 30px; */
      box-shadow: var(--gh-cart-shadow);
      display: block; /* Sử dụng block thay vì grid để giữ thứ tự tự nhiên */
+     max-width: 100%;
+     overflow-x: hidden;
+     box-sizing: border-box;
  }
 
  .gh-cart-items-header {
@@ -73,15 +85,31 @@
  /* Cart Item */
  .gh-cart-item {
      display: grid;
-     grid-template-columns: 100px 1fr 150px 120px;
-     gap: 20px;
+     grid-template-columns: 30px 100px 1fr 150px 120px;
+     gap: 15px;
      padding: 20px 0;
      border-bottom: 1px solid var(--gh-cart-medium-gray);
      align-items: center;
+     max-width: 100%;
+     overflow-x: hidden;
+     box-sizing: border-box;
  }
 
  .gh-cart-item:last-child {
      border-bottom: none;
+ }
+
+ .gh-cart-item-checkbox-wrapper {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     min-width: 30px;
+ }
+
+ .gh-cart-item-checkbox {
+     margin: 0;
+     transform: scale(1.2);
+     cursor: pointer;
  }
 
  .gh-cart-item-image {
@@ -96,6 +124,21 @@
  .gh-cart-item-image:hover {
      transform: scale(1.03);
      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+ }
+
+ .gh-cart-item-image-link {
+     display: block;
+     text-decoration: none;
+ }
+
+ .gh-cart-item-title-link {
+     text-decoration: none;
+     color: inherit;
+ }
+
+ .gh-cart-item-title-link:hover {
+     color: var(--gh-cart-primary);
+     text-decoration: underline;
  }
 
  .gh-cart-item-details {
@@ -392,13 +435,14 @@
 
  /* Giỏ hàng rỗng */
  .cart-items {
-     padding: 60px 40px;
+     padding: 40px 20px;
      display: flex;
      flex-direction: column;
      align-items: center;
      justify-content: center;
      text-align: center;
-     background: #fcfcfc;
+     background: transparent;
+     min-height: 300px;
  }
 
  .empty-cart-icon {
@@ -616,6 +660,13 @@
  }
 
  /* Responsive */
+ @media (min-width: 1201px) {
+     .gh-cart-item {
+         grid-template-columns: 30px 100px 2fr 150px 120px;
+         gap: 20px;
+     }
+ }
+
  @media (max-width: 1200px) {
      .gh-cart-container {
          width: 92%;
@@ -649,6 +700,11 @@
      .gh-cart-page-header {
          padding: 50px 0 30px;
      }
+
+     .gh-cart-item {
+         grid-template-columns: 25px 80px 1fr 140px 100px;
+         gap: 10px;
+     }
  }
 
  @media (max-width: 768px) {
@@ -666,15 +722,16 @@
      }
 
      .gh-cart-item {
-         grid-template-columns: 80px 1fr;
+         grid-template-columns: 25px 80px 1fr;
          grid-template-rows: auto auto auto;
-         gap: 15px;
+         gap: 10px;
          padding: 20px 0;
      }
 
      .gh-cart-item-price,
      .gh-cart-quantity-control {
-         grid-column: span 2;
+         grid-column: span 3;
+         justify-self: start;
      }
 
      .gh-cart-item-details {
@@ -692,6 +749,20 @@
      .gh-cart-items-container,
      .gh-cart-summary {
          padding: 20px;
+     }
+
+     .gh-cart-bulk-actions {
+         padding: 8px !important;
+         gap: 10px !important;
+     }
+
+     .gh-cart-bulk-actions label {
+         font-size: 12px !important;
+     }
+
+     #gh-cart-remove-selected {
+         padding: 6px 12px !important;
+         font-size: 12px !important;
      }
  }
 
@@ -720,8 +791,13 @@
      }
 
      .gh-cart-item {
-         grid-template-columns: 70px 1fr;
-         gap: 12px;
+         grid-template-columns: 20px 70px 1fr;
+         gap: 8px;
+     }
+
+     .gh-cart-item-price,
+     .gh-cart-quantity-control {
+         grid-column: span 3;
      }
 
      .gh-cart-item-image {
@@ -739,5 +815,21 @@
      .gh-cart-checkout-btn {
          height: 44px;
          font-size: 14px;
+     }
+
+     .gh-cart-bulk-actions {
+         flex-direction: column !important;
+         align-items: flex-start !important;
+         gap: 8px !important;
+         padding: 10px !important;
+     }
+
+     .gh-cart-bulk-actions label {
+         font-size: 14px !important;
+     }
+
+     #gh-cart-remove-selected {
+         width: 100%;
+         justify-content: center;
      }
  }
