@@ -329,6 +329,7 @@
         border-radius: 0.5rem;
         padding: 1.5rem;
         width: 100%;
+        margin-left: 650px;
         max-width: 600px;
         box-shadow: var(--shadow-md);
         max-height: 90vh;
