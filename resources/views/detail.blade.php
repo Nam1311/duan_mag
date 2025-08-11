@@ -77,6 +77,33 @@
                         <div class="original-price">{{ number_format($product_detail->original_price) }}đ</div>
                         <div class="discount-badge">{{ $product_detail->sale }}%</div>
                     </div>
+                    <style>
+                        .detail-try-on{
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            /* width: 170.5px; */
+                            height: 50.4px;
+                            background-color: black;
+                            box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
+                            cursor: pointer;
+                            margin-bottom: 5px;
+                        }
+                        .detail-try-on>a{
+                            /* margin: auto; */
+                            color: white;
+                        }
+                        .detail-try-on>a>i{
+                            color: white;
+                            font-size: 16px;
+                        }
+                        .detail-try-on>p{
+                            /* margin: auto; */
+                            color: white;
+                            font-size: 12px;
+                        }
+                    </style>
                     <div class="detail-button-mua" style="margin-bottom: 15px">
                         <button class="add-button-detail" id="btnAddCart">
                             <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
@@ -89,6 +116,10 @@
                         <input type="hidden" id="product_variant_id" name="product_variant_id" value="">
                         {{-- quantity input exists --}}
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
+                    </div>
+                    <div class="detail-try-on">
+                        <a href="/try-on"><i class="fa fa-asterisk" aria-hidden="true"></i>   Thử ngay</a>
+                        <p>Phòng thử đồ online</p>
                     </div>
 
                     {{-- giới thiệu sản phẩm --}}
