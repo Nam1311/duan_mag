@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlynguoidung.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/quanlytintuc.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/admin/binhluan.css') }}">
+     <link rel="stylesheet" href="{{ asset('/css/admin/orders.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic-all/ckeditor.js"></script>
 

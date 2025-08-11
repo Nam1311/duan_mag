@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+     Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('address_id')->nullable()->constrained('addresses')->onDelete('set null');
+            $table->string('phone')->nullable();
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->onDelete('set null');
             $table->decimal('total_price', 12, 2);
-            $table->string('status');
+            $table->string('status')->default('Chờ xác nhận');
+            $table->string('name')->nullable()->after('id');
             $table->timestamps();
             $table->softDeletes();
-        });
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('status')->default('Chờ xác nhận');
         });
     }
 
