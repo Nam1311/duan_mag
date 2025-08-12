@@ -83,7 +83,6 @@
                             flex-direction: column;
                             justify-content: center;
                             align-items: center;
-                            /* width: 170.5px; */
                             height: 50.4px;
                             background-color: black;
                             box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
@@ -91,7 +90,6 @@
                             margin-bottom: 5px;
                         }
                         .detail-try-on>a{
-                            /* margin: auto; */
                             color: white;
                         }
                         .detail-try-on>a>i{
@@ -99,7 +97,6 @@
                             font-size: 16px;
                         }
                         .detail-try-on>p{
-                            /* margin: auto; */
                             color: white;
                             font-size: 12px;
                         }

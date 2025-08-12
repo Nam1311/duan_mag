@@ -533,6 +533,64 @@
                 });
         }
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartIcons = document.querySelectorAll('.item-buy-now');
+
+        cartIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                const productLink = icon.closest('.item').querySelector('a');
+                if (!productLink) return;
+
+                const href = productLink.getAttribute('href');
+                const productId = href.split('/').pop(); // e.g. /detail/10 => 10
+
+                BuyInHome(productId);
+            });
+        });
+    });
+
+    // mua ở trang chủ
+    function BuyInHome(productId) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/cart/add/home', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                product_variant_id: null,
+                quantity: 1,
+                product_id: productId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Đã xảy ra lỗi');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.redirect) {
+                window.location.href = data.redirect; // chuyển tới thanh toán nếu thành công
+            } else {
+                alert(data.message || 'Thêm sản phẩm thành công');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            alert(error.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+        });
+    }
+</script>
     <script src="{{ asset('/js/detail.js') }}"></script>
 
 @endsection
