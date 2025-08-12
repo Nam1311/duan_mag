@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('/css/admin/banner.css') }}">
 
 <div class="container">
-    <h2>Quản lý Banner</h2>
+    <h2 class="h2-banner">Quản lý Banner</h2>
     <button class="btn btn-primary" onclick="openModal()">+ Thêm Banner</button>
 
     {{-- Danh sách banner --}}

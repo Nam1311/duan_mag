@@ -31,12 +31,27 @@ class PageController extends Controller
         $product_categories = Product_categories::all();
         $news = News::where('views', '>', 190)->take(6)->get();
         $product_new = Product_categories::with(['products' => function ($query) {
-            $query->take(8);
+            $query->where('is_active', '>', 0)
+                ->take(8);
         }])->get();
-        $products_bestseller = Products::with('thumbnail')
+
+
+        $products_bestseller = Products::with([
+                'thumbnail',
+                'images',
+                'variants'
+            ])
             ->orderBy('sold_count', 'desc')
             ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
-            ->take(8)->get();
+            ->take(8)
+            ->get();
+
+
+        // Lấy danh sách màu và kích thước toàn cục (nếu cần)
+        $allColors = colors::all(); // Giả sử có model Color
+        $allSizes = sizes::all();   // Giả sử có model Size
+
+
 
         // ======== Flash Sale =========
         $now = Carbon::now('Asia/Ho_Chi_Minh');
@@ -109,6 +124,12 @@ class PageController extends Controller
                         ->where('id', '!=', $product->id)
                         ->with('images')
                         ->get();
+                    // Map thêm màu & size
+                    $recommendedProducts->map(function ($product) {
+                        $product->colors = $product->variants->pluck('color')->unique()->values();
+                        $product->sizes  = $product->variants->pluck('size')->unique()->values();
+                        return $product;
+                    });
                 }
             }
         }
@@ -124,9 +145,32 @@ class PageController extends Controller
             'products_bestseller' => $products_bestseller,
             'sliders' => $sliders,
             'recommendedProducts' => $recommendedProducts,
+            'allColors' => $allColors,
+            'allSizes' => $allSizes
         ];
 
         return view('home', $data);
+    }
+
+    public function get_variant($id)
+    {
+        $product = Products::with(['variants.color', 'variants.size'])->findOrFail($id);
+        $colors = $product->variants->map->color->unique('id')->values();
+        $sizes = $product->variants->map->size->unique('id')->values();
+        $variants = $product->variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'color_id' => $variant->color_id,
+                'size_id' => $variant->size_id,
+                'quantity' => $variant->quantity
+            ];
+        })->values();
+
+        return response()->json([
+            'colors' => $colors,
+            'sizes' => $sizes,
+            'variants' => $variants
+        ]);
     }
 
     public function detail($id)
@@ -145,23 +189,23 @@ class PageController extends Controller
 
         // Lưu sản phẩm đã xem vào session
         $viewedProducts = session()->get('viewed_products', []);
-        
+
         // Loại bỏ sản phẩm hiện tại nếu đã tồn tại để tránh trùng lặp
         $viewedProducts = array_filter($viewedProducts, function($productId) use ($id) {
             return $productId != $id;
         });
-        
+
         // Thêm sản phẩm hiện tại vào đầu danh sách
         array_unshift($viewedProducts, (int)$id);
-        
+
         // Giới hạn chỉ lưu 10 sản phẩm gần nhất
         $viewedProducts = array_slice($viewedProducts, 0, 10);
-        
+
         // Cập nhật session
         session()->put('viewed_products', $viewedProducts);
 
 $reviewDetail = reviews::with([
-    'user', 
+    'user',
     'replies.user',           // load user của reply
     'replies.replies.user'    // load reply của reply (2 cấp)
 ])
@@ -207,7 +251,7 @@ $reviewDetail = reviews::with([
     }
 
 
-    
+
     public function getVariantQuantity(Request $request)
     {
         $productId = (int) $request->query('product_id');
@@ -225,7 +269,7 @@ $reviewDetail = reviews::with([
 
         // Kiểm tra category để quyết định logic tìm variant
         $categoryName = strtolower($product->category->name ?? '');
-        $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+        $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') ||
                                str_contains($categoryName, 'quần') ||
                                str_contains($categoryName, 'accessories') ||
                                str_contains($categoryName, 'pants') ||

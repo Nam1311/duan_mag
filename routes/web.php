@@ -45,6 +45,8 @@ use App\Http\Controllers\Admin\AdminBaocaoController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
 
+use App\Models\Products;
+use App\Models\product_variants;
 
 Route::get('about', function () {
     return view('about');
@@ -422,3 +424,6 @@ Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review
 
 Route::get('/admin/caidat', [AdminSettingController::class, 'index']);
 Route::post('/admin/settings/update', [AdminSettingController::class, 'update'])->name('admin.settings.update');
+
+// laays biến thể mua ngay
+Route::get('/api/product/{id}', [PageController::class, 'get_variant']);

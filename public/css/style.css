@@ -1298,6 +1298,25 @@ header>.nav-top>.nav-pc>ul>li>a {
     opacity: 1;
 }
 
+.item-select-variant{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background-color: rgb(0, 0, 0);
+    width: 100%;
+    bottom: 0px;
+}
+.a-buy-now{
+    color: white;
+    padding: 13px;
+}
+.item-img:hover .item-select-variant {
+    opacity: 1;
+}
+
 .item-img:hover .item-icon {
     opacity: 1;
 }
@@ -1734,14 +1753,16 @@ footer {
 /* fillter */
 .pruductall-danhmuc {
     background: white;
-    /* border-radius: 10px; */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     padding: 20px;
-    /* position: fixed; */
-    margin-top: 20px;
+    margin-top: 70px;
     top: 20px;
+    position: fixed;
 }
 
+.pruductall-danhmuc.stop-fixed {
+    position: absolute;
+}
 .filter {
     margin-top: 20px;
 }
