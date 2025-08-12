@@ -21,7 +21,7 @@ class LoginController extends Controller
     {
         // Đánh dấu đây là form login
         session(['form_type' => 'login']);
-        
+
         $request->validate([
             'email' => 'required',
             'password' => 'required|string|min:8',
@@ -47,7 +47,7 @@ class LoginController extends Controller
                     'email' => 'Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt.',
                 ])->withInput();
             }
-            if (Auth::user()->is_locked == 0) {
+            if (Auth::user()->is_locked == 1) {
                 Auth::logout();
 
                 return back()->withErrors([
@@ -72,7 +72,7 @@ class LoginController extends Controller
     {
         // Đánh dấu đây là form register
         session(['form_type' => 'register']);
-        
+
         $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email',
@@ -132,7 +132,7 @@ class LoginController extends Controller
     {
         // Đánh dấu đây là form forgot password
         session(['form_type' => 'forgot']);
-        
+
         $request->validate([
             'email' => 'required|email',
         ], [
@@ -199,7 +199,7 @@ class LoginController extends Controller
 
         $sessionCart = session()->get('cart', []);
         \Log::info('Session cart data:', ['cart' => $sessionCart]);
-        
+
         if (empty($sessionCart)) {
             \Log::info('Cart sync skipped: Session cart is empty');
             return;
@@ -210,7 +210,7 @@ class LoginController extends Controller
 
         foreach ($sessionCart as $item) {
             \Log::info('Processing cart item:', ['item' => $item]);
-            
+
             if (empty($item['product_variant_id']) || empty($item['quantity'])) {
                 \Log::warning('Skipping invalid cart item:', ['item' => $item]);
                 continue;
@@ -249,7 +249,7 @@ class LoginController extends Controller
 
         // Xóa giỏ hàng trong session sau khi đồng bộ
         session()->forget('cart');
-        
+
         \Log::info('Cart sync completed:', [
             'user_id' => $userId,
             'total_items' => count($sessionCart),

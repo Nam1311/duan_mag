@@ -1,479 +1,440 @@
-      :root {
-        --primary-color: #4f46e5;
-        --danger-color: #ef4444;
-        --success-color: #22c55e;
-        --secondary-color: #f9fafb;
-        --light-color: #ffffff;
-        --border-color: #e5e7eb;
-        --text-color: #374151;
-        --text-muted: #6b7280;
-        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      }
+:root {
+  --primary-color: #4f46e5;
+  --danger-color: #ef4444;
+  --success-color: #22c55e;
+  --secondary-color: #f9fafb;
+  --light-color: #ffffff;
+  --border-color: #e5e7eb;
+  --text-color: #374151;
+  --text-muted: #6b7280;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Inter", sans-serif;
-      }
-      body {
-        background-color: var(--secondary-color);
-        color: var(--text-color);
-      }
-      .acustomermanagement-container {
-        display: flex;
-        min-height: 100vh;
-      }
-      .acustomermanagement-sidebar {
-        width: 280px;
-        background-color: var(--light-color);
-        padding: 1.5rem 0;
-        box-shadow: var(--shadow-sm);
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        transition: width 0.3s ease;
-      }
-      .acustomermanagement-sidebar-header {
-        padding: 0 1.5rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 1.5rem;
-      }
-      .acustomermanagement-sidebar-header h2 {
-        color: var(--primary-color);
-        font-size: 1.25rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-      .acustomermanagement-sidebar-header h2 i {
-        font-size: 1.5rem;
-      }
-      .acustomermanagement-sidebar-section {
-        margin-bottom: 2rem;
-        padding: 0 1.5rem;
-      }
-      .acustomermanagement-sidebar-section h3 {
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-      }
-      .acustomermanagement-sidebar-item {
-        padding: 0.75rem 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s ease;
-        color: var(--text-color);
-        text-decoration: none;
-        font-weight: 500;
-      }
-      .acustomermanagement-sidebar-item i {
-        width: 1.5rem;
-        text-align: center;
-        font-size: 1rem;
-      }
-      .acustomermanagement-sidebar-item:hover {
-        background-color: var(--secondary-color);
-        color: var(--primary-color);
-        transform: translateX(0.25rem);
-      }
-      .acustomermanagement-sidebar-item.acustomermanagement-active {
-        background-color: rgba(79, 70, 229, 0.1);
-        color: var(--primary-color);
-        font-weight: 600;
-      }
-      .acustomermanagement-main-content {
-        flex: 1;
-        padding: 2rem;
-        background-color: var(--secondary-color);
-      }
-      .acustomermanagement-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-      .acustomermanagement-search-bar {
-        display: flex;
-        align-items: center;
-        background-color: var(--light-color);
-        border-radius: 0.5rem;
-        padding: 0.5rem 1rem;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: var(--shadow-sm);
-        transition: all 0.2s ease;
-      }
-      .acustomermanagement-search-bar:hover {
-        box-shadow: var(--shadow-md);
-      }
-      .acustomermanagement-search-bar input {
-        border: none;
-        outline: none;
-        flex: 1;
-        padding: 0.5rem;
-        font-size: 0.9rem;
-        background: transparent;
-      }
-      .acustomermanagement-search-bar i {
-        color: var(--text-muted);
-        margin-right: 0.5rem;
-      }
-      .acustomermanagement-user-profile {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-      .acustomermanagement-notification-bell {
-        position: relative;
-        font-size: 1.25rem;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: color 0.2s ease;
-      }
-      .acustomermanagement-notification-bell:hover {
-        color: var(--primary-color);
-      }
-      .acustomermanagement-notification-bell::after {
-        content: "3";
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: var(--danger-color);
-        color: white;
-        border-radius: 50%;
-        font-size: 0.7rem;
-        width: 1rem;
-        height: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .acustomermanagement-profile-avatar {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-      }
-      .acustomermanagement-page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-color);
-        margin-bottom: 0.5rem;
-      }
-      .acustomermanagement-page-subtitle {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
-      }
-      .acustomermanagement-filter-bar {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-      }
-      .acustomermanagement-filter-select {
-        padding: 0.5rem;
-        border-radius: 0.375rem;
-        border: 1px solid var(--border-color);
-        background: var(--light-color);
-        font-size: 0.85rem;
-      }
-      .acustomermanagement-data-card {
-        background-color: var(--light-color);
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
-      }
-      .acustomermanagement-data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .acustomermanagement-data-table th {
-        text-align: left;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--border-color);
-      }
-      .acustomermanagement-data-table td {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 0.85rem;
-      }
-      .acustomermanagement-data-table tr:last-child td {
-        border-bottom: none;
-      }
-      .acustomermanagement-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        cursor: pointer;
-        border: none;
-        transition: all 0.2s ease;
-        margin-right: 0.5rem;
-        position: relative;
-      }
-      .acustomermanagement-btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-      }
-      .acustomermanagement-btn-primary:hover {
-        background-color: #4338ca;
-      }
-      .acustomermanagement-btn-secondary {
-        background-color: var(--light-color);
-        color: var(--text-color);
-        border: 1px solid var(--border-color);
-      }
-      .acustomermanagement-btn-secondary:hover {
-        background-color: #f3f4f6;
-      }
-      .acustomermanagement-btn-danger {
-        background-color: var(--danger-color);
-        color: white;
-      }
-      .acustomermanagement-btn-danger:hover {
-        background-color: #dc2626;
-      }
-      .acustomermanagement-btn:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--text-color);
-        color: white;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        z-index: 10;
-      }
-      .acustomermanagement-status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-      }
-      .acustomermanagement-status-active {
-        background-color: rgba(34, 197, 94, 0.1);
-        color: var(--success-color);
-      }
-      .acustomermanagement-status-inactive {
-        background-color: rgba(107, 114, 128, 0.1);
-        color: var(--text-muted);
-      }
-      .acustomermanagement-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 1rem 0;
-      }
-      .acustomermanagement-pagination-controls {
-        display: flex;
-        gap: 0.5rem;
-      }
-      .acustomermanagement-pagination-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        border: 1px solid var(--border-color);
-        background: var(--light-color);
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-      }
-      .acustomermanagement-pagination-btn:hover {
-        background: var(--secondary-color);
-      }
-      .acustomermanagement-pagination-btn.acustomermanagement-active {
-        background: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-      }
-      .acustomermanagement-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      }
-      .acustomermanagement-modal-content {
-        background: white;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        width: 100%;
-        max-width: 600px;
-        box-shadow: var(--shadow-md);
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-      .acustomermanagement-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-      }
-      .acustomermanagement-modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-      .acustomermanagement-modal-close {
-        display: flex;
-        justify-content: flex-end;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-muted);
-      }
-      .acustomermanagement-modal-close:hover {
-        color: var(--text-color);
-      }
-      .acustomermanagement-modal-body {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-      .acustomermanagement-modal-body label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-      }
-      .acustomermanagement-modal-body input,
-      .acustomermanagement-modal-body select {
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.375rem;
-        font-size: 0.85rem;
-        width: 100%;
-      }
-      .acustomermanagement-modal-body p {
-        font-size: 0.85rem;
-        margin-bottom: 0.5rem;
-      }
-      .acustomermanagement-modal-body p strong {
-        font-weight: 600;
-      }
-      .acustomermanagement-modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-      }
-      .acustomermanagement-order-history {
-        margin-top: 1rem;
-      }
-      .acustomermanagement-order-history h3 {
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-      }
-      .acustomermanagement-order-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .acustomermanagement-order-table th {
-        border: 1px solid var(--border-color);
-      }
-      .acustomermanagement-order-table td {
-        border: 1px solid var(--border-color);
-        padding: 0.5rem;
-        font-size: 0.85rem;
-        text-align: left;
-      }
-      .acustomermanagement-order-table th {
-        background: var(--secondary-color);
-        font-weight: 500;
-      }
-      @media (max-width: 1024px) {
-        .acustomermanagement-sidebar {
-          width: 80px;
-        }
-        .acustomermanagement-sidebar-header h2 span,
-        .acustomermanagement-sidebar-item span,
-        .acustomermanagement-sidebar-section h3 {
-          display: none;
-        }
-        .acustomermanagement-sidebar-item {
-          justify-content: center;
-        }
-        .acustomermanagement-sidebar-item i {
-          margin: 0;
-        }
-        .acustomermanagement-data-table th,
-        .acustomermanagement-data-table td {
-          font-size: 0.75rem;
-          padding: 0.5rem;
-        }
-      }
-      @media (max-width: 768px) {
-        .acustomermanagement-container {
-          flex-direction: column;
-        }
-        .acustomermanagement-sidebar {
-          width: 100%;
-          height: auto;
-          position: relative;
-        }
-        .acustomermanagement-main-content {
-          padding: 1rem;
-        }
-        .acustomermanagement-search-bar {
-          max-width: 100%;
-        }
-        .acustomermanagement-filter-bar {
-          flex-direction: column;
-        }
-        .acustomermanagement-modal-content {
-          margin: 1rem;
-          max-width: 90%;
-        }
-        .acustomermanagement-data-table {
-          display: block;
-          overflow-x: auto;
-        }
-        .acustomermanagement-data-table thead {
-          display: none;
-        }
-        .acustomermanagement-data-table tbody,
-        .acustomermanagement-data-table tr,
-        .acustomermanagement-data-table td {
-          display: block;
-          width: 100%;
-        }
-        .acustomermanagement-data-table td {
-          position: relative;
-          padding-left: 50%;
-        }
-        .acustomermanagement-data-table td::before {
-          content: attr(data-label);
-          position: absolute;
-          left: 1rem;
-          width: 45%;
-          font-weight: 600;
-        }
-      }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.acustomermanagement-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.acustomermanagement-sidebar {
+  width: 280px;
+  background-color: var(--light-color);
+  padding: 1.5rem 0;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: width 0.3s ease;
+}
+
+.acustomermanagement-sidebar-header {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.acustomermanagement-sidebar-header h2 {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.acustomermanagement-sidebar-header h2 i {
+  font-size: 1.5rem;
+}
+
+.acustomermanagement-sidebar-section {
+  margin-bottom: 2rem;
+  padding: 0 1.5rem;
+}
+
+.acustomermanagement-sidebar-section h3 {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.acustomermanagement-sidebar-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.acustomermanagement-sidebar-item i {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.acustomermanagement-sidebar-item:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  transform: translateX(0.25rem);
+}
+
+.acustomermanagement-sidebar-item.acustomermanagement-active {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.acustomermanagement-main-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: var(--secondary-color);
+}
+
+/* -------- HEADER & FILTER -------- */
+.acustomermanagement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.acustomermanagement-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--light-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.acustomermanagement-search-bar:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.acustomermanagement-search-bar input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  background: transparent;
+}
+
+.acustomermanagement-search-bar i {
+  color: var(--text-muted);
+  margin-right: 0.5rem;
+}
+
+.acustomermanagement-subheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.acustomermanagement-page-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.acustomermanagement-filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.acustomermanagement-filter-actions select,
+.acustomermanagement-filter-actions button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* -------- TABLE -------- */
+.acustomermanagement-data-card {
+  background-color: var(--light-color);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.acustomermanagement-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.acustomermanagement-data-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem; /* giảm khoảng cách */
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.acustomermanagement-data-table td {
+  padding: 0.5rem 0.75rem; /* giảm khoảng cách */
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.acustomermanagement-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* -------- BUTTON -------- */
+.acustomermanagement-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  margin-right: 0.3rem;
+  position: relative;
+}
+
+.acustomermanagement-btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.acustomermanagement-btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.acustomermanagement-btn-secondary {
+  background-color: var(--light-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.acustomermanagement-btn-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+.acustomermanagement-btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.acustomermanagement-btn-danger:hover {
+  background-color: #dc2626;
+}
+
+/* -------- STATUS BADGE -------- */
+.acustomermanagement-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.acustomermanagement-status-active {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success-color);
+}
+
+.acustomermanagement-status-inactive {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: var(--text-muted);
+}
+
+/* -------- MODAL -------- */
+.acustomermanagement-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.acustomermanagement-modal-content {
+  background: #fff;
+  width: 100%;
+  max-width: 550px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.acustomermanagement-modal-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.acustomermanagement-form-group {
+  margin-bottom: 15px;
+}
+
+.acustomermanagement-form-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.modal-input:focus {
+  border-color: #409eff;
+  outline: none;
+}
+
+.acustomermanagement-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+/* -------- PAGINATION -------- */
+.acustomermanagement-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.acustomermanagement-pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.acustomermanagement-pagination-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+  background: var(--light-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.acustomermanagement-pagination-btn:hover {
+  background: var(--secondary-color);
+}
+
+.acustomermanagement-pagination-btn.acustomermanagement-active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* -------- RESPONSIVE -------- */
+@media (max-width: 1024px) {
+  .acustomermanagement-sidebar {
+    width: 80px;
+  }
+  .acustomermanagement-sidebar-header h2 span,
+  .acustomermanagement-sidebar-item span,
+  .acustomermanagement-sidebar-section h3 {
+    display: none;
+  }
+  .acustomermanagement-sidebar-item {
+    justify-content: center;
+  }
+  .acustomermanagement-sidebar-item i {
+    margin: 0;
+  }
+  .acustomermanagement-data-table th,
+  .acustomermanagement-data-table td {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .acustomermanagement-container {
+    flex-direction: column;
+  }
+  .acustomermanagement-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .acustomermanagement-main-content {
+    padding: 1rem;
+  }
+  .acustomermanagement-search-bar {
+    max-width: 100%;
+  }
+  .acustomermanagement-filter-bar {
+    flex-direction: column;
+  }
+  .acustomermanagement-modal-content {
+    margin: 1rem;
+    max-width: 90%;
+  }
+  .acustomermanagement-data-table {
+    display: block;
+    overflow-x: auto;
+  }
+  .acustomermanagement-data-table thead {
+    display: none;
+  }
+  .acustomermanagement-data-table tbody,
+  .acustomermanagement-data-table tr,
+  .acustomermanagement-data-table td {
+    display: block;
+    width: 100%;
+  }
+  .acustomermanagement-data-table td {
+    position: relative;
+    padding-left: 50%;
+  }
+  .acustomermanagement-data-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: 45%;
+    font-weight: 600;
+  }
+}
