@@ -47,7 +47,7 @@
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label"><i class="fas fa-receipt"></i> Tổng cộng</div>
-                            <div class="ctdh-summary-value">{{ number_format($order->total_price, 0, ',', '.') }} đ</div>
+                            <div class="ctdh-summary-value">{{ number_format($order->total_final, 0, ',', '.') }} đ</div>
                         </div>
                     </div>
                 </div>

@@ -114,6 +114,8 @@
 
                         {{-- Place to store variant id --}}
                         <input type="hidden" id="product_variant_id" name="product_variant_id" value="">
+                        <input type="hidden" id="product-id" name="product_id" value="{{ $product_detail->id }}">
+                        <input type="hidden" id="product-category" name="product_category" value="{{ strtolower($product_detail->category->name ?? '') }}">
                         {{-- quantity input exists --}}
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
                     </div>
@@ -459,6 +461,57 @@
                     if (viewBtn) viewBtn.style.display = 'flex';
                 });
             });
+        });
+    </script>
+
+    {{-- Viewed Products Tracking Script --}}
+    <script>
+        // Track viewed product when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get product data from page
+            const productData = {
+                id: {{ $product_detail->id }},
+                name: @json($product_detail->name),
+                price: {{ $product_detail->price }},
+                image: @if($product_detail->images->first()) @json(asset($product_detail->images->first()->path)) @else null @endif,
+                viewedAt: new Date().toISOString()
+            };
+            
+            // Call tracking function if available
+            if (typeof trackViewedProduct === 'function') {
+                trackViewedProduct(productData.id, productData.name, productData.price, productData.image);
+            } else {
+                // Fallback: Store directly in localStorage
+                const storageKey = 'viewedProducts';
+                const maxItems = 8;
+                
+                let viewed = [];
+                try {
+                    const stored = localStorage.getItem(storageKey);
+                    viewed = stored ? JSON.parse(stored) : [];
+                } catch (e) {
+                    viewed = [];
+                }
+                
+                // Remove existing item if present
+                viewed = viewed.filter(item => item.id !== productData.id);
+                
+                // Add to beginning
+                viewed.unshift(productData);
+                
+                // Limit items
+                if (viewed.length > maxItems) {
+                    viewed = viewed.slice(0, maxItems);
+                }
+                
+                // Save to localStorage
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(viewed));
+                    console.log('Tracked viewed product:', productData.name);
+                } catch (e) {
+                    console.error('Failed to track viewed product:', e);
+                }
+            }
         });
     </script>
 @endsection

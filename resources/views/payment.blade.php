@@ -138,11 +138,16 @@
 
                     @foreach($cartDetails as $item)
                         <div class="tt-product-item">
-                            <img src="{{ $item->productVariant->product->thumbnail->path }}" alt="" class="tt-product-image">
+                            <img src="{{ $item->productVariant->product->thumbnail->path ?? '/img/default.jpg' }}" alt="" class="tt-product-image">
                             <div class="tt-product-info">
-                                <div class="tt-product-title">{{ $item->productVariant->product->name }}</div>
-                                <div class="tt-product-variant">Size: {{ $item->productVariant->size->name }} | Màu:
-                                    {{ $item->productVariant->color->name }}
+                                <div class="tt-product-title">{{ $item->productVariant->product->name ?? 'Sản phẩm không xác định' }}</div>
+                                <div class="tt-product-variant">
+                                    @if($item->productVariant->size)
+                                        Size: {{ $item->productVariant->size->name }} | 
+                                    @endif
+                                    @if($item->productVariant->color)
+                                        Màu: {{ $item->productVariant->color->name }}
+                                    @endif
                                 </div>
                                 <div class="tt-product-variant">Số lượng: {{ $item->quantity }}</div>
                                 <div class="tt-product-price">{{ number_format($item->subtotal) }}đ</div>

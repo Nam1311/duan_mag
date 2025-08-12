@@ -137,7 +137,7 @@
                                                 {{ $order->orderDetails->pluck('productVariant.product.name')->join(', ') }}
                                             </div>
                                             <div class="user-info-order-total">
-                                                {{ number_format($order->total_price, 0, ',', '.') }} đ</div>
+                                                {{ number_format($order->total_final, 0, ',', '.') }} đ</div>
                                         </div>
                                         <div class="user-info-order-actions">
                                             <a class="user-info-order-detail-btn"

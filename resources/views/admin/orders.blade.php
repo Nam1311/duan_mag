@@ -98,7 +98,7 @@
                         <td>#DH-{{ $order->id }}</td>
                         <td>{{ $customerName }}</td>
                         <td>{{ $phone }}</td>
-                        <td>{{ number_format($order->total_price, 0, ',', '.') }}đ</td>
+                        <td>{{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }}đ</td>
                         <td>{{ $order->created_at->format('d-m-Y') }}</td>
                         <td>
                             @if ($order->status == 'Đã hủy' || $order->status == 'Thành công')

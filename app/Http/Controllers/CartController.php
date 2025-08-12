@@ -5,18 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\product_variants;
 use App\Models\Products;
+use App\Models\Setting;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\Cart;
+use function Laravel\Prompts\select;
 
 class CartController extends Controller
 {
     public function viewCart()
     {
         if (auth()->check()) {
-            $cartItems = Cart::where('user_id', auth()->id())->with('productVariant.product.thumbnail')->get();
+            $cartItems = Cart::where('user_id', auth()->id())
+                ->with([
+                    'productVariant.product.thumbnail',
+                    'productVariant.product',
+                    'productVariant.size',
+                    'productVariant.color'
+                ])
+                ->get();
             $subtotal = $cartItems->sum(function ($item) {
                 return $item->productVariant->product->price * $item->quantity;
             });
@@ -34,8 +43,12 @@ class CartController extends Controller
         } else {
             $sessionCart = session()->get('cart', []);
             $cartItems = collect($sessionCart)->map(function ($item) {
-                $variant = product_variants::with('product.thumbnail')
-                    ->find($item['product_variant_id']);
+                $variant = product_variants::with([
+                    'product.thumbnail',
+                    'product',
+                    'size',
+                    'color'
+                ])->find($item['product_variant_id']);
                 if (!$variant) {
                     return null;
                 }
@@ -71,7 +84,8 @@ class CartController extends Controller
                 session()->forget('applied_voucher');
             }
         }
-        $shippingFee = 40000;
+        // Lấy phí vận chuyển từ bảng settings (cột ship_price), nếu không có thì mặc định 40000
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
         $total = $subtotal - $voucherDiscount + $shippingFee;
         $data = $this->getCartData();
 
@@ -110,19 +124,55 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
             'product_id' => 'nullable|integer|exists:products,id',
         ]);
-        $productVariantId = $validated['product_variant_id'];
+        $productVariantId = $validated['product_variant_id'] ?? null;
 
         if (!$productVariantId) {
-            $productId = $validated['product_id'];
-            $variant = product_variants::where('product_id', $productId)
-                ->where('quantity', '>', 0) // chỉ lấy biến thể còn hàng
-                ->orderBy('id') // ưu tiên biến thể đầu tiên còn hàng
-                ->first();
+            $productId = $validated['product_id'] ?? null;
+            
+            if (!$productId) {
+                return response()->json([
+                    'message' => 'Cần cung cấp product_id hoặc product_variant_id'
+                ], 422);
+            }
+            
+            $product = Products::with('category')->find($productId);
+            
+            if (!$product) {
+                return response()->json([
+                    'message' => 'Sản phẩm không tồn tại'
+                ], 422);
+            }
+            
+            // Kiểm tra category để quyết định logic variant
+            $categoryName = strtolower($product->category->name ?? '');
+            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+                                   str_contains($categoryName, 'quần') ||
+                                   str_contains($categoryName, 'accessories') ||
+                                   str_contains($categoryName, 'pants') ||
+                                   str_contains($categoryName, 'trousers');
+            
+            if ($isAccessoryOrTrousers) {
+                // Với phụ kiện/quần: chỉ cần màu, không cần size
+                $variant = product_variants::where('product_id', $productId)
+                    ->where('quantity', '>', 0)
+                    ->whereNotNull('color_id') // có màu
+                    ->orderBy('id')
+                    ->first();
+            } else {
+                // Với áo và sản phẩm khác: cần cả size và màu
+                $variant = product_variants::where('product_id', $productId)
+                    ->where('quantity', '>', 0)
+                    ->whereNotNull('size_id') // có size
+                    ->whereNotNull('color_id') // có màu
+                    ->orderBy('id')
+                    ->first();
+            }
+            
             if ($variant) {
                 $productVariantId = $variant->id;
             } else {
                 return response()->json([
-                    'message' => 'Sản phẩm này hiện không có sẵn biến thể nào'
+                    'message' => 'Sản phẩm này hiện không có sẵn biến thể nào phù hợp'
                 ], 422);
             }
         } else {
@@ -184,10 +234,38 @@ class CartController extends Controller
         // Nếu không có product_variant_id, lấy biến thể đầu tiên theo product_id
         if (!$productVariantId) {
             $productId = $validated['product_id'];
-            $variant = product_variants::where('product_id', $productId)
-                ->where('quantity', '>', 0) // chỉ lấy biến thể còn hàng
-                ->orderBy('id') // ưu tiên biến thể đầu tiên còn hàng
-                ->first();
+            $product = Products::with('category')->find($productId);
+            
+            if (!$product) {
+                return response()->json([
+                    'message' => 'Sản phẩm không tồn tại'
+                ], 422);
+            }
+            
+            // Kiểm tra category để quyết định logic variant
+            $categoryName = strtolower($product->category->name ?? '');
+            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+                                   str_contains($categoryName, 'quần') ||
+                                   str_contains($categoryName, 'accessories') ||
+                                   str_contains($categoryName, 'pants') ||
+                                   str_contains($categoryName, 'trousers');
+            
+            if ($isAccessoryOrTrousers) {
+                // Với phụ kiện/quần: chỉ cần màu, không cần size
+                $variant = product_variants::where('product_id', $productId)
+                    ->where('quantity', '>', 0)
+                    ->whereNotNull('color_id') // có màu
+                    ->orderBy('id')
+                    ->first();
+            } else {
+                // Với áo và sản phẩm khác: cần cả size và màu
+                $variant = product_variants::where('product_id', $productId)
+                    ->where('quantity', '>', 0) // chỉ lấy biến thể còn hàng
+                    ->whereNotNull('size_id') // có size
+                    ->whereNotNull('color_id') // có màu
+                    ->orderBy('id')
+                    ->first();
+            }
 
             if (!$variant) {
                 return response()->json([
@@ -297,10 +375,10 @@ class CartController extends Controller
                 return response()->json([
                     'items_html' => view('cart._items', $data)->render(),
                     'summary_html' => view('cart._summary', $data)->render(),
-                    'message' => 'Đã xóa mã giảm giá.',
+                    'message' => 'Không có mã giảm giá nào được áp dụng.',
                 ]);
             }
-            return redirect()->route('cart.view')->with('success', 'Đã xóa mã giảm giá.');
+            return redirect()->route('cart.view')->with('success', 'Không có mã giảm giá nào được áp dụng.');
         }
 
         $voucher = Voucher::where('code', $vouCherCode)
@@ -391,6 +469,108 @@ class CartController extends Controller
             ]);
         }
         return redirect()->route('cart.view')->with('success', 'Đã xóa ' . count($variantIds) . ' sản phẩm khỏi giỏ hàng');
+    }
+
+    public function checkoutSelected(Request $request)
+    {
+        $validated = $request->validate([
+            'variant_ids' => 'required|array|min:1',
+            'variant_ids.*' => 'integer|exists:product_variants,id',
+        ]);
+
+        $variantIds = $validated['variant_ids'];
+
+        // Lấy thông tin các sản phẩm được chọn
+        if (Auth::check()) {
+            $selectedItems = Cart::where('user_id', Auth::id())
+                ->whereIn('product_variant_id', $variantIds)
+                ->with([
+                    'productVariant.product.thumbnail',
+                    'productVariant.product',
+                    'productVariant.size',
+                    'productVariant.color'
+                ])
+                ->get();
+        } else {
+            $sessionCart = session()->get('cart', []);
+            $selectedItems = collect($sessionCart)
+                ->filter(function ($item) use ($variantIds) {
+                    return in_array($item['product_variant_id'], $variantIds);
+                })
+                ->map(function ($item) {
+                    $variant = product_variants::with([
+                        'product.thumbnail',
+                        'product',
+                        'size',
+                        'color'
+                    ])->find($item['product_variant_id']);
+                    
+                    if ($variant && $variant->product) {
+                        return (object) [
+                            'productVariant' => $variant,
+                            'quantity' => $item['quantity'],
+                        ];
+                    }
+                    return null;
+                })
+                ->filter();
+        }
+
+        if ($selectedItems->isEmpty()) {
+            return response()->json([
+                'error' => 'Không có sản phẩm nào được chọn để thanh toán.'
+            ], 422);
+        }
+
+        // Tạo dữ liệu thanh toán cho các sản phẩm được chọn
+        $cartDetails = $selectedItems->map(function ($item) {
+            if ($item && $item->productVariant && $item->productVariant->product) {
+                return (object) [
+                    'productVariant' => $item->productVariant,
+                    'quantity' => $item->quantity,
+                    'subtotal' => $item->productVariant->product->price * $item->quantity,
+                ];
+            }
+            return null;
+        })->filter()->toArray();
+
+        $subtotal = collect($cartDetails)->sum('subtotal');
+        
+        // Tính voucher discount
+        $appliedVoucherCode = session()->get('applied_voucher');
+        $voucherDiscount = 0;
+        if ($appliedVoucherCode) {
+            $voucher = Voucher::where('code', $appliedVoucherCode)
+                ->where('expiration_date', '>=', now())
+                ->where('start_date', '<=', now())
+                ->where('quantity', '>', 0)
+                ->first();
+            
+            if ($voucher) {
+                if ($voucher->value_type == 'fixed') {
+                    $voucherDiscount = $voucher->discount_amount;
+                } elseif ($voucher->value_type == 'percent') {
+                    $voucherDiscount = $subtotal * ($voucher->discount_amount / 100);
+                }
+            }
+        }
+
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
+        $total = $subtotal - $voucherDiscount + $shippingFee;
+
+        // Lưu dữ liệu thanh toán vào session
+        session()->put('checkout_data', [
+            'cartDetails' => $cartDetails,
+            'subtotal' => $subtotal,
+            'voucherDiscount' => $voucherDiscount,
+            'shippingFee' => $shippingFee,
+            'total' => $total,
+            'selected_checkout' => true
+        ]);
+
+        return response()->json([
+            'redirect' => route('payment.show')
+        ]);
     }
     public function updateQuantity($variantId, Request $request)
     {
@@ -593,7 +773,12 @@ class CartController extends Controller
 
 
         $cartDetails = collect($cartItems)->map(function ($item) {
-            $variant = product_variants::with('product.thumbnail')->find($item['product_variant_id']);
+            $variant = product_variants::with([
+                'product.thumbnail',
+                'product',
+                'size',
+                'color'
+            ])->find($item['product_variant_id']);
             if ($variant) {
                 return (object) [
                     'productVariant' => $variant,
@@ -625,7 +810,7 @@ class CartController extends Controller
         }
 
         // Tính phí vận chuyển (giả sử cố định là 40,000 VND)
-        $shippingFee = 40000;
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
 
         // Tính tổng cộng
         $total = $subtotal - $voucherDiscount + $shippingFee;
@@ -650,7 +835,12 @@ class CartController extends Controller
             'product_id' => 'required|integer|exists:products,id',
         ]);
 
-        $variant = product_variants::find($validated['product_variant_id']);
+        $variant = product_variants::with([
+            'product.thumbnail',
+            'product',
+            'size',
+            'color'
+        ])->find($validated['product_variant_id']);
 
         // Kiểm tra tồn kho chặt chẽ hơn
         if (!$variant) {
@@ -700,6 +890,16 @@ class CartController extends Controller
         ]);
     }
 
+    public function clearViewedHistory()
+    {
+        session()->forget('viewed_products');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xóa lịch sử đã xem'
+        ]);
+    }
+
     private function createDirectCheckoutData($variant, $quantity)
     {
         $cartDetails = [
@@ -711,7 +911,7 @@ class CartController extends Controller
         ];
 
         $subtotal = $variant->product->price * $quantity;
-        $shippingFee = 40000;
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
         $voucherDiscount = 0;
 
         // Áp dụng voucher nếu có
@@ -763,7 +963,12 @@ class CartController extends Controller
             $sessionCart = session()->get('cart', []);
             $cartItems = collect($sessionCart)
                 ->map(function ($item) {
-                    $variant = product_variants::with('product.thumbnail')->find($item['product_variant_id']);
+                    $variant = product_variants::with([
+                        'product.thumbnail',
+                        'product',
+                        'size',
+                        'color'
+                    ])->find($item['product_variant_id']);
                     if ($variant) {
                         return (object) [
                             'id' => $item['id'] ?? $item['product_variant_id'], // Thêm id duy nhất
@@ -800,10 +1005,119 @@ class CartController extends Controller
             }
         }
 
-        $shippingFee = 40000;
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
         $total = $subtotal - $voucherDiscount + $shippingFee;
 
-        return compact('cartItems', 'subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers', 'appliedVoucherCode');
+        // Lấy sản phẩm gợi ý
+        $suggestedProducts = $this->getSuggestedProducts($cartItems);
+        
+        // Lấy lịch sử sản phẩm đã xem từ session
+        $viewedProducts = $this->getViewedProducts();
+
+        return compact('cartItems', 'subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers', 'appliedVoucherCode', 'suggestedProducts', 'viewedProducts');
+    }
+
+    private function getSuggestedProducts($cartItems)
+    {
+        // Nếu giỏ hàng trống, hiển thị sản phẩm nổi bật
+        if ($cartItems->isEmpty()) {
+            return \App\Models\Products::with('thumbnail')
+                ->active()
+                ->featured()
+                ->inRandomOrder()
+                ->limit(8)
+                ->get();
+        }
+
+        // Lấy danh mục của sản phẩm trong giỏ hàng
+        $cartCategoryIds = $cartItems->pluck('productVariant.product.category_id')->unique();
+        
+        // Logic gợi ý sản phẩm
+        $suggestedCategoryIds = collect();
+        
+        foreach ($cartCategoryIds as $categoryId) {
+            // Lấy thông tin category để xác định loại sản phẩm
+            $category = \App\Models\Product_categories::find($categoryId);
+            if ($category) {
+                $categoryName = strtolower($category->name);
+                
+                // Logic gợi ý dựa trên tên danh mục
+                if (str_contains($categoryName, 'áo') || str_contains($categoryName, 'shirt') || str_contains($categoryName, 'top')) {
+                    // Nếu có áo, gợi ý quần và phụ kiện
+                    $suggested = \App\Models\Product_categories::where(function($query) {
+                        $query->where('name', 'like', '%quần%')
+                              ->orWhere('name', 'like', '%pant%')
+                              ->orWhere('name', 'like', '%jean%')
+                              ->orWhere('name', 'like', '%phụ kiện%')
+                              ->orWhere('name', 'like', '%accessory%');
+                    })->pluck('id');
+                    $suggestedCategoryIds = $suggestedCategoryIds->merge($suggested);
+                    
+                } elseif (str_contains($categoryName, 'quần') || str_contains($categoryName, 'pant') || str_contains($categoryName, 'jean')) {
+                    // Nếu có quần, gợi ý áo và phụ kiện
+                    $suggested = \App\Models\Product_categories::where(function($query) {
+                        $query->where('name', 'like', '%áo%')
+                              ->orWhere('name', 'like', '%shirt%')
+                              ->orWhere('name', 'like', '%top%')
+                              ->orWhere('name', 'like', '%phụ kiện%')
+                              ->orWhere('name', 'like', '%accessory%');
+                    })->pluck('id');
+                    $suggestedCategoryIds = $suggestedCategoryIds->merge($suggested);
+                    
+                } elseif (str_contains($categoryName, 'phụ kiện') || str_contains($categoryName, 'accessory')) {
+                    // Nếu có phụ kiện, gợi ý áo khoác và áo
+                    $suggested = \App\Models\Product_categories::where(function($query) {
+                        $query->where('name', 'like', '%áo khoác%')
+                              ->orWhere('name', 'like', '%jacket%')
+                              ->orWhere('name', 'like', '%coat%')
+                              ->orWhere('name', 'like', '%áo%')
+                              ->orWhere('name', 'like', '%shirt%');
+                    })->pluck('id');
+                    $suggestedCategoryIds = $suggestedCategoryIds->merge($suggested);
+                }
+            }
+        }
+
+        // Loại bỏ danh mục đã có trong giỏ hàng
+        $suggestedCategoryIds = $suggestedCategoryIds->diff($cartCategoryIds)->unique();
+
+        // Lấy sản phẩm từ các danh mục gợi ý
+        if ($suggestedCategoryIds->isNotEmpty()) {
+            return \App\Models\Products::with('thumbnail')
+                ->active()
+                ->whereIn('category_id', $suggestedCategoryIds)
+                ->inRandomOrder()
+                ->limit(8)
+                ->get();
+        }
+
+        // Nếu không có gợi ý cụ thể, lấy sản phẩm ngẫu nhiên
+        return \App\Models\Products::with('thumbnail')
+            ->active()
+            ->whereNotIn('category_id', $cartCategoryIds)
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
+    }
+
+    private function getViewedProducts()
+    {
+        $viewedProductIds = session()->get('viewed_products', []);
+        
+        if (empty($viewedProductIds)) {
+            return collect();
+        }
+
+        // Lấy tối đa 6 sản phẩm đã xem gần nhất
+        $recentViewedIds = array_slice(array_reverse($viewedProductIds), 0, 6);
+        
+        return \App\Models\Products::with('thumbnail')
+            ->active()
+            ->whereIn('id', $recentViewedIds)
+            ->get()
+            ->sortBy(function($product) use ($recentViewedIds) {
+                return array_search($product->id, $recentViewedIds);
+            });
     }
 }
 

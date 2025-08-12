@@ -192,7 +192,7 @@
                                 <td>#DH-{{ $donhangganday->id }}</td>
                                <td>{{ $donhangganday->user->name ?? '' }}</td>
 
-                                <td>{{ $donhangganday->total_price }}đ</td>
+                                <td>{{ number_format($donhangganday->orderDetails->sum('total_final'), 0, ',', '.') }}đ</td>
                                 <td>
                                     <span
                                         class="aindex-status-badge aindex-status-active">{{ $donhangganday->status }}</span>
@@ -205,7 +205,7 @@
         <tr>
             <td>#DH-{{ $don->id }}</td>
             <td>{{ $don->user?->name ??  $don->address?->receiver_name}}</td>
-            <td>{{ number_format($don->total_price, 0, ',', '.') }}đ</td>
+            <td>{{ number_format($don->orderDetails->sum('total_final'), 0, ',', '.') }}đ</td>
             <td>
                 <span class="aindex-status-badge aindex-status-active">
                     {{ $don->status }}

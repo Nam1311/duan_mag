@@ -22,15 +22,19 @@ class HomeAdminController extends Controller
         $yesterday = Carbon::yesterday('Asia/Ho_Chi_Minh');
         Carbon::setLocale('vi');
 
-        // Doanh thu hôm nay
-        $doanhThuHomNay = Order::whereBetween('created_at', [$today, $tomorrow])
+        // Doanh thu hôm nay - tính từ OrderDetail
+        $orderIdsToday = Order::whereBetween('created_at', [$today, $tomorrow])
             ->where('status', 'Thành công')
-            ->sum('total_price');
+            ->pluck('id');
+        $doanhThuHomNay = OrderDetail::whereIn('order_id', $orderIdsToday)
+            ->sum('total_final');
 
-        // Doanh thu hôm qua
-        $doanhThuHomQua = Order::whereBetween('created_at', [$yesterday, $today])
+        // Doanh thu hôm qua - tính từ OrderDetail
+        $orderIdsYesterday = Order::whereBetween('created_at', [$yesterday, $today])
             ->where('status', 'Thành công')
-            ->sum('total_price');
+            ->pluck('id');
+        $doanhThuHomQua = OrderDetail::whereIn('order_id', $orderIdsYesterday)
+            ->sum('total_final');
 
         // Đơn hàng thành công hôm nay
         $soDonHomNay = Order::whereBetween('created_at', [$today, $tomorrow])
@@ -43,19 +47,11 @@ class HomeAdminController extends Controller
             ->count();
 
         // Tổng sản phẩm hôm nay
-        $orderIdsToday = Order::where('status', 'Thành công')
-            ->whereBetween('created_at', [$today, $tomorrow])
-            ->pluck('id');
-
         $tongSanPhamBanRa = OrderDetail::whereIn('order_id', $orderIdsToday)
             ->sum('quantity');
 
         // Tổng sản phẩm hôm qua
-        $orderIdsHomQua = Order::where('status', 'Thành công')
-            ->whereBetween('created_at', [$yesterday, $today])
-            ->pluck('id');
-
-        $tongSanPhamBanRaHomQua = OrderDetail::whereIn('order_id', $orderIdsHomQua)
+        $tongSanPhamBanRaHomQua = OrderDetail::whereIn('order_id', $orderIdsYesterday)
             ->sum('quantity');
         // Khách hàng mới hôm nay
         $khachHangMoi = User::whereBetween('created_at', [$today, $tomorrow])->count();
@@ -95,12 +91,10 @@ class HomeAdminController extends Controller
 
             $labels[] = $ngay->isoFormat('dddd');
 
-            $doanhThu = Order::whereBetween('created_at', [$ngay, $ngayKeTiep])
-                ->where('status', 'Thành công')->sum('total_price');
-            $doanhThuTuan[] = $doanhThu;
-
             $orderIds = Order::whereBetween('created_at', [$ngay, $ngayKeTiep])
                 ->where('status', 'Thành công')->pluck('id');
+            $doanhThu = OrderDetail::whereIn('order_id', $orderIds)->sum('total_final');
+            $doanhThuTuan[] = $doanhThu;
 
             $soLuong = OrderDetail::whereIn('order_id', $orderIds)->sum('quantity');
             $sanPhamTuan[] = $soLuong;
@@ -141,7 +135,7 @@ class HomeAdminController extends Controller
             ->get();
 
         // đơn hàng gần đây
-        $donhangganday = Order::with('user')->where('created_at', '>=', now()->subDays(7))->orderBy('created_at', 'desc')->take(10)->get();
+        $donhangganday = Order::with(['user', 'orderDetails'])->where('created_at', '>=', now()->subDays(7))->orderBy('created_at', 'desc')->take(10)->get();
 
 
  $reviews = Reviews::with(['user', 'children.user'])

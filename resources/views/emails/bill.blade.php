@@ -5,9 +5,17 @@
 
 @component('mail::panel')
 **Ngày đặt:** {{ $order->created_at->format('d/m/Y H:i') }}  
-**Tổng thanh toán:** {{ number_format($order->total_price, 0, ',', '.') }}₫  
-**Phương thức thanh toán:** {{ $order->payment_method === 'cod' ? 'COD' : 'Chuyển khoản' }}  
-**Trạng thái:** Đã xác nhận
+**Tổng thanh toán:** {{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }}₫  
+**Phương thức thanh toán:** {{ $order->payment_methods }}  
+**Trạng thái:** {{ $order->status}}  
+@if($order->voucher)
+**Mã giảm giá:** {{ $order->voucher->code }} 
+@if($order->voucher->value_type === 'percent')
+(Giảm {{ $order->voucher->discount_amount }}%)
+@else
+(Giảm {{ number_format($order->voucher->discount_amount, 0, ',', '.') }}₫)
+@endif
+@endif
 @endcomponent
 
 ### Chi tiết sản phẩm
@@ -22,7 +30,8 @@
     <tbody>
         @foreach($details as $item)
         @php
-            $unitPrice = $item->price ?? $item->productVariant->product->price;
+            // Sử dụng giá từ productVariant và tính toán thành tiền
+            $unitPrice = $item->productVariant->product->price;
             $itemTotal = $unitPrice * $item->quantity;
         @endphp
         <tr>
@@ -41,19 +50,19 @@
 <div class="bg-gray-50 rounded-lg p-4 mt-4">
     <div class="flex justify-between py-1">
         <span>Tổng tiền hàng:</span>
-        <span>{{ number_format($order->total_price - 40000 + ($order->voucherDiscount ?? 0), 0, ',', '.') }}₫</span>
+        <span>{{ number_format($productsTotal, 0, ',', '.') }}₫</span>
     </div>
     <div class="flex justify-between py-1">
         <span>Phí vận chuyển:</span>
-        <span>40.000₫</span>
+        <span>{{ number_format($shippingFee, 0, ',', '.') }}₫</span>
     </div>
     <div class="flex justify-between py-1">
         <span>Giảm giá:</span>
-        <span class="text-red-600">-{{ number_format($order->voucherDiscount ?? 0, 0, ',', '.') }}₫</span>
+        <span class="text-red-600">-{{ number_format($voucherDiscount, 0, ',', '.') }}₫</span>
     </div>
     <div class="flex justify-between pt-1 mt-2 border-t border-gray-200 font-semibold">
         <span>Tổng thanh toán:</span>
-        <span class="text-blue-600">{{ number_format($order->total_price, 0, ',', '.') }}₫</span>
+        <span class="text-blue-600">{{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }}₫</span>
     </div>
 </div>
 

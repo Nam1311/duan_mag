@@ -110,7 +110,7 @@
                 <td>{{ $detail->productVariant->product->name }}</td>
 
                 {{-- Tên khách hàng: ưu tiên user đăng nhập, nếu không thì lấy từ địa chỉ giao hàng --}}
-                <td>{{ $order->user?->name ?? $order->address?->receiver_name }}</td>
+                <td>{{ $order->user?->name ?? $order->shippingAddress?->receiver_name }}</td>
 
                 {{-- Số lượng --}}
                 <td>{{ $detail->quantity }}</td>

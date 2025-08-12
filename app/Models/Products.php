@@ -13,6 +13,18 @@ class Products extends Model
     protected $fillable = ['name','sku', 'price', 'slug', 'category_id', 'description', 'original_price', 'sale', 'sold_count', 'is_featured', 'is_active'];
     protected $dates = ['deleted_at'];
 
+    // Scope để lấy sản phẩm active
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    // Scope để lấy sản phẩm featured
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
     public function images()
     {
         return $this->hasMany(Product_images::class, 'product_id', 'id');
@@ -36,9 +48,9 @@ class Products extends Model
         $now = now();
 
         $countdown = $this->countDowns()
-            ->where('status', 'active')
-            ->where('start_hour', '<=', $now)
-            ->where('end_hour', '>=', $now)
+            ->where('product_count_downs.status', 'active')
+            ->where('product_count_downs.start_hour', '<=', $now)
+            ->where('product_count_downs.end_hour', '>=', $now)
             ->first();
 
         $baseSale = floatval($this->sale);
@@ -54,9 +66,9 @@ class Products extends Model
         $now = now();
 
         $countdown = $this->countDowns()
-            ->where('status', 'active')
-            ->where('start_hour', '<=', $now)
-            ->where('end_hour', '>=', $now)
+            ->where('product_count_downs.status', 'active')
+            ->where('product_count_downs.start_hour', '<=', $now)
+            ->where('product_count_downs.end_hour', '>=', $now)
             ->first();
 
         $baseSale = floatval($this->sale);

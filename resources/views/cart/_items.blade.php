@@ -1,19 +1,3 @@
-<style>
-    .gh-cart2 {
-        box-shadow: none !important;
-        padding: 0px !important;
-        padding-top: 10px !important;
-        border-radius: 0 !important;
-    }
-
-    .ghcart3 {
-        padding: 30px !important;
-        box-shadow: none !important;
-        height: fit-content;
-        position: sticky;
-        top: 100px;
-    }
-</style>
 <div class="gh-cart-items-container gh-cart2">
     <div class="ghcart3">
         <!-- Debug: Số lượng items: {{ $cartItems->count() }} -->
@@ -45,14 +29,22 @@
                     $product = $variant->product;
                     $color = $variant->color;
                     $size = $variant->size;
-                    $img = $variant->product->thumbnail;
+                    $img = $variant->product->thumbnail ?? null;
                     $stock = $variant->quantity;
                     $availableVariants = \App\Models\product_variants::with(['color', 'size'])
                         ->where('product_id', $product->id)
                         ->where('quantity', '>', 0)
                         ->get();
-                    $availableColors = $availableVariants->pluck('color')->unique('id');
-                    $availableSizes = $availableVariants->pluck('size')->unique('id');
+                    $availableColors = $availableVariants->pluck('color')->unique('id')->filter();
+                    $availableSizes = $availableVariants->pluck('size')->unique('id')->filter();
+                    
+                    // Kiểm tra xem sản phẩm này có cần size không (dựa vào category)
+                    $categoryName = strtolower($product->category->name ?? '');
+                    $needsSize = !str_contains($categoryName, 'phụ kiện') && 
+                                !str_contains($categoryName, 'quần') &&
+                                !str_contains($categoryName, 'accessories') &&
+                                !str_contains($categoryName, 'pants');
+                    
                     // Tạo cart ID nhất quán để giữ vị trí khi update variant
                     $cartItemId = 'cart-item-' . $index . '-' . $product->id;
                 @endphp
@@ -72,20 +64,35 @@
                                 data-variant-id="{{ $variant->id }}" data-cart-id="{{ $cartItemId }}">
                                 @csrf
                                 @method('PUT')
-                                <select name="color_id" class="gh-cart-select">
-                                    @foreach ($availableColors as $c)
-                                        <option value="{{ $c->id }}" {{ $c->id == $variant->color_id ? 'selected' : '' }}>
-                                            {{ $c->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <select name="size_id" class="gh-cart-select">
-                                    @foreach ($availableSizes as $s)
-                                        <option value="{{ $s->id }}" {{ $s->id == $variant->size_id ? 'selected' : '' }}>
-                                            {{ $s->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                
+                                {{-- Luôn hiển thị màu sắc --}}
+                                @if($availableColors->count() > 0)
+                                <div class="variant-option">
+                                    <label>Màu sắc:</label>
+                                    <select name="color_id" class="gh-cart-select">
+                                        @foreach ($availableColors as $c)
+                                            <option value="{{ $c->id }}" {{ $c && $c->id == $variant->color_id ? 'selected' : '' }}>
+                                                {{ $c->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @endif
+                                
+                                {{-- Chỉ hiển thị size khi sản phẩm cần size --}}
+                                @if($needsSize && $availableSizes->count() > 0)
+                                <div class="variant-option">
+                                    <label>Kích thước:</label>
+                                    <select name="size_id" class="gh-cart-select">
+                                        @foreach ($availableSizes as $s)
+                                            <option value="{{ $s->id }}" {{ $s && $s->id == $variant->size_id ? 'selected' : '' }}>
+                                                {{ $s->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @endif
+                                
                                 <input type="hidden" name="quantity" value="{{ $item->quantity }}">
                             </form>
                         </div>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Icons Fallback</title>
+    
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Fallback CSS -->
+    <link rel="stylesheet" href="/css/fontawesome-fallback-simple.css">
+    
+    <!-- Immediate Fallback Script -->
+    <script>
+        (function() {
+            document.documentElement.className += ' fontawesome-fallback-immediate';
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                .fas:before, .fa:before {
+                    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', Arial, sans-serif !important;
+                    font-style: normal !important;
+                    font-weight: normal !important;
+                }
+                .fa-shopping-cart:before, .fa-cart-plus:before { content: "🛒" !important; }
+                .fa-plus:before { content: "➕" !important; }
+                .fa-minus:before { content: "➖" !important; }
+                .fa-trash:before, .fa-trash-alt:before { content: "🗑️" !important; }
+                .fa-credit-card:before { content: "💳" !important; }
+                .fa-lightbulb:before { content: "💡" !important; }
+                .fa-history:before { content: "🕒" !important; }
+                .fa-eye:before { content: "👁️" !important; }
+                .fa-heart:before { content: "♥️" !important; color: #e74c3c; }
+                .fa-check:before { content: "✅" !important; }
+                .fa-times:before, .fa-close:before { content: "❌" !important; }
+                .fa-search:before { content: "🔍" !important; }
+                .fa-home:before { content: "🏠" !important; }
+                .fa-user:before { content: "👤" !important; }
+            `;
+            document.head.insertBefore(style, document.head.firstChild);
+        })();
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-test {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .icon-test:hover {
+            background: #0056b3;
+        }
+        .icon-large {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Icons Fallback System</h1>
+    
+    <div class="test-section">
+        <h2>📊 Detection Status</h2>
+        <div id="fontawesome-status" class="status">Đang kiểm tra...</div>
+        <div id="fallback-status" class="status">Đang kiểm tra...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🛒 Cart Icons</h2>
+        <div class="icon-test"><i class="fas fa-shopping-cart icon-large"></i>Shopping Cart</div>
+        <div class="icon-test"><i class="fas fa-cart-plus icon-large"></i>Add to Cart</div>
+        <div class="icon-test"><i class="fas fa-plus icon-large"></i>Plus</div>
+        <div class="icon-test"><i class="fas fa-minus icon-large"></i>Minus</div>
+        <div class="icon-test"><i class="fas fa-trash icon-large"></i>Delete</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>💳 Payment & Actions</h2>
+        <div class="icon-test"><i class="fas fa-credit-card icon-large"></i>Payment</div>
+        <div class="icon-test"><i class="fas fa-check icon-large"></i>Check</div>
+        <div class="icon-test"><i class="fas fa-times icon-large"></i>Close</div>
+        <div class="icon-test"><i class="fas fa-eye icon-large"></i>View</div>
+        <div class="icon-test"><i class="fas fa-heart icon-large"></i>Heart</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔍 Navigation & Others</h2>
+        <div class="icon-test"><i class="fas fa-search icon-large"></i>Search</div>
+        <div class="icon-test"><i class="fas fa-home icon-large"></i>Home</div>
+        <div class="icon-test"><i class="fas fa-user icon-large"></i>User</div>
+        <div class="icon-test"><i class="fas fa-lightbulb icon-large"></i>Suggestion</div>
+        <div class="icon-test"><i class="fas fa-history icon-large"></i>History</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Manual Controls</h2>
+        <button id="force-fallback" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+            Force Fallback Mode
+        </button>
+        <button id="remove-fallback" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+            Remove Fallback Mode
+        </button>
+        <button id="reload-fontawesome" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px;">
+            Reload FontAwesome
+        </button>
+    </div>
+    
+    <script>
+        // FontAwesome Detection
+        function checkFontAwesome() {
+            return new Promise((resolve) => {
+                const testElement = document.createElement('i');
+                testElement.className = 'fas fa-heart';
+                testElement.style.position = 'absolute';
+                testElement.style.left = '-9999px';
+                document.body.appendChild(testElement);
+                
+                setTimeout(() => {
+                    const computedStyle = window.getComputedStyle(testElement, ':before');
+                    const fontFamily = computedStyle.fontFamily;
+                    
+                    document.body.removeChild(testElement);
+                    
+                    const isLoaded = fontFamily && (
+                        fontFamily.includes('Font Awesome') || 
+                        fontFamily.includes('FontAwesome') ||
+                        fontFamily.includes('"Font Awesome')
+                    );
+                    
+                    resolve(isLoaded);
+                }, 100);
+            });
+        }
+        
+        // Update status
+        async function updateStatus() {
+            const fontAwesomeLoaded = await checkFontAwesome();
+            const fallbackActive = document.body.classList.contains('fontawesome-fallback') || 
+                                   document.documentElement.classList.contains('fontawesome-fallback-immediate');
+            
+            const fontAwesomeStatus = document.getElementById('fontawesome-status');
+            const fallbackStatus = document.getElementById('fallback-status');
+            
+            if (fontAwesomeLoaded) {
+                fontAwesomeStatus.textContent = '✅ FontAwesome đã load thành công';
+                fontAwesomeStatus.className = 'status success';
+            } else {
+                fontAwesomeStatus.textContent = '❌ FontAwesome chưa load hoặc bị lỗi';
+                fontAwesomeStatus.className = 'status error';
+            }
+            
+            if (fallbackActive) {
+                fallbackStatus.textContent = '🔄 Chế độ fallback đang hoạt động (icons sẽ hiển thị dưới dạng emoji)';
+                fallbackStatus.className = 'status warning';
+            } else {
+                fallbackStatus.textContent = '🎯 Chế độ FontAwesome bình thường';
+                fallbackStatus.className = 'status success';
+            }
+        }
+        
+        // Manual controls
+        document.getElementById('force-fallback').addEventListener('click', () => {
+            document.body.classList.add('fontawesome-fallback');
+            document.documentElement.classList.add('fontawesome-fallback-immediate');
+            updateStatus();
+        });
+        
+        document.getElementById('remove-fallback').addEventListener('click', () => {
+            document.body.classList.remove('fontawesome-fallback');
+            document.documentElement.classList.remove('fontawesome-fallback-immediate');
+            document.body.classList.add('fontawesome-loaded');
+            updateStatus();
+        });
+        
+        document.getElementById('reload-fontawesome').addEventListener('click', () => {
+            // Remove existing links
+            const existingLinks = document.querySelectorAll('link[href*="font-awesome"]');
+            existingLinks.forEach(link => link.remove());
+            
+            // Add new link
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+            link.crossOrigin = 'anonymous';
+            link.integrity = 'sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==';
+            document.head.appendChild(link);
+            
+            setTimeout(updateStatus, 1000);
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', updateStatus);
+        setTimeout(updateStatus, 500);
+    </script>
+</body>
+</html>

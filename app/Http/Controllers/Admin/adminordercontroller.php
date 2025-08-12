@@ -115,8 +115,8 @@ class AdminOrderController extends Controller
                 'orderDetails.productVariant.color'
             ])->findOrFail($id);
 
-            // Lấy cột orders.address (string)
-            $orderAddressString = $order->getAttribute('address') ?? 'Không xác định';
+            // Lấy cột orders.address_text (string)
+            $orderAddressString = $order->getAttribute('address_text') ?? 'Không xác định';
 
             // Lấy quan hệ addresses
             $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);
@@ -148,7 +148,7 @@ class AdminOrderController extends Controller
                 'orderDetails.productVariant.color'
             ])->findOrFail($id);
 
-            $orderAddressString = $order->getAttribute('address') ?? 'Không xác định';
+            $orderAddressString = $order->getAttribute('address_text') ?? 'Không xác định';
             $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);
             $order->address_details = $this->fetchAddressDetails($order);
 
@@ -170,7 +170,7 @@ class AdminOrderController extends Controller
         // Khởi tạo giá trị mặc định
         $receiver_name = 'Không xác định';
         $phone = 'Không xác định';
-        $address = $order->address ?? 'Không xác định';
+        $address = $order->address_text ?? 'Không xác định';
 
         // Lấy quan hệ address
         $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);

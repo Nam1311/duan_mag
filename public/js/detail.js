@@ -6,18 +6,38 @@ let maxStock = 0;
 // Hàm cập nhật số lượng hiển thị theo màu + size đã chọn
 function updateQuantityDisplay() {
     const productIdInput = document.getElementById('product-id');  // Lấy input ẩn chứa product id
+    const categoryInput = document.getElementById('product-category'); // Lấy category
+    
     if (!productIdInput) {
         console.error('Không tìm thấy input product-id trong DOM');
         return;  // Nếu không có product id thì thoát hàm
     }
 
     const productId = productIdInput.value;  // Lấy giá trị product id
+    const category = categoryInput ? categoryInput.value : '';
+    
+    // Kiểm tra xem có phải phụ kiện hoặc quần không
+    const isAccessoryOrTrousers = category.includes('phụ kiện') || 
+                                category.includes('quần') ||
+                                category.includes('accessories') ||
+                                category.includes('pants') ||
+                                category.includes('trousers');
+    
+    // Với phụ kiện/quần: chỉ cần màu, không cần size
+    // Với áo khác: cần cả màu và size
+    const canProceed = isAccessoryOrTrousers ? 
+        (selectedColor) : 
+        (selectedColor && selectedSize);
 
-    if (selectedColor && selectedSize) {  // Nếu đã chọn đủ màu và size
-        console.log('Gọi API với:', { productId, selectedColor, selectedSize });
+    if (canProceed) {  // Nếu đã chọn đủ thông tin cần thiết
+        console.log('Gọi API với:', { productId, selectedColor, selectedSize, category });
 
-        // Gọi API lấy số lượng variant dựa trên product_id, color, size
-        fetch(`/get-variant-quantity?product_id=${productId}&color=${selectedColor}&size=${selectedSize}`)
+        const url = isAccessoryOrTrousers ? 
+            `/get-variant-quantity?product_id=${productId}&color=${selectedColor}` :
+            `/get-variant-quantity?product_id=${productId}&color=${selectedColor}&size=${selectedSize}`;
+            
+        // Gọi API lấy số lượng variant dựa trên product_id, color, size (tùy category)
+        fetch(url)
             .then(response => {
                 if (!response.ok) throw new Error('Lỗi khi fetch dữ liệu'); // Nếu lỗi HTTP thì báo lỗi
                 return response.json();  // Trả về dữ liệu JSON
@@ -107,10 +127,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
     document.getElementById('btnAddCart').addEventListener('click', () => {
-
+        const categoryInput = document.getElementById('product-category');
+        const category = categoryInput ? categoryInput.value : '';
+        
+        // Kiểm tra category để quyết định yêu cầu
+        const isAccessoryOrTrousers = category.includes('phụ kiện') || 
+                                    category.includes('quần') ||
+                                    category.includes('accessories') ||
+                                    category.includes('pants') ||
+                                    category.includes('trousers');
+        
+        // Kiểm tra điều kiện dựa trên category
+        if (isAccessoryOrTrousers) {
+            if (!selectedColor) {
+                alert('Vui lòng chọn màu trước khi thêm giỏ hàng.');
+                return;
+            }
+        } else {
+            if (!selectedColor || !selectedSize) {
+                alert('Vui lòng chọn màu và kích thước trước khi thêm giỏ hàng.');
+                return;
+            }
+        }
 
         if (!currentVariantId) {
-            alert('Vui lòng chọn màu và kích thước trước khi thêm giỏ hàng.');
+            alert('Không tìm thấy biến thể phù hợp. Vui lòng thử lại.');
             return;
         }
 
@@ -185,8 +226,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // });
 
     document.getElementById('btnAddCheckout').addEventListener('click', () => {
+        const categoryInput = document.getElementById('product-category');
+        const category = categoryInput ? categoryInput.value : '';
+        
+        // Kiểm tra category để quyết định yêu cầu
+        const isAccessoryOrTrousers = category.includes('phụ kiện') || 
+                                    category.includes('quần') ||
+                                    category.includes('accessories') ||
+                                    category.includes('pants') ||
+                                    category.includes('trousers');
+        
+        // Kiểm tra điều kiện dựa trên category
+        if (isAccessoryOrTrousers) {
+            if (!selectedColor) {
+                alert('Vui lòng chọn màu trước khi thanh toán.');
+                return;
+            }
+        } else {
+            if (!selectedColor || !selectedSize) {
+                alert('Vui lòng chọn màu và kích thước trước khi thanh toán.');
+                return;
+            }
+        }
+
         if (!currentVariantId) {
-            alert('Vui lòng chọn màu và kích thước trước khi thanh toán.');
+            alert('Không tìm thấy biến thể phù hợp. Vui lòng thử lại.');
             return;
         }
 
