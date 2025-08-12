@@ -382,8 +382,12 @@
         <h1 class="failed-title">Thanh toán thất bại!</h1>
 
         <p class="failed-message">
-            Rất tiếc, giao dịch của bạn không thể được xử lý.
-            Vui lòng kiểm tra thông tin và thử lại.
+            @if(isset($error))
+                {{ $error }}
+            @else
+                Rất tiếc, giao dịch của bạn không thể được xử lý.
+                Vui lòng kiểm tra thông tin và thử lại.
+            @endif
         </p>
 
         <div class="failed-reasons">

@@ -1,114 +1,4 @@
 @extends('admin.app')
-<style>
-    .acustomermanagement-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
-    }
-
-    .acustomermanagement-search-bar input {
-        padding: 8px 12px;
-        width: 280px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-
-    .acustomermanagement-subheader {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-
-    .acustomermanagement-page-title {
-        font-size: 26px;
-        font-weight: bold;
-        color: #333;
-        margin: 0;
-    }
-
-    .acustomermanagement-filter-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .acustomermanagement-filter-actions select,
-    .acustomermanagement-filter-actions button {
-        padding: 8px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-    /* Nâng cấp modal form */
-    .acustomermanagement-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .acustomermanagement-modal-content {
-        background: #fff;
-        width: 100%;
-        max-width: 550px;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    .acustomermanagement-modal-content h2 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-    .acustomermanagement-form-group {
-        margin-bottom: 15px;
-    }
-
-    .acustomermanagement-form-group label {
-        font-weight: 600;
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-    }
-
-    .modal-input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 15px;
-        transition: 0.3s;
-    }
-
-    .modal-input:focus {
-        border-color: #409eff;
-        outline: none;
-    }
-
-    .acustomermanagement-modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 25px;
-    }
-</style>
-
 @section('admin.body')
     <link rel="stylesheet" href="{{ asset('css/admin/quanlykhachhang.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -131,8 +21,8 @@
             <div class="acustomermanagement-filter-actions">
                 <select id="activityFilter">
                     <option value="">Tất cả trạng thái</option>
-                    <option value="1">Hoạt động</option>
-                    <option value="0">Tạm khóa</option>
+                    <option value="0">Hoạt động</option>
+                    <option value="1">Tạm khóa</option>
                 </select>
 
                 <button id="sendMailBtn" class="acustomermanagement-btn acustomermanagement-btn-secondary">
@@ -168,14 +58,15 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->phone }}</td>
-                            <td>
-                                @if ($user->is_locked)
+                            <td data-is_locked="{{ $user->is_locked }}">
+                                @if ($user->is_locked == 0)
                                     <span class="acustomermanagement-status-badge acustomermanagement-status-active">Hoạt
                                         động</span>
                                 @else
                                     <span class="acustomermanagement-status-badge acustomermanagement-status-inactive">Tạm
                                         khóa</span>
                                 @endif
+
                             </td>
                             <td>{{ $user->is_active ? 'Đã kích hoạt' : 'Chưa kích hoạt' }}</td>
                             <td>{{ $user->created_at->format('Y-m-d') }}</td>
@@ -217,6 +108,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal thêm/sửa/xem khách hàng -->
     <div class="acustomermanagement-modal" id="customerModal" style="display: none">
         <div class="acustomermanagement-modal-content">
             <h2 id="modalTitle">Thông tin khách hàng</h2>
@@ -245,8 +138,8 @@
             <div class="acustomermanagement-form-group">
                 <label>Trạng thái hoạt động:</label>
                 <select id="modalLocked" class="modal-input">
-                    <option value="1">Hoạt động</option>
-                    <option value="0">Tạm khóa</option>
+                    <option value="0">Hoạt động</option>
+                    <option value="1">Tạm khóa</option>
                 </select>
             </div>
 
@@ -284,21 +177,19 @@
                 const id = row.cells[1].innerText.toLowerCase();
                 const name = row.cells[2].innerText.toLowerCase();
                 const email = row.cells[3].innerText.toLowerCase();
-                const isActive = row.cells[5].innerText.includes('Hoạt');
+                const isLocked = row.cells[5].dataset.is_locked;
 
                 const matchSearch = id.includes(keyword) || name.includes(keyword) || email.includes(keyword);
-                const matchStatus = status === "" || (status === "1" && isActive) || (status === "0" && !isActive);
+                const matchStatus = status === "" || status === isLocked;
 
                 row.style.display = (matchSearch && matchStatus) ? "" : "none";
             });
         }
 
-        // Check all
         document.getElementById("checkAll").addEventListener("click", function() {
             document.querySelectorAll(".user-checkbox").forEach(cb => cb.checked = this.checked);
         });
 
-        // Gửi tin nhắn
         document.getElementById("sendMailBtn").addEventListener("click", () => {
             const selected = Array.from(document.querySelectorAll(".user-checkbox:checked")).map(cb => cb.value);
             if (selected.length === 0) return alert("Vui lòng chọn người nhận.");
@@ -335,6 +226,7 @@
                 })
                 .catch(() => alert("Gửi thất bại"));
         });
+
         document.getElementById("addCustomerBtn").addEventListener("click", () => {
             openModal();
         });
@@ -352,15 +244,13 @@
             document.getElementById("modalEmail").value = data?.email || '';
             document.getElementById("modalPhone").value = data?.phone || '';
             document.getElementById("modalAddress").value = data?.address || '';
-            document.getElementById("modalLocked").value = data?.is_locked ?? 1;
+            document.getElementById("modalLocked").value = data?.is_locked ?? 0;
             document.getElementById("modalLockReason").value = data?.lock_reason || '';
             document.getElementById("modalCreated").value = data?.created_at || '';
 
             document.getElementById("modalCreatedWrapper").style.display = viewOnly ? "block" : "none";
 
-            const inputs = modal.querySelectorAll("input, select");
-            inputs.forEach(input => input.disabled = viewOnly);
-
+            modal.querySelectorAll("input, select").forEach(input => input.disabled = viewOnly);
             if (data) document.getElementById("modalEmail").disabled = true;
             document.getElementById("saveCustomerBtn").style.display = viewOnly ? "none" : "inline-block";
         }
@@ -372,17 +262,13 @@
         function viewUser(id) {
             fetch(`/admin/khachhang/${id}`)
                 .then(res => res.json())
-                .then(user => {
-                    openModal(user, true);
-                });
+                .then(user => openModal(user, true));
         }
 
         function editUser(id) {
             fetch(`/admin/khachhang/${id}`)
                 .then(res => res.json())
-                .then(user => {
-                    openModal(user, false);
-                });
+                .then(user => openModal(user, false));
         }
 
         document.getElementById("saveCustomerBtn").addEventListener("click", () => {

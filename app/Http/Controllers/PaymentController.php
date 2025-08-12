@@ -95,9 +95,17 @@ class PaymentController extends Controller
         $total = $checkoutData['total'];
         $voucherCode = session()->get('applied_voucher');
         $voucherId = session()->get('applied_voucher_id');
+        $calculatedVoucherDiscount = 0;
+        
         if ($voucherId) {
             $voucher = Voucher::find($voucherId);
             if ($voucher && $voucher->quantity > 0) {
+                // Tính toán số tiền giảm giá thực tế
+                if ($voucher->value_type === 'percent') {
+                    $calculatedVoucherDiscount = min(($subtotal * $voucher->discount_amount / 100), $voucher->discount_amount);
+                } else { // fixed
+                    $calculatedVoucherDiscount = min($subtotal, $voucher->discount_amount);
+                }
                 $voucher->decrement('quantity');
             } else {
                 $voucherId = null;
@@ -107,10 +115,6 @@ class PaymentController extends Controller
         $order = new Order();
         $order->user_id = Auth::id() ?? null;
         $order->voucher_id = $voucherId;
-        $order->total_price = $total;
-        $order->total = $subtotal; // Tổng tiền trước khi áp dụng voucher và phí ship
-        $order->total_final = $total; // Tổng tiền cuối cùng sau khi áp dụng voucher và phí ship
-        $order->ship_price = $shippingFee; // Phí vận chuyển
         $order->status_payment = 'Chờ xử lý';
         $order->payment_methods = $request->payment;
         $order->status = 'Chờ xác nhận';
@@ -129,7 +133,7 @@ class PaymentController extends Controller
             if (!$address) {
                 return back()->withErrors(['address' => 'Địa chỉ không tồn tại.']);
             }
-            $order->address = $address->address . ', ' . $address->ward . ', ' . $address->district . ', ' . $address->province;
+            $order->address_text = $address->address . ', ' . $address->ward . ', ' . $address->district . ', ' . $address->province;
         } else {
             $address = new addresses();
             $address->user_id = null;
@@ -144,18 +148,30 @@ class PaymentController extends Controller
             
             $order->name = $request->fullname; // Tên người đặt hàng khi chưa đăng nhập
             $order->phone = $request->phone;
-            $order->address = $request->address . ', ' . $request->ward . ', ' . $request->district . ', ' . $request->city;
+            $order->address_text = $request->address . ', ' . $request->ward . ', ' . $request->district . ', ' . $request->city;
             $order->address_id = $address->id;
         }
         $order->note = $request->note ?? null;
         $order->save();
 
+        // Lưu thông tin chi tiết vào OrderDetail với phân bổ các giá trị
+        $itemCount = count($cartDetails);
+        $shippingPerItem = $itemCount > 0 ? $shippingFee / $itemCount : 0;
+        $voucherDiscountPerItem = $itemCount > 0 ? $calculatedVoucherDiscount / $itemCount : 0;
+
         foreach ($cartDetails as $item) {
+            $itemSubtotal = $item->productVariant->product->price * $item->quantity;
+            $itemTotal = $itemSubtotal + $shippingPerItem;
+            $itemFinal = $itemTotal - $voucherDiscountPerItem;
+
             $orderDetail = new OrderDetail();
             $orderDetail->order_id = $order->id;
             $orderDetail->product_variant_id = $item->productVariant->id;
-            $orderDetail->unit_price = $item->productVariant->product->price;
             $orderDetail->quantity = $item->quantity;
+            $orderDetail->ship_price = $shippingPerItem;
+            $orderDetail->total = $itemTotal;
+            $orderDetail->total_final = $itemFinal;
+            $orderDetail->voucher_discount = $voucherDiscountPerItem;
             $orderDetail->save();
         }
 
@@ -175,11 +191,11 @@ class PaymentController extends Controller
                 "vnp_CurrCode" => "VND",
                 "vnp_IpAddr" => $vnp_IpAddr,
                 "vnp_Locale" => $vnp_Locale,
-                "vnp_OrderInfo" => "Thanh toan GD: " . $vnp_TxnRef,
+                "vnp_OrderInfo" => "Thanh toan don hang " . $vnp_TxnRef,
                 "vnp_OrderType" => "other",
                 "vnp_ReturnUrl" => $this->vnp_Returnurl,
                 "vnp_TxnRef" => $vnp_TxnRef,
-                "vnp_ExpireDate" => date('YmdHis', strtotime('+15 minutes')),
+                "vnp_ExpireDate" => date('YmdHis', strtotime('+30 minutes')),
             ];
 
             if ($vnp_BankCode) {
@@ -188,25 +204,29 @@ class PaymentController extends Controller
 
             ksort($inputData);
             $query = "";
-            $i = 0;
             $hashdata = "";
+            
             foreach ($inputData as $key => $value) {
-                if ($i == 1) {
-                    $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
-                } else {
-                    $hashdata .= urlencode($key) . "=" . urlencode($value);
-                    $i = 1;
-                }
+                $hashdata .= urlencode($key) . "=" . urlencode($value) . '&';
                 $query .= urlencode($key) . "=" . urlencode($value) . '&';
             }
+            
+            $hashdata = rtrim($hashdata, '&');
+            $query = rtrim($query, '&');
 
             $vnp_Url = $this->vnp_Url . "?" . $query;
             if (isset($this->vnp_HashSecret)) {
                 $vnpSecureHash = hash_hmac('sha512', $hashdata, $this->vnp_HashSecret);
-                $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
+                $vnp_Url .= '&vnp_SecureHash=' . $vnpSecureHash;
             }
-            header('Location: ' . $vnp_Url);
-            die();
+            
+            \Log::info('VNPay Payment URL Created', [
+                'order_id' => $order->id,
+                'amount' => $vnp_Amount,
+                'url' => $vnp_Url
+            ]);
+            
+            return redirect($vnp_Url);
         } elseif ($request->payment == 'Momo') {
             // Xử lý Momo nếu cần
         } else { // COD
@@ -224,9 +244,21 @@ class PaymentController extends Controller
             if (Auth::check()) {
                 Cart::where('user_id', Auth::id())->delete();
             }
-            session()->forget(['cart', 'checkout_data', 'applied_voucher']);
+            session()->forget(['cart', 'checkout_data', 'applied_voucher', 'applied_voucher_id']);
 
-            $email = Auth::check() && $order->user ? $order->user->email : $request->email;
+            // Lấy email để gửi bill
+            $email = null;
+            if (Auth::check() && $order->user) {
+                $email = $order->user->email;
+            } elseif ($order->address_id) {
+                $guestAddress = addresses::find($order->address_id);
+                if ($guestAddress && $guestAddress->email) {
+                    $email = $guestAddress->email;
+                }
+            } elseif ($request->email) {
+                $email = $request->email;
+            }
+            
             if ($email) {
                 Mail::to($email)->send(new Bill($order));
             }
@@ -237,14 +269,17 @@ class PaymentController extends Controller
 
     public function result(Request $request)
     {
-        $vnp_SecureHash = $_GET['vnp_SecureHash'];
+        // Lấy tất cả parameters từ request
+        $vnp_SecureHash = $request->input('vnp_SecureHash');
         $inputData = [];
-        foreach ($_GET as $key => $value) {
+        
+        foreach ($request->all() as $key => $value) {
             if (substr($key, 0, 4) == "vnp_") {
                 $inputData[$key] = $value;
             }
         }
 
+        // Xóa vnp_SecureHash khỏi dữ liệu để tính hash
         unset($inputData['vnp_SecureHash']);
         ksort($inputData);
 
@@ -259,15 +294,27 @@ class PaymentController extends Controller
                 $i = 1;
             }
         }
+        
         $secureHash = hash_hmac('sha512', $hashData, $this->vnp_HashSecret);
 
+        // Log để debug
+        \Log::info('VNPay Result Debug', [
+            'calculated_hash' => $secureHash,
+            'received_hash' => $vnp_SecureHash,
+            'response_code' => $request->input('vnp_ResponseCode'),
+            'order_id' => $request->input('vnp_TxnRef'),
+            'input_data' => $inputData
+        ]);
+
         if ($secureHash == $vnp_SecureHash) {
-            if ($_GET['vnp_ResponseCode'] == '00') {
-                $orderId = $request->vnp_TxnRef;
+            if ($request->input('vnp_ResponseCode') == '00') {
+                $orderId = $request->input('vnp_TxnRef');
                 $order = Order::find($orderId);
                 if ($order) {
                     $order->status_payment = 'Đã thanh toán';
                     $order->save();
+                    
+                    // Cập nhật số lượng sản phẩm
                     foreach ($order->orderDetails as $detail) {
                         $variant = product_variants::find($detail->product_variant_id);
                         if ($variant) {
@@ -275,32 +322,69 @@ class PaymentController extends Controller
                             $variant->save();
                         }
                     }
+                    
+                    // Xóa giỏ hàng và session
                     if (Auth::check()) {
                         Cart::where('user_id', Auth::id())->delete();
                     }
-                    session()->forget(['cart', 'checkout_data', 'applied_voucher']);
+                    session()->forget(['cart', 'checkout_data', 'applied_voucher', 'applied_voucher_id']);
+                    
+                    // Xử lý email cho cả user đã đăng nhập và chưa đăng nhập
                     $email = null;
                     if (Auth::check() && $order->user && $order->user->email) {
                         $email = $order->user->email;
-                    } elseif ($order->shippingAddress  && $order->shippingAddress->email) {
-                        $email = $order->shippingAddress->email;
-                    } elseif ($request->has('email')) {
-                        $email = $request->input('email');
+                    } elseif ($order->address_id) {
+                        $shippingAddress = addresses::find($order->address_id);
+                        if ($shippingAddress && $shippingAddress->email) {
+                            $email = $shippingAddress->email;
+                        }
                     }
 
                     if ($email) {
-                        Mail::to($email)->send(new Bill($order));
+                        try {
+                            Mail::to($email)->send(new Bill($order));
+                        } catch (\Exception $e) {
+                            \Log::error('Email send failed: ' . $e->getMessage());
+                        }
                     }
 
                     return view('payment.success');
                 } else {
+                    \Log::error('Order not found: ' . $orderId);
                     return view('payment.error');
                 }
             } else {
-                return view('payment.fail');
+                // Xử lý các mã lỗi VNPay
+                $errorMessage = $this->getVNPayErrorMessage($request->input('vnp_ResponseCode'));
+                \Log::error('VNPay Error: ' . $request->input('vnp_ResponseCode') . ' - ' . $errorMessage);
+                return view('payment.fail', ['error' => $errorMessage]);
             }
         } else {
+            \Log::error('VNPay Hash verification failed');
             return view('payment.error');
         }
+    }
+
+    /**
+     * Lấy thông báo lỗi VNPay dựa trên mã phản hồi
+     */
+    private function getVNPayErrorMessage($responseCode)
+    {
+        $errorMessages = [
+            '07' => 'Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).',
+            '09' => 'Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking tại ngân hàng.',
+            '10' => 'Giao dịch không thành công do: Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần',
+            '11' => 'Giao dịch không thành công do: Đã hết hạn chờ thanh toán. Xin quý khách vui lòng thực hiện lại giao dịch.',
+            '12' => 'Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng bị khóa.',
+            '13' => 'Giao dịch không thành công do Quý khách nhập sai mật khẩu xác thực giao dịch (OTP). Xin quý khách vui lòng thực hiện lại giao dịch.',
+            '24' => 'Giao dịch không thành công do: Khách hàng hủy giao dịch',
+            '51' => 'Giao dịch không thành công do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.',
+            '65' => 'Giao dịch không thành công do: Tài khoản của Quý khách đã vượt quá hạn mức giao dịch trong ngày.',
+            '75' => 'Ngân hàng thanh toán đang bảo trì.',
+            '79' => 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch',
+            '99' => 'Các lỗi khác (lỗi còn lại, không có trong danh sách mã lỗi đã liệt kê)'
+        ];
+
+        return $errorMessages[$responseCode] ?? 'Giao dịch thất bại. Vui lòng thử lại sau.';
     }
 }

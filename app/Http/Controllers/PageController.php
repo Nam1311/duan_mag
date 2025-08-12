@@ -143,6 +143,23 @@ class PageController extends Controller
         $product = Products::findOrFail($id);
         $product->increment('views');
 
+        // Lưu sản phẩm đã xem vào session
+        $viewedProducts = session()->get('viewed_products', []);
+        
+        // Loại bỏ sản phẩm hiện tại nếu đã tồn tại để tránh trùng lặp
+        $viewedProducts = array_filter($viewedProducts, function($productId) use ($id) {
+            return $productId != $id;
+        });
+        
+        // Thêm sản phẩm hiện tại vào đầu danh sách
+        array_unshift($viewedProducts, (int)$id);
+        
+        // Giới hạn chỉ lưu 10 sản phẩm gần nhất
+        $viewedProducts = array_slice($viewedProducts, 0, 10);
+        
+        // Cập nhật session
+        session()->put('viewed_products', $viewedProducts);
+
 $reviewDetail = reviews::with([
     'user', 
     'replies.user',           // load user của reply
@@ -198,12 +215,35 @@ $reviewDetail = reviews::with([
         $sizeName = $request->query('size');
 
         $colorId = colors::where('name', $colorName)->value('id');
-        $sizeId = sizes::where('name', $sizeName)->value('id');
+        $sizeId = $sizeName ? sizes::where('name', $sizeName)->value('id') : null;
 
-        $variant = product_variants::where('product_id', $productId)
-            ->where('color_id', $colorId)
-            ->where('size_id', $sizeId)
-            ->first();
+        // Lấy thông tin sản phẩm và category
+        $product = Products::with('category')->find($productId);
+        if (!$product) {
+            return response()->json(['quantity' => 0]);
+        }
+
+        // Kiểm tra category để quyết định logic tìm variant
+        $categoryName = strtolower($product->category->name ?? '');
+        $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+                               str_contains($categoryName, 'quần') ||
+                               str_contains($categoryName, 'accessories') ||
+                               str_contains($categoryName, 'pants') ||
+                               str_contains($categoryName, 'trousers');
+
+        $variantQuery = product_variants::where('product_id', $productId)
+            ->where('color_id', $colorId);
+
+        if ($isAccessoryOrTrousers) {
+            // Với phụ kiện/quần: chỉ cần màu, không cần size
+            $variant = $variantQuery->whereNotNull('color_id')->first();
+        } else {
+            // Với áo và sản phẩm khác: cần cả size và màu
+            if (!$sizeId) {
+                return response()->json(['quantity' => 0, 'message' => 'Size is required for this product']);
+            }
+            $variant = $variantQuery->where('size_id', $sizeId)->first();
+        }
 
         if (!$variant) {
             return response()->json(['quantity' => 0]);
@@ -215,8 +255,6 @@ $reviewDetail = reviews::with([
             'product_variant_id' => $variant->id,
             'price' => $variant->product->price,
             'name' => $variant->product->name
-
-
         ]);
     }
 }

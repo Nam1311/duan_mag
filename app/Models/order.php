@@ -9,8 +9,8 @@ class Order extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-        'user_id', 'voucher_id', 'total_price', 'status_payment', 'payment_methods', 
-        'status', 'order_code', 'address_id', 'note', 'phone', 'address'
+        'user_id', 'voucher_id', 'status_payment', 'payment_methods', 
+        'status', 'order_code', 'address_id', 'note', 'phone', 'name', 'address_text'
     ];
     public function orderDetails()
     {
@@ -21,6 +21,12 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class, 'voucher_id');
+    }
+    
      public function address()
     {
         return $this->belongsTo(addresses::class);

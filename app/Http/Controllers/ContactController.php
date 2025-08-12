@@ -23,7 +23,7 @@ class ContactController extends Controller
 
         // Gửi mail cho admin
         Mail::send('emails.contact', ['data' => $data], function ($message) use ($data) {
-            $message->to('admin@example.com')
+            $message->to('magstudiostore@gmail.com')
                     ->subject('Liên hệ từ khách hàng: ' . ($data['subject'] ?? 'Không có chủ đề'));
         });
 

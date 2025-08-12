@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Responsive Test</title>
+    <link rel="stylesheet" href="/css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Test viewport indicators */
+        .viewport-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #000;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        
+        .viewport-indicator::before {
+            content: "Desktop (1400px+)";
+        }
+        
+        @media (max-width: 1024px) {
+            .viewport-indicator::before {
+                content: "Tablet (1024px)";
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .viewport-indicator::before {
+                content: "Mobile (768px)";
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .viewport-indicator::before {
+                content: "Small Mobile (480px)";
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="viewport-indicator"></div>
+    
+    <div class="gh-cart-root">
+        <div class="gh-cart-container">
+            <div class="gh-cart-layout">
+                <!-- Cart Items Section -->
+                <div class="gh-cart-items-section">
+                    <div class="gh-cart-items-header">
+                        <h2 class="gh-cart-items-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            Giỏ hàng (2 sản phẩm)
+                        </h2>
+                    </div>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="gh-cart-bulk-actions">
+                        <label>
+                            <input type="checkbox" id="select-all">
+                            Chọn tất cả sản phẩm
+                        </label>
+                        <div>
+                            <button id="gh-cart-checkout-selected" disabled>
+                                <i class="fas fa-credit-card"></i>
+                                Thanh toán đã chọn
+                            </button>
+                            <button id="gh-cart-remove-selected" disabled>
+                                <i class="fas fa-trash-alt"></i>
+                                Xóa đã chọn
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="gh-cart-items-container">
+                        <!-- Sample Cart Item 1 -->
+                        <div class="gh-cart-item">
+                            <div class="gh-cart-item-checkbox-wrapper">
+                                <input type="checkbox" class="gh-cart-item-checkbox">
+                            </div>
+                            <div class="gh-cart-item-image">
+                                <img src="https://via.placeholder.com/120x120/f8f9fa/000?text=Áo+Thun" alt="Product">
+                            </div>
+                            <div class="gh-cart-item-details">
+                                <h3 class="gh-cart-item-name">Áo Thun Teelab Local Brand Unisex Cat Vietnam TS161</h3>
+                                <div class="gh-cart-item-variants">
+                                    <select class="gh-cart-select">
+                                        <option>Màu đen</option>
+                                        <option>Màu trắng</option>
+                                    </select>
+                                    <select class="gh-cart-select">
+                                        <option>Size L</option>
+                                        <option>Size XL</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="gh-cart-item-price">350.000đ</div>
+                            <div class="gh-cart-quantity-control">
+                                <button class="gh-cart-quantity-btn minus">-</button>
+                                <input type="number" value="1" class="gh-cart-quantity-input">
+                                <button class="gh-cart-quantity-btn plus">+</button>
+                            </div>
+                            <button class="gh-cart-remove-item">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Sample Cart Item 2 -->
+                        <div class="gh-cart-item">
+                            <div class="gh-cart-item-checkbox-wrapper">
+                                <input type="checkbox" class="gh-cart-item-checkbox">
+                            </div>
+                            <div class="gh-cart-item-image">
+                                <img src="https://via.placeholder.com/120x120/f8f9fa/000?text=Áo+Polo" alt="Product">
+                            </div>
+                            <div class="gh-cart-item-details">
+                                <h3 class="gh-cart-item-name">Áo Polo Teelab Local Brand Regular Fit PL024</h3>
+                                <div class="gh-cart-item-variants">
+                                    <select class="gh-cart-select">
+                                        <option>Màu navy</option>
+                                        <option>Màu đen</option>
+                                    </select>
+                                    <select class="gh-cart-select">
+                                        <option>Size M</option>
+                                        <option>Size L</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="gh-cart-item-price">285.000đ</div>
+                            <div class="gh-cart-quantity-control">
+                                <button class="gh-cart-quantity-btn minus">-</button>
+                                <input type="number" value="2" class="gh-cart-quantity-input">
+                                <button class="gh-cart-quantity-btn plus">+</button>
+                            </div>
+                            <button class="gh-cart-remove-item">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cart Summary -->
+                <div class="gh-cart-summary">
+                    <div class="ghcart3">
+                        <h3 class="gh-cart-summary-title">Tóm tắt đơn hàng</h3>
+                        
+                        <div class="gh-cart-summary-row">
+                            <span class="gh-cart-summary-label">Tạm tính</span>
+                            <span class="gh-cart-summary-value">920.000đ</span>
+                        </div>
+                        
+                        <div class="gh-cart-summary-row">
+                            <span class="gh-cart-summary-label">Giảm giá</span>
+                            <span class="gh-cart-summary-value">-50.000đ</span>
+                        </div>
+                        
+                        <div class="gh-cart-summary-row">
+                            <span class="gh-cart-summary-label">Phí vận chuyển</span>
+                            <span class="gh-cart-summary-value">40.000đ</span>
+                        </div>
+                        
+                        <div class="gh-cart-summary-row gh-cart-total-row">
+                            <span class="gh-cart-summary-label">Tổng cộng</span>
+                            <span class="gh-cart-summary-value">910.000đ</span>
+                        </div>
+                        
+                        <button class="gh-cart-checkout-btn">
+                            <i class="fas fa-lock"></i>
+                            Thanh toán tất cả sản phẩm
+                        </button>
+                        
+                        <a href="#" class="gh-cart-continue-shopping">
+                            <i class="fas fa-arrow-left"></i>
+                            Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions Section -->
+            <div class="gh-cart-suggestions-section">
+                <div class="gh-tab-navigation">
+                    <div class="gh-tab-buttons">
+                        <button class="gh-tab-btn active" onclick="switchTab('suggestions')">
+                            <i class="fas fa-lightbulb"></i>
+                            For You
+                        </button>
+                        <button class="gh-tab-btn" onclick="switchTab('history')">
+                            <i class="fas fa-history"></i>
+                            Đã xem gần đây
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="suggestions-tab" class="gh-tab-content active">
+                    <div class="gh-suggestions-grid">
+                        <!-- Sample Suggestion Items -->
+                        <div class="gh-suggestion-item">
+                            <div class="gh-suggestion-image">
+                                <img src="https://via.placeholder.com/200x200/f8f9fa/000?text=Sản+phẩm" alt="Product">
+                            </div>
+                            <div class="gh-suggestion-content">
+                                <h4>Áo Hoodie Teelab Unisex Local Brand HD001</h4>
+                                <div class="gh-suggestion-actions">
+                                    <span class="gh-price">450.000đ</span>
+                                    <button class="gh-add-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gh-suggestion-item">
+                            <div class="gh-suggestion-image">
+                                <img src="https://via.placeholder.com/200x200/f8f9fa/000?text=Sản+phẩm" alt="Product">
+                            </div>
+                            <div class="gh-suggestion-content">
+                                <h4>Quần Jean Teelab Slim Fit JN002</h4>
+                                <div class="gh-suggestion-actions">
+                                    <span class="gh-price">380.000đ</span>
+                                    <button class="gh-add-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gh-suggestion-item">
+                            <div class="gh-suggestion-image">
+                                <img src="https://via.placeholder.com/200x200/f8f9fa/000?text=Sản+phẩm" alt="Product">
+                            </div>
+                            <div class="gh-suggestion-content">
+                                <h4>Áo Khoác Gió Teelab Unisex JK003</h4>
+                                <div class="gh-suggestion-actions">
+                                    <span class="gh-price">520.000đ</span>
+                                    <button class="gh-add-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gh-suggestion-item">
+                            <div class="gh-suggestion-image">
+                                <img src="https://via.placeholder.com/200x200/f8f9fa/000?text=Sản+phẩm" alt="Product">
+                            </div>
+                            <div class="gh-suggestion-content">
+                                <h4>Nón Snapback Teelab Local Brand CP004</h4>
+                                <div class="gh-suggestion-actions">
+                                    <span class="gh-price">180.000đ</span>
+                                    <button class="gh-add-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="history-tab" class="gh-tab-content">
+                    <div id="viewed-products-grid" class="gh-viewed-grid">
+                        <div class="gh-viewed-item">
+                            <div class="gh-viewed-image">
+                                <img src="https://via.placeholder.com/200x200/f8f9fa/000?text=Đã+xem" alt="Product">
+                            </div>
+                            <div class="gh-viewed-content">
+                                <h4>Sản phẩm đã xem trước đó</h4>
+                                <div class="gh-viewed-actions">
+                                    <span class="gh-price">250.000đ</span>
+                                    <button class="gh-add-btn">
+                                        <i class="fas fa-plus"></i>
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo interactions
+        document.getElementById('select-all').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.gh-cart-item-checkbox');
+            const checkoutBtn = document.getElementById('gh-cart-checkout-selected');
+            const removeBtn = document.getElementById('gh-cart-remove-selected');
+            
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            
+            if (this.checked) {
+                checkoutBtn.disabled = false;
+                removeBtn.disabled = false;
+                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Thanh toán 2 sản phẩm';
+                removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Xóa 2 sản phẩm';
+            } else {
+                checkoutBtn.disabled = true;
+                removeBtn.disabled = true;
+                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Thanh toán đã chọn';
+                removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Xóa đã chọn';
+            }
+        });
+        
+        // Quantity controls
+        document.querySelectorAll('.gh-cart-quantity-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.parentNode.querySelector('.gh-cart-quantity-input');
+                const currentValue = parseInt(input.value);
+                
+                if (this.classList.contains('minus') && currentValue > 1) {
+                    input.value = currentValue - 1;
+                } else if (this.classList.contains('plus')) {
+                    input.value = currentValue + 1;
+                }
+            });
+        });
+        
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.gh-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.gh-tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'suggestions') {
+                document.querySelector('.gh-tab-btn:first-child').classList.add('active');
+                document.getElementById('suggestions-tab').classList.add('active');
+            } else if (tab === 'history') {
+                document.querySelector('.gh-tab-btn:last-child').classList.add('active');
+                document.getElementById('history-tab').classList.add('active');
+            }
+        }
+        
+        // Tab switching
+        document.querySelectorAll('.gh-tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.gh-tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
