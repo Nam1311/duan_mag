@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BulkNotificationMail;
 
@@ -23,6 +24,7 @@ class AdminCustomerController extends Controller
             });
         }
 
+        // Lọc theo trạng thái: 0 = hoạt động, 1 = tạm khóa
         if ($request->has('status') && $request->status !== '') {
             $query->where('is_locked', $request->status);
         }
@@ -45,17 +47,26 @@ class AdminCustomerController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
+            'password' => 'nullable|string|min:6',
             'phone'    => 'nullable|string',
             'address'  => 'nullable|string',
         ]);
 
-        $validated['role'] = 'user';
-        $validated['is_active'] = 1;
-        $validated['is_locked'] = 1;
+        $validated['role']       = 'user';
+        $validated['is_active']  = 1;
+        $validated['is_locked']  = 0; // Mặc định HOẠT ĐỘNG khi tạo mới
+
+        // Nếu không nhập mật khẩu thì đặt mặc định
+        $validated['password'] = Hash::make(
+            $validated['password'] ?? '12345678'
+        );
 
         $user = User::create($validated);
 
-        return response()->json(['message' => 'Thêm khách hàng thành công!', 'user' => $user]);
+        return response()->json([
+            'message' => 'Thêm khách hàng thành công!',
+            'user'    => $user
+        ]);
     }
 
     // Cập nhật thông tin khách hàng
@@ -73,7 +84,10 @@ class AdminCustomerController extends Controller
 
         $user->update($validated);
 
-        return response()->json(['message' => 'Cập nhật thành công!', 'user' => $user]);
+        return response()->json([
+            'message' => 'Cập nhật thành công!',
+            'user'    => $user
+        ]);
     }
 
     // Xoá khách hàng
@@ -89,7 +103,7 @@ class AdminCustomerController extends Controller
     public function lockToggle($id)
     {
         $user = User::findOrFail($id);
-        $user->is_locked = !$user->is_locked;
+        $user->is_locked = $user->is_locked == 1 ? 0 : 1;
         $user->save();
 
         return response()->json(['message' => 'Đã cập nhật trạng thái tài khoản.']);
@@ -107,7 +121,9 @@ class AdminCustomerController extends Controller
         $users = User::whereIn('id', $request->ids)->get();
 
         foreach ($users as $user) {
-           Mail::to($user->email)->send(new BulkNotificationMail($request->subject, $request->content));
+            Mail::to($user->email)->send(
+                new BulkNotificationMail($request->subject, $request->content)
+            );
         }
 
         return response()->json(['message' => 'Đã gửi tin nhắn đến người dùng.']);

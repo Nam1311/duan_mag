@@ -163,7 +163,7 @@
             document.getElementById('editUserId').value = id;
             document.getElementById('editRole').value = role;
             document.getElementById('editStatus').value = status;
-            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('editModal').style.display = 'flex';
         }
 
         function closeEditModal() {
@@ -216,7 +216,7 @@
         }
 
         document.getElementById('addUserBtn').addEventListener('click', function() {
-            document.getElementById('addUserModal').style.display = 'block';
+            document.getElementById('addUserModal').style.display = 'flex';
         });
 
         function closeAddUserModal() {
