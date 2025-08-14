@@ -60,22 +60,21 @@
 
         .button {
             display: inline-block;
-            background-color: #4f46e5;
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 12px 24px;
+            margin-top: 20px;
+            background-color: #005baa;
+            color: #fff !important;
             text-decoration: none;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
         .button:hover {
-            background-color: #4338ca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(79, 70, 229, 0.4);
+            background-color: #004080;
         }
+
+
 
         .footer {
             margin-top: 40px;
