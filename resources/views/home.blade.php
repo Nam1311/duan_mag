@@ -897,6 +897,18 @@
                 })
                 .catch(err => alert(err.message || 'Lỗi kết nối'));
         }
+
+        document.querySelector('.icon-search-mobile').addEventListener('click', function () {
+            const searchBox = document.querySelector('.search-input-mobile');
+            searchBox.classList.toggle('active');
+
+            if (searchBox.classList.contains('active')) {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        });
     </script>
     <script src="{{ asset('/js/detail.js') }}"></script>
 @endsection
