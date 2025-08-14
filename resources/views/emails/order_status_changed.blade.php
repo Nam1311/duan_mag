@@ -79,6 +79,9 @@
 
 <body>
     <div class="container">
+        <div class="logo">
+            <img src="cid:mag-logo" alt="Logo Mail" style="max-height:60px;">
+        </div>
         <h2>Xin chào {{ $order->user->name ?? 'Khách hàng' }},</h2>
         <p>🛒 Đơn hàng <strong>#{{ $order->id }}</strong> của bạn đã được cập nhật:</p>
 

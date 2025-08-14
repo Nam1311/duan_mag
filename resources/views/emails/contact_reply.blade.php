@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>MAG - Phản hồi liên hệ</title>
@@ -61,20 +62,21 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="logo">
-            <img src="https://yourdomain.com/logo.png" alt="MAG Logo">
+            <img src="cid:mag-logo" alt="Logo Mail" style="max-height:60px;">
         </div>
         <h2>Xin chào {{ $name }},</h2>
         <p>
-            Cảm ơn bạn đã liên hệ với <strong>MAG</strong>. Chúng tôi đã nhận được thông tin của bạn và sẽ phản hồi trong thời gian sớm nhất.
+            Cảm ơn bạn đã liên hệ với <strong>MAG</strong>. Chúng tôi đã nhận được thông tin của bạn và sẽ phản hồi
+            trong thời gian sớm nhất.
         </p>
         <p>
             Nếu bạn có bất kỳ câu hỏi nào thêm, đừng ngần ngại liên hệ lại với chúng tôi qua email hoặc hotline.
         </p>
 
-        <!-- Nút truy cập website -->
         <p style="text-align: center;">
             <a href="https://yourwebsite.com" class="btn" target="_blank">Truy cập website MAG</a>
         </p>
@@ -88,4 +90,5 @@
         </div>
     </div>
 </body>
+
 </html>

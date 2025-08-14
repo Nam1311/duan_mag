@@ -2,10 +2,52 @@
 
 @section('body')
     @if (session('success'))
-        <div class="alert alert-success" style="margin-bottom: 15px;">
+        <div id="toast-success" role="alert" aria-live="polite" aria-atomic="true">
             {{ session('success') }}
         </div>
+
+        <style>
+            #toast-success {
+                position: fixed;
+                top: 60px;
+                right: 20px;
+                /* bên phải */
+                max-width: 420px;
+                background: #22c55e;
+                /* xanh thành công */
+                color: #fff;
+                padding: 12px 16px;
+                border-radius: 10px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+                z-index: 9999;
+                font-weight: 500;
+                line-height: 1.4;
+                opacity: 1;
+                transform: translateX(0);
+                transition: opacity .4s ease, transform .4s ease;
+            }
+
+            #toast-success.hide {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const toast = document.getElementById('toast-success');
+                if (!toast) return;
+
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    toast.addEventListener('transitionend', () => toast.remove(), {
+                        once: true
+                    });
+                }, 3000); // 3 giây
+            });
+        </script>
     @endif
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="grid wide container">
@@ -77,6 +119,33 @@
                         <div class="original-price">{{ number_format($product_detail->original_price) }}đ</div>
                         <div class="discount-badge">{{ $product_detail->sale }}%</div>
                     </div>
+                    <style>
+                        .detail-try-on {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            height: 50.4px;
+                            background-color: black;
+                            box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
+                            cursor: pointer;
+                            margin-bottom: 5px;
+                        }
+
+                        .detail-try-on>a {
+                            color: white;
+                        }
+
+                        .detail-try-on>a>i {
+                            color: white;
+                            font-size: 16px;
+                        }
+
+                        .detail-try-on>p {
+                            color: white;
+                            font-size: 12px;
+                        }
+                    </style>
                     <div class="detail-button-mua" style="margin-bottom: 15px">
                         <button class="add-button-detail" id="btnAddCart">
                             <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
@@ -88,14 +157,13 @@
                         {{-- Place to store variant id --}}
                         <input type="hidden" id="product_variant_id" name="product_variant_id" value="">
                         <input type="hidden" id="product-id" name="product_id" value="{{ $product_detail->id }}">
-                        <input type="hidden" id="product-category" name="product_category" value="{{ strtolower($product_detail->category->name ?? '') }}">
+                        <input type="hidden" id="product-category" name="product_category"
+                            value="{{ strtolower($product_detail->category->name ?? '') }}">
                         {{-- quantity input exists --}}
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
                     </div>
-                    <div class="detail-try-on" id="tryOnBtn" data-product-id="{{ $product_detail->id }}" data-product-name="{{ $product_detail->name }}">
-                        <a href="javascript:void(0);">
-                            <i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay
-                        </a>
+                    <div class="detail-try-on">
+                        <a href="/try-on"><i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay</a>
                         <p>Phòng thử đồ online</p>
                     </div>
 
@@ -181,139 +249,159 @@
                 </div>
                 {{--  --}}
 
-<div id="box-detail-bl" class="box-chuyendoi1" style="display: none;">
-    @foreach ($reviewDetail as $review)
-        <!-- Main Review Header -->
-        <div class="detaill-review-header" id="review-{{ $review->id }}">
-            <div class="detaill-user-avatar">
-                <span>{{ strtoupper(mb_substr($review->user->name, 0, 1, 'UTF-8')) }}</span>
-            </div>
-            <div class="detaill-user-info">
-                <h4 class="detaill-username">{{ $review->user->name }}</h4>
-                <div class="detaill-review-meta">
-                    <div class="detaill-rating-stars">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= floor($review->rating))
-                                <i class="fas fa-star detaill-active"></i>
-                            @elseif ($i == ceil($review->rating) && $review->rating - floor($review->rating) >= 0.5)
-                                <i class="fas fa-star-half-alt detaill-active"></i>
-                            @else
-                                <i class="far fa-star"></i>
-                            @endif
-                        @endfor
-                        <span class="detaill-rating-value">{{ $review->rating }}</span>
-                    </div>
-                    <span class="detaill-review-date">
-                        Đánh giá ngày {{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y') }}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Review Content -->
-        <div class="detaill-review-content">
-            <p class="detaill-review-text">{{ $review->comment }}</p>
-        </div>
-
-        <!-- Reply Button -->
-        <button class="detaill-action-btn detaill-reply-btn" data-type="review" data-id="{{ $review->id }}">
-            <i class="far fa-comment-dots"></i> Trả lời
-        </button>
-
-        <!-- Reply Form for Review -->
-        <div class="detaill-review-footer">
-            <form method="POST" action="{{ route('reviews.reply') }}" class="detaill-reply-form" id="reply-form-review-{{ $review->id }}" style="display:none;">
-                @csrf
-                <input type="hidden" name="parent_id" value="{{ $review->id }}">
-                <textarea name="comment" placeholder="Viết phản hồi của bạn..." class="detaill-reply-input"></textarea>
-                <div class="detaill-form-actions">
-                    <button type="reset" class="detaill-cancel-btn" data-id="{{ $review->id }}">Hủy</button>
-                    <button type="submit" class="detaill-submit-btn">Gửi phản hồi</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Replies cấp 1 -->
-        @if ($review->replies->count() > 0)
-            <button class="detaill-action-btn detaill-view-replies-btn" data-id="{{ $review->id }}">
-                <i class="fas fa-chevron-down"></i> Xem {{ $review->replies->count() }} phản hồi
-            </button>
-            <div class="detaill-review-replies" id="replies-review-{{ $review->id }}" style="display: none; margin-left: 20px;">
-                @foreach ($review->replies as $reply)
-                    <div class="detaill-reply-item" id="reply-{{ $reply->id }}">
-                        <div class="detaill-reply-header">
+                <div id="box-detail-bl" class="box-chuyendoi1" style="display: none;">
+                    @foreach ($reviewDetail as $review)
+                        <!-- Main Review Header -->
+                        <div class="detaill-review-header" id="review-{{ $review->id }}">
                             <div class="detaill-user-avatar">
-                                {{ strtoupper(mb_substr($reply->user->name, 0, 1, 'UTF-8')) }}
+                                <span>{{ strtoupper(mb_substr($review->user->name, 0, 1, 'UTF-8')) }}</span>
                             </div>
-                            <span class="detaill-reply-name">{{ $reply->user->name }}</span>
-                            <span class="detaill-reply-date">{{ \Carbon\Carbon::parse($reply->created_at)->format('d/m/Y') }}</span>
+                            <div class="detaill-user-info">
+                                <h4 class="detaill-username">{{ $review->user->name }}</h4>
+                                <div class="detaill-review-meta">
+                                    <div class="detaill-rating-stars">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= floor($review->rating))
+                                                <i class="fas fa-star detaill-active"></i>
+                                            @elseif ($i == ceil($review->rating) && $review->rating - floor($review->rating) >= 0.5)
+                                                <i class="fas fa-star-half-alt detaill-active"></i>
+                                            @else
+                                                <i class="far fa-star"></i>
+                                            @endif
+                                        @endfor
+                                        <span class="detaill-rating-value">{{ $review->rating }}</span>
+                                    </div>
+                                    <span class="detaill-review-date">
+                                        Đánh giá ngày {{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y') }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        <p class="detaill-reply-text">{{ $reply->comment }}</p>
+                        <!-- Main Review Content -->
+                        <div class="detaill-review-content">
+                            <p class="detaill-review-text">{{ $review->comment }}</p>
+                        </div>
 
-                        <!-- Reply to Reply Button -->
-                        <button class="detaill-action-btn detaill-reply-to-reply-btn" data-type="reply" data-id="{{ $reply->id }}" data-parent="{{ $review->id }}">
+                        <!-- Reply Button -->
+                        <button class="detaill-action-btn detaill-reply-btn" data-type="review"
+                            data-id="{{ $review->id }}">
                             <i class="far fa-comment-dots"></i> Trả lời
                         </button>
 
-                        <!-- Reply Form for Reply cấp 1 -->
-                        <form method="POST" action="{{ route('reviews.reply') }}" class="detaill-reply-form" id="reply-form-reply-{{ $reply->id }}" style="display:none; margin-left: 20px;">
-                            @csrf
-                            <input type="hidden" name="parent_id" value="{{ $reply->id }}">
-                            <textarea name="comment" placeholder="Viết phản hồi của bạn..." class="detaill-reply-input"></textarea>
-                            <div class="detaill-form-actions">
-                                <button type="reset" class="detaill-cancel-btn" data-id="{{ $reply->id }}">Hủy</button>
-                                <button type="submit" class="detaill-submit-btn">Gửi phản hồi</button>
-                            </div>
-                        </form>
+                        <!-- Reply Form for Review -->
+                        <div class="detaill-review-footer">
+                            <form method="POST" action="{{ route('reviews.reply') }}" class="detaill-reply-form"
+                                id="reply-form-review-{{ $review->id }}" style="display:none;">
+                                @csrf
+                                <input type="hidden" name="parent_id" value="{{ $review->id }}">
+                                <textarea name="comment" placeholder="Viết phản hồi của bạn..." class="detaill-reply-input"></textarea>
+                                <div class="detaill-form-actions">
+                                    <button type="reset" class="detaill-cancel-btn"
+                                        data-id="{{ $review->id }}">Hủy</button>
+                                    <button type="submit" class="detaill-submit-btn">Gửi phản hồi</button>
+                                </div>
+                            </form>
+                        </div>
 
-                        <!-- Replies cấp 2 (reply của reply) -->
-                        @if ($reply->replies->count() > 0)
-                            <div style="margin-left: 40px; margin-top: 10px;">
-                                @foreach ($reply->replies as $reply2)
-                                    <div class="detaill-reply-item" id="reply-{{ $reply2->id }}">
+                        <!-- Replies cấp 1 -->
+                        @if ($review->replies->count() > 0)
+                            <button class="detaill-action-btn detaill-view-replies-btn" data-id="{{ $review->id }}">
+                                <i class="fas fa-chevron-down"></i> Xem {{ $review->replies->count() }} phản hồi
+                            </button>
+                            <div class="detaill-review-replies" id="replies-review-{{ $review->id }}"
+                                style="display: none; margin-left: 20px;">
+                                @foreach ($review->replies as $reply)
+                                    <div class="detaill-reply-item" id="reply-{{ $reply->id }}">
                                         <div class="detaill-reply-header">
                                             <div class="detaill-user-avatar">
-                                                {{ strtoupper(mb_substr($reply2->user->name, 0, 1, 'UTF-8')) }}
+                                                {{ strtoupper(mb_substr($reply->user->name, 0, 1, 'UTF-8')) }}
                                             </div>
-                                            <span class="detaill-reply-name">{{ $reply2->user->name }}</span>
-                                            <span class="detaill-reply-date">{{ \Carbon\Carbon::parse($reply2->created_at)->format('d/m/Y') }}</span>
+                                            <span class="detaill-reply-name">{{ $reply->user->name }}</span>
+                                            <span
+                                                class="detaill-reply-date">{{ \Carbon\Carbon::parse($reply->created_at)->format('d/m/Y') }}</span>
                                         </div>
 
-                                        <p class="detaill-reply-text">{{ $reply2->comment }}</p>
+                                        <p class="detaill-reply-text">{{ $reply->comment }}</p>
 
-                                        <!-- Reply to Reply Button (nếu cần) -->
-                                        <button class="detaill-action-btn detaill-reply-to-reply-btn" data-type="reply" data-id="{{ $reply2->id }}" data-parent="{{ $reply->id }}">
+                                        <!-- Reply to Reply Button -->
+                                        <button class="detaill-action-btn detaill-reply-to-reply-btn" data-type="reply"
+                                            data-id="{{ $reply->id }}" data-parent="{{ $review->id }}">
                                             <i class="far fa-comment-dots"></i> Trả lời
                                         </button>
 
-                                        <!-- Reply Form for Reply cấp 2 (nếu cần) -->
-                                        <form method="POST" action="{{ route('reviews.reply') }}" class="detaill-reply-form" id="reply-form-reply-{{ $reply2->id }}" style="display:none; margin-left: 20px;">
+                                        <!-- Reply Form for Reply cấp 1 -->
+                                        <form method="POST" action="{{ route('reviews.reply') }}"
+                                            class="detaill-reply-form" id="reply-form-reply-{{ $reply->id }}"
+                                            style="display:none; margin-left: 20px;">
                                             @csrf
-                                            <input type="hidden" name="parent_id" value="{{ $reply2->id }}">
+                                            <input type="hidden" name="parent_id" value="{{ $reply->id }}">
                                             <textarea name="comment" placeholder="Viết phản hồi của bạn..." class="detaill-reply-input"></textarea>
                                             <div class="detaill-form-actions">
-                                                <button type="reset" class="detaill-cancel-btn" data-id="{{ $reply2->id }}">Hủy</button>
+                                                <button type="reset" class="detaill-cancel-btn"
+                                                    data-id="{{ $reply->id }}">Hủy</button>
                                                 <button type="submit" class="detaill-submit-btn">Gửi phản hồi</button>
                                             </div>
                                         </form>
+
+                                        <!-- Replies cấp 2 (reply của reply) -->
+                                        @if ($reply->replies->count() > 0)
+                                            <div style="margin-left: 40px; margin-top: 10px;">
+                                                @foreach ($reply->replies as $reply2)
+                                                    <div class="detaill-reply-item" id="reply-{{ $reply2->id }}">
+                                                        <div class="detaill-reply-header">
+                                                            <div class="detaill-user-avatar">
+                                                                {{ strtoupper(mb_substr($reply2->user->name, 0, 1, 'UTF-8')) }}
+                                                            </div>
+                                                            <span
+                                                                class="detaill-reply-name">{{ $reply2->user->name }}</span>
+                                                            <span
+                                                                class="detaill-reply-date">{{ \Carbon\Carbon::parse($reply2->created_at)->format('d/m/Y') }}</span>
+                                                        </div>
+
+                                                        <p class="detaill-reply-text">{{ $reply2->comment }}</p>
+
+                                                        <!-- Reply to Reply Button (nếu cần) -->
+                                                        <button class="detaill-action-btn detaill-reply-to-reply-btn"
+                                                            data-type="reply" data-id="{{ $reply2->id }}"
+                                                            data-parent="{{ $reply->id }}">
+                                                            <i class="far fa-comment-dots"></i> Trả lời
+                                                        </button>
+
+                                                        <!-- Reply Form for Reply cấp 2 (nếu cần) -->
+                                                        <form method="POST" action="{{ route('reviews.reply') }}"
+                                                            class="detaill-reply-form"
+                                                            id="reply-form-reply-{{ $reply2->id }}"
+                                                            style="display:none; margin-left: 20px;">
+                                                            @csrf
+                                                            <input type="hidden" name="parent_id"
+                                                                value="{{ $reply2->id }}">
+                                                            <textarea name="comment" placeholder="Viết phản hồi của bạn..." class="detaill-reply-input"></textarea>
+                                                            <div class="detaill-form-actions">
+                                                                <button type="reset" class="detaill-cancel-btn"
+                                                                    data-id="{{ $reply2->id }}">Hủy</button>
+                                                                <button type="submit" class="detaill-submit-btn">Gửi phản
+                                                                    hồi</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </div>
                                 @endforeach
+
+                                <!-- Collapse Replies Button -->
+                                <div class="detaill-collapse-replies">
+                                    <button class="detaill-action-btn detaill-collapse-replies-btn"
+                                        data-id="{{ $review->id }}">
+                                        <i class="fas fa-chevron-up"></i> Thu gọn
+                                    </button>
+                                </div>
                             </div>
                         @endif
-                    </div>
-                @endforeach
-
-                <!-- Collapse Replies Button -->
-                <div class="detaill-collapse-replies">
-                    <button class="detaill-action-btn detaill-collapse-replies-btn" data-id="{{ $review->id }}">
-                        <i class="fas fa-chevron-up"></i> Thu gọn
-                    </button>
+                    @endforeach
                 </div>
-            </div>
-        @endif
-    @endforeach
-</div>
 
 
 
@@ -448,10 +536,14 @@
                 id: {{ $product_detail->id }},
                 name: @json($product_detail->name),
                 price: {{ $product_detail->price }},
-                image: @if($product_detail->images->first()) @json(asset($product_detail->images->first()->path)) @else null @endif,
+                image: @if ($product_detail->images->first())
+                    @json(asset($product_detail->images->first()->path))
+                @else
+                    null
+                @endif ,
                 viewedAt: new Date().toISOString()
             };
-            
+
             // Call tracking function if available
             if (typeof trackViewedProduct === 'function') {
                 trackViewedProduct(productData.id, productData.name, productData.price, productData.image);
@@ -459,7 +551,7 @@
                 // Fallback: Store directly in localStorage
                 const storageKey = 'viewedProducts';
                 const maxItems = 8;
-                
+
                 let viewed = [];
                 try {
                     const stored = localStorage.getItem(storageKey);
@@ -467,18 +559,18 @@
                 } catch (e) {
                     viewed = [];
                 }
-                
+
                 // Remove existing item if present
                 viewed = viewed.filter(item => item.id !== productData.id);
-                
+
                 // Add to beginning
                 viewed.unshift(productData);
-                
+
                 // Limit items
                 if (viewed.length > maxItems) {
                     viewed = viewed.slice(0, maxItems);
                 }
-                
+
                 // Save to localStorage
                 try {
                     localStorage.setItem(storageKey, JSON.stringify(viewed));
@@ -487,79 +579,6 @@
                     console.error('Failed to track viewed product:', e);
                 }
             }
-
-            // Handle Try-On button click
-            const tryOnBtn = document.getElementById('tryOnBtn');
-            if (tryOnBtn) {
-                tryOnBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Get current displaying image from main slider
-                    const activeImage = document.querySelector('#sliderdeital img.activedeiatl');
-                    const currentImageSrc = activeImage ? activeImage.src : null;
-                    
-                    if (currentImageSrc) {
-                        // Store the current product image data for TryOn form
-                        const tryOnData = {
-                            productId: this.getAttribute('data-product-id'),
-                            productName: this.getAttribute('data-product-name'),
-                            currentImage: currentImageSrc,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        // Save to localStorage for TryOn form to use
-                        localStorage.setItem('tryOnProductData', JSON.stringify(tryOnData));
-                        
-                        // Navigate to TryOn page
-                        window.location.href = '/try-on';
-                    } else {
-                        // Fallback - just go to try-on page
-                        window.location.href = '/try-on';
-                    }
-                });
-            }
-
-            // Ensure AI Avatar works on detail page
-            const avatar = document.getElementById('avatar');
-            const boxAi = document.getElementById('box-ai');
-            
-            if (avatar && boxAi) {
-                // Force show avatar if hidden
-                avatar.style.display = 'flex';
-                
-                // Add click handler if not already added
-                if (!avatar.hasAttribute('data-click-handler')) {
-                    avatar.addEventListener('click', function() {
-                        console.log('Avatar clicked on detail page');
-                        avatar.style.display = 'none';
-                        boxAi.style.display = 'block';
-                        avatar.classList.remove('has-notification');
-                        
-                        // Auto scroll to bottom when opening chat
-                        setTimeout(() => {
-                            const chatMessages = document.getElementById('chat-messages');
-                            if (chatMessages) {
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
-                            }
-                        }, 100);
-                    });
-                    avatar.setAttribute('data-click-handler', 'true');
-                }
-            } else {
-                console.error('Avatar or Box AI not found on detail page');
-            }
-
-            // Ensure close button works on detail page
-            const closeBtn = document.querySelector('.close-chat');
-            if (closeBtn && !closeBtn.hasAttribute('data-close-handler')) {
-                closeBtn.addEventListener('click', function() {
-                    console.log('Close button clicked on detail page');
-                    if (boxAi) boxAi.style.display = 'none';
-                    if (avatar) avatar.style.display = 'flex';
-                });
-                closeBtn.setAttribute('data-close-handler', 'true');
-            }
         });
     </script>
 @endsection
-
