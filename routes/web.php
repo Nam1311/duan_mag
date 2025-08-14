@@ -225,7 +225,7 @@ Route::get('/try-on/result', [TryOnController::class, 'showResult'])->name('tryo
 // ========================================== admin
 
 
-Route::get('/admin/', [HomeAdminController::class, 'show_home']);
+
 Route::post('/admin/reply-comment', [HomeAdminController::class, 'replyComment'])->name('admin.reply-comment');
 
 // Route::get('/admin/', function () {
@@ -284,44 +284,16 @@ Route::get('/payment/momo', function () {
     return view('payment.momo');
 });
 
-Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-Route::get('/admin/orders/{id}/edit', [AdminOrderController::class, 'edit'])->name('admin.orders.edit');
-Route::put('/admin/orders/{id}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
-Route::delete('/admin/orders/{id}', [AdminOrderController::class, 'softDelete'])->name('admin.orders.softDelete');
-Route::get('/admin/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-
-
-
-Route::post('/admin/countdown', [PromotionController::class, 'store'])->name('admin.countdown.store');
-// Route::get('/admin/countdown', [PromotionController::class, 'index']);
-Route::get('/admin/countdown', [PromotionController::class, 'index'])->name('admin.countdown.index');
-// Route::post('/admin/countdown/create', [PromotionController::class, 'store']);
-Route::put('/admin/countdown/{promotion}', [PromotionController::class, 'update'])->name('admin.countdown.update');
-Route::delete('/admin/countdown/{promotion}', [PromotionController::class, 'destroy'])->name('admin.countdown.destroy');
-
-// kiểm tra reload khi đến giờ và khi kết thúc
-// Route::get('/apply-countdown', [CountDownController::class, 'applyCountdown'])->name('ajax.applyCountdown');
-// Route::get('/check-reset-countdown', [CountDownController::class, 'resetCountdownSale'])->name('ajax.resetCountdown');
-
-Route::get('/kiem_tra_flashsale', [CountDownController::class, 'kiem_tra_flashsale'])->name('ajax.kiem_tra_flashsale');
 
 
 
 
 
-// router trung
 
-Route::get('/admin/khuyenmai', [VoucherAdminController::class, 'index'])->name('admin.vouchers.index');
-Route::post('/admin/vouchers', [VoucherAdminController::class, 'store'])->name('admin.vouchers.store');
-Route::delete('/admin/vouchers/{id}', [VoucherAdminController::class, 'destroy'])->name('admin.vouchers.destroy');
-Route::put('/admin/vouchers/{id}', [VoucherAdminController::class, 'update'])->name('vouchers.update');
 
-Route::get('/admin/khuyenmai/search', [VoucherAdminController::class, 'search'])->name('admin.vouchers.search');
 
-Route::get('/admin/danhmuc', [CategoryAdminController::class, 'index'])->name('admin.categories.index');
-Route::post('/admin/categories', [CategoryAdminController::class, 'store'])->name('admin.categories.store');
-Route::delete('/admin/categories/{id}', [CategoryAdminController::class, 'destroy'])->name('admin.categories.destroy');
-Route::put('/admin/categories/{id}', [CategoryAdminController::class, 'update'])->name('admin.categories.update');
+
+
 
 
 
@@ -347,25 +319,9 @@ Route::get('/products/search', [ProductAdminController::class, 'search'])->name(
 
 
 
-// router của Khôi
-//lienhe
-Route::get('/admin/quanlylienhe', [ContactAdminController::class, 'index'])->name('admin.quanlylienhe.index');
-Route::get('/admin/quanlylienhe/{id}', [ContactAdminController::class, 'show'])->name('admin.quanlylienhe.show');
-Route::post('/admin/quanlylienhe/{id}/reply', [ContactAdminController::class, 'reply'])->name('admin.quanlylienhe.reply');
-Route::delete('/admin/quanlylienhe/{id}', [ContactAdminController::class, 'destroy'])->name('admin.quanlylienhe.destroy');
-//ql user
-Route::get('/admin/quanlykhachhang', [AdminCustomerController::class, 'index'])->name('admin.customers.index');
-Route::get('/admin/khachhang/{id}', [AdminCustomerController::class, 'show']);
-Route::post('/admin/khachhang', [AdminCustomerController::class, 'store']);
-Route::put('/admin/khachhang/{id}', [AdminCustomerController::class, 'update']);
-Route::delete('/admin/khachhang/{id}', [AdminCustomerController::class, 'destroy']);
-Route::patch('/admin/khachhang/{id}/lock', [AdminCustomerController::class, 'lockToggle']);
-//ql role
-Route::get('/admin/quanlynguoidung', [AdminUserController::class, 'index'])->name('admin.users.index');
-Route::post('/admin/quanlynguoidung/add', [AdminUserController::class, 'add'])->name('admin.users.add');
-Route::put('/admin/quanlynguoidung/{id}/update', [AdminUserController::class, 'updateRoleAndStatus'])->name('admin.users.update');
-Route::delete('/admin/quanlynguoidung/{id}/remove-role', [AdminUserController::class, 'removeRole'])->name('admin.users.removeRole');
-Route::get('/admin/quanlynguoidung/{id}', [AdminUserController::class, 'show'])->name('admin.users.show');
+
+
+
 
 
 // Danh sách banner
@@ -381,18 +337,6 @@ Route::put('/admin/banners/{id}', [BannerAdminController::class, 'update'])->nam
 Route::delete('/admin/banners/{id}', [BannerAdminController::class, 'destroy'])->name('admin.banners.destroy');
 
 Route::get('/check-login', [UserInfoController::class, 'Kiem_tra_login']);
-// chung theem
-Route::get('/admin/khuyenmai', [VoucherAdminController::class, 'index'])->name('admin.vouchers.index');
-Route::post('/admin/vouchers', [VoucherAdminController::class, 'store'])->name('admin.vouchers.store');
-Route::delete('/admin/vouchers/{id}', [VoucherAdminController::class, 'destroy'])->name('admin.vouchers.destroy');
-Route::put('/admin/vouchers/{id}', [VoucherAdminController::class, 'update'])->name('vouchers.update');
-
-
-
-Route::get('/admin/danhmuc', [CategoryAdminController::class, 'index'])->name('admin.categories.index');
-Route::post('/admin/categories', [CategoryAdminController::class, 'store'])->name('admin.categories.store');
-Route::delete('/admin/categories/{id}', [CategoryAdminController::class, 'destroy'])->name('admin.categories.destroy');
-Route::put('/admin/categories/{id}', [CategoryAdminController::class, 'update'])->name('admin.categories.update');
 
 
 // manh
@@ -406,8 +350,7 @@ Route::get('/admin/comment/delete/{id}', [AdminReviewController::class, 'destroy
 // Route::get('/admin/baocao', function () {
 //     return view('admin.baocao');
 // });
-Route::get('/admin/baocao', [AdminBaocaoController::class, 'index']);
-Route::post('/admin/reports/filter', [AdminBaocaoController::class, 'filter'])->name('admin.reports.filter');
+
 
 Route::post('/admin/send-bulk-mail', [AdminCustomerController::class, 'sendBulkMail']);
 Route::get('/review/{order}', [ReviewController::class, 'create'])->name('review.form');
@@ -415,26 +358,105 @@ Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review
 
 // Route::get('/', [PageController::class, 'homepage'])->name('homepage');
 
-Route::get('/admin/caidat', [AdminSettingController::class, 'index']);
-Route::post('/admin/settings/update', [AdminSettingController::class, 'update'])->name('admin.settings.update');
+
 
 // laays biến thể mua ngay
 Route::get('/api/product/{id}', [PageController::class, 'get_variant']);
 
 
 
-Route::prefix('admin')->middleware(CheckAdmin::class)->group(function () {
-    });
 
+
+
+
+
+
+
+// Role admin ----------------------------------------------------------------------------------------------------------------------------------------------
+Route::prefix('admin')->middleware(CheckAdmin::class)->group(function () {
+
+    Route::get('/', [HomeAdminController::class, 'show_home']);
+
+    // cáo cáo
+    Route::get('/baocao', [AdminBaocaoController::class, 'index']);
+    Route::post('/reports/filter', [AdminBaocaoController::class, 'filter'])->name('admin.reports.filter');
+
+    // ql voucher
+    Route::get('/khuyenmai', [VoucherAdminController::class, 'index'])->name('admin.vouchers.index');
+    Route::post('/vouchers', [VoucherAdminController::class, 'store'])->name('admin.vouchers.store');
+    Route::delete('/vouchers/{id}', [VoucherAdminController::class, 'destroy'])->name('admin.vouchers.destroy');
+    Route::put('/vouchers/{id}', [VoucherAdminController::class, 'update'])->name('vouchers.update');
+    Route::get('/khuyenmai/search', [VoucherAdminController::class, 'search'])->name('admin.vouchers.search');
+
+
+    //ql coutdown
+    Route::post('countdown', [PromotionController::class, 'store'])->name('admin.countdown.store');
+    // Route::get('countdown', [PromotionController::class, 'index']);
+    Route::get('countdown', [PromotionController::class, 'index'])->name('admin.countdown.index');
+    // Route::post('countdown/create', [PromotionController::class, 'store']);
+    Route::put('countdown/{promotion}', [PromotionController::class, 'update'])->name('admin.countdown.update');
+    Route::delete('countdown/{promotion}', [PromotionController::class, 'destroy'])->name('admin.countdown.destroy');
+
+    // kiểm tra reload khi đến giờ và khi kết thúc
+    // Route::get('/apply-countdown', [CountDownController::class, 'applyCountdown'])->name('ajax.applyCountdown');
+    // Route::get('/check-reset-countdown', [CountDownController::class, 'resetCountdownSale'])->name('ajax.resetCountdown');
+
+    Route::get('/kiem_tra_flashsale', [CountDownController::class, 'kiem_tra_flashsale'])->name('ajax.kiem_tra_flashsale');
+
+    //ql user
+    Route::get('quanlykhachhang', [AdminCustomerController::class, 'index'])->name('admin.customers.index');
+    Route::get('khachhang/{id}', [AdminCustomerController::class, 'show']);
+    Route::post('khachhang', [AdminCustomerController::class, 'store']);
+    Route::put('khachhang/{id}', [AdminCustomerController::class, 'update']);
+    Route::delete('khachhang/{id}', [AdminCustomerController::class, 'destroy']);
+    Route::patch('khachhang/{id}/lock', [AdminCustomerController::class, 'lockToggle']);
+    //ql role
+    Route::get('quanlynguoidung', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('quanlynguoidung/add', [AdminUserController::class, 'add'])->name('admin.users.add');
+    Route::put('quanlynguoidung/{id}/update', [AdminUserController::class, 'updateRoleAndStatus'])->name('admin.users.update');
+    Route::delete('quanlynguoidung/{id}/remove-role', [AdminUserController::class, 'removeRole'])->name('admin.users.removeRole');
+    Route::get('quanlynguoidung/{id}', [AdminUserController::class, 'show'])->name('admin.users.show');
+
+    // setting
+    Route::get('/admin/caidat', [AdminSettingController::class, 'index']);
+    Route::post('/admin/settings/update', [AdminSettingController::class, 'update'])->name('admin.settings.update');
+});
+
+
+// Role quản lý sp ----------------------------------------------------------------------------------------------------------------------------------------------
 Route::prefix('admin')->middleware(CheckProductsManager::class)->group(function () {
+
     Route::get('/quanlyhinhanh', [ImageAdminController::class, 'index'])->name('admin.images.index');
     Route::post('/images', [ImageAdminController::class, 'store'])->name('admin.images.store');
     Route::delete('/images/destroy/{id}', [ImageAdminController::class, 'destroy'])->name('admin.images.destroy');
     Route::put('/images/{id}', [ImageAdminController::class, 'update'])->name('admin.images.update');
-    });
 
-Route::prefix('admin')->middleware(CheckCustomerService::class)->group(function () {
+    Route::get('/danhmuc', [CategoryAdminController::class, 'index'])->name('admin.categories.index');
+    Route::post('/categories', [CategoryAdminController::class, 'store'])->name('admin.categories.store');
+    Route::delete('/categories/{id}', [CategoryAdminController::class, 'destroy'])->name('admin.categories.destroy');
+    Route::put('/categories/{id}', [CategoryAdminController::class, 'update'])->name('admin.categories.update');
+
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}/edit', [AdminOrderController::class, 'edit'])->name('admin.orders.edit');
+    Route::put('/orders/{id}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
+    Route::delete('/orders/{id}', [AdminOrderController::class, 'softDelete'])->name('admin.orders.softDelete');
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 });
 
-Route::prefix('admin')->middleware(CheckNewsManager::class)->group(function () {
-    });
+
+
+
+// Role chăm sóc kh ----------------------------------------------------------------------------------------------------------------------------------------------
+Route::prefix('admin')->middleware(CheckCustomerService::class)->group(function () {
+
+    //lienhe
+    Route::get('/quanlylienhe', [ContactAdminController::class, 'index'])->name('admin.quanlylienhe.index');
+    Route::get('/quanlylienhe/{id}', [ContactAdminController::class, 'show'])->name('admin.quanlylienhe.show');
+    Route::post('/quanlylienhe/{id}/reply', [ContactAdminController::class, 'reply'])->name('admin.quanlylienhe.reply');
+    Route::delete('/quanlylienhe/{id}', [ContactAdminController::class, 'destroy'])->name('admin.quanlylienhe.destroy');
+});
+
+
+
+// Role quản lý tin ----------------------------------------------------------------------------------------------------------------------------------------------
+Route::prefix('admin')->middleware(CheckNewsManager::class)->group(function () {});
