@@ -31,6 +31,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Montserrat:wght@100..900&family=Oxanium:wght@200..800&display=swap"
         rel="stylesheet">
+
+        <link rel="icon" type="image/png" href="{{ asset('/img/logo.png') }}">
     @stack('styles')
 </head>
 
