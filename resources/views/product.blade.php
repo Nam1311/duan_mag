@@ -524,6 +524,21 @@
             });
         });
     });
+
+    window.addEventListener('scroll', function () {
+        const box = document.querySelector('.pruductall-danhmuc');
+        const stopPoint = 1100; // px, điểm muốn dừng lại
+
+        if (window.scrollY >= stopPoint) {
+            box.classList.add('stop-fixed');
+            // Giữ nguyên vị trí khi dừng
+            box.style.top = stopPoint + 'px';
+        } else {
+            box.classList.remove('stop-fixed');
+            box.style.top = '20px'; // về lại vị trí ban đầu
+        }
+    });
+
 </script>
 
 <style>

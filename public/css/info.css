@@ -32,12 +32,9 @@
         }
 
         .user-info-sidebar {
-            /* width: 250px; */
             background: var(--user-info-white);
-            border-radius: var(--user-info-border-radius);
             box-shadow: var(--user-info-box-shadow);
             border: 1px solid var(--user-info-light-gray);
-            padding: 1rem;
             height: 100%;
         }
 
@@ -54,7 +51,6 @@
             font-weight: 500;
             color: var(--user-info-black);
             transition: var(--user-info-transition);
-            border-radius: var(--user-info-border-radius);
             display: flex;
             align-items: center;
             gap: 0.75rem;

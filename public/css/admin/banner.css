@@ -1,13 +1,16 @@
     /* General Container Styles */
+    *{
+            font-family: "Inter", sans-serif;
+    }
     .container {
-        width: 100%;
+        width: 80%;
         padding: 20px;
         background-color: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    h2 {
+    .h2-banner{
         color: #333;
         margin-bottom: 20px;
         font-size: 24px;
