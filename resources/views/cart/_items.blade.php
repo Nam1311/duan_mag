@@ -107,7 +107,7 @@
                     <div class="gh-cart-quantity-control">
                         <button class="gh-cart-quantity-btn minus" data-variant-id="{{ $variant->id }}" {{ $item->quantity <= 1 ? 'disabled' : '' }}>−</button>
                         <input type="number" value="{{ $item->quantity }}" min="1" max="{{ $stock }}"
-                            class="gh-cart-quantity-input" readonly>
+                            class="gh-cart-quantity-input" data-variant-id="{{ $variant->id }}">
                         <button class="gh-cart-quantity-btn plus" data-variant-id="{{ $variant->id }}" {{ $item->quantity >= $stock ? 'disabled' : '' }}>+</button>
                     </div>
                 </div>
