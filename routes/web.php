@@ -212,6 +212,7 @@ Route::get('/wishlist/clear', [WishlistController::class, 'clear'])->name('wishl
 // ai mặc thử sản phẩm
 Route::get('/try-on', [TryOnController::class, 'showForm'])->name('tryon.form');
 Route::post('/try-on', [TryOnController::class, 'process'])->name('tryon.process');
+Route::get('/try-on/result', [TryOnController::class, 'showResult'])->name('tryon.result');
 
 // ai box chat
 // Route::get('/a', function (Request $request) {

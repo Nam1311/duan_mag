@@ -77,30 +77,6 @@
                         <div class="original-price">{{ number_format($product_detail->original_price) }}đ</div>
                         <div class="discount-badge">{{ $product_detail->sale }}%</div>
                     </div>
-                    <style>
-                        .detail-try-on{
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            height: 50.4px;
-                            background-color: black;
-                            box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
-                            cursor: pointer;
-                            margin-bottom: 5px;
-                        }
-                        .detail-try-on>a{
-                            color: white;
-                        }
-                        .detail-try-on>a>i{
-                            color: white;
-                            font-size: 16px;
-                        }
-                        .detail-try-on>p{
-                            color: white;
-                            font-size: 12px;
-                        }
-                    </style>
                     <div class="detail-button-mua" style="margin-bottom: 15px">
                         <button class="add-button-detail" id="btnAddCart">
                             <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
@@ -116,8 +92,10 @@
                         {{-- quantity input exists --}}
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
                     </div>
-                    <div class="detail-try-on">
-                        <a href="/try-on"><i class="fa fa-asterisk" aria-hidden="true"></i>   Thử ngay</a>
+                    <div class="detail-try-on" id="tryOnBtn" data-product-id="{{ $product_detail->id }}" data-product-name="{{ $product_detail->name }}">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay
+                        </a>
                         <p>Phòng thử đồ online</p>
                     </div>
 
@@ -508,6 +486,78 @@
                 } catch (e) {
                     console.error('Failed to track viewed product:', e);
                 }
+            }
+
+            // Handle Try-On button click
+            const tryOnBtn = document.getElementById('tryOnBtn');
+            if (tryOnBtn) {
+                tryOnBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Get current displaying image from main slider
+                    const activeImage = document.querySelector('#sliderdeital img.activedeiatl');
+                    const currentImageSrc = activeImage ? activeImage.src : null;
+                    
+                    if (currentImageSrc) {
+                        // Store the current product image data for TryOn form
+                        const tryOnData = {
+                            productId: this.getAttribute('data-product-id'),
+                            productName: this.getAttribute('data-product-name'),
+                            currentImage: currentImageSrc,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Save to localStorage for TryOn form to use
+                        localStorage.setItem('tryOnProductData', JSON.stringify(tryOnData));
+                        
+                        // Navigate to TryOn page
+                        window.location.href = '/try-on';
+                    } else {
+                        // Fallback - just go to try-on page
+                        window.location.href = '/try-on';
+                    }
+                });
+            }
+
+            // Ensure AI Avatar works on detail page
+            const avatar = document.getElementById('avatar');
+            const boxAi = document.getElementById('box-ai');
+            
+            if (avatar && boxAi) {
+                // Force show avatar if hidden
+                avatar.style.display = 'flex';
+                
+                // Add click handler if not already added
+                if (!avatar.hasAttribute('data-click-handler')) {
+                    avatar.addEventListener('click', function() {
+                        console.log('Avatar clicked on detail page');
+                        avatar.style.display = 'none';
+                        boxAi.style.display = 'block';
+                        avatar.classList.remove('has-notification');
+                        
+                        // Auto scroll to bottom when opening chat
+                        setTimeout(() => {
+                            const chatMessages = document.getElementById('chat-messages');
+                            if (chatMessages) {
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            }
+                        }, 100);
+                    });
+                    avatar.setAttribute('data-click-handler', 'true');
+                }
+            } else {
+                console.error('Avatar or Box AI not found on detail page');
+            }
+
+            // Ensure close button works on detail page
+            const closeBtn = document.querySelector('.close-chat');
+            if (closeBtn && !closeBtn.hasAttribute('data-close-handler')) {
+                closeBtn.addEventListener('click', function() {
+                    console.log('Close button clicked on detail page');
+                    if (boxAi) boxAi.style.display = 'none';
+                    if (avatar) avatar.style.display = 'flex';
+                });
+                closeBtn.setAttribute('data-close-handler', 'true');
             }
         });
     </script>

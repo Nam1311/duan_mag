@@ -9,6 +9,18 @@
     max-width: 100%;
   }
 
+  /* Exclude AI chatbox images from this rule */
+  #box-detail-sp img:not(.ai-chat-container img):not(.suggestion-list img) {
+    max-width: 100%;
+  }
+
+  /* Ensure AI chatbox images are not affected by detail page styles */
+  .ai-chat-container img,
+  .ai-chat-body img,
+  .suggestion-list img {
+    max-width: none !important;
+  }
+
   .detail-thumbnails .detail-itemimg {
       width: 80px;
       height: 80px;
@@ -56,8 +68,26 @@
       transition: opacity 0.5s ease;
   }
 
+  /* Exclude AI chatbox images from detail page image rules */
+  .detail-imgall img:not(.ai-chat-container img):not(.suggestion-list img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      transition: opacity 0.5s ease;
+  }
+
+  .detail-imgall img.activedeiatl:not(.ai-chat-container img):not(.suggestion-list img) {
+      display: block;
+  }
+
   .detail-imgall img.activedeiatl {
       display: block;
+  }
+
+  /* Fix for AI chatbox images */
+  .ai-chat-container .suggestion-list a img {
+      display: block !important;
   }
 
   .detail-imgall button {
@@ -393,7 +423,8 @@
   }
 
   .buy-button-detail:hover {
-      background-color: rgba(183, 28, 28, 0.227) transform: translateY(-2px);
+      background-color: rgba(183, 28, 28, 0.227);
+      transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
   }
 
@@ -1192,4 +1223,209 @@
   color: #155724;
   border: 1px solid #c3e6cb;
   box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
+}
+
+/* Detail Try-On Button Styles */
+.detail-try-on {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    background-color: #000000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: 2px solid transparent;
+}
+
+.detail-try-on:hover {
+    background-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-color: #ffffff;
+}
+
+.detail-try-on > a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.detail-try-on > a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.detail-try-on > a > i {
+    color: white;
+    font-size: 16px;
+}
+
+.detail-try-on > p {
+    color: white;
+    font-size: 12px;
+    margin: 2px 0 0 0;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detail-try-on {
+        height: 45px;
+    }
+    
+    .detail-try-on > a {
+        font-size: 13px;
+    }
+    
+    .detail-try-on > a > i {
+        font-size: 14px;
+    }
+    
+    .detail-try-on > p {
+        font-size: 11px;
+    }
+}
+
+/* Ensure AI Avatar is always visible on detail page */
+#avatar {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Fix image display issues */
+.detail-imgall img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: none !important;
+    transition: opacity 0.5s ease !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.detail-imgall img.activedeiatl {
+    display: block !important;
+}
+
+.detail-thumbnails .detail-itemimg img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* Fix AI chatbox suggestion images on detail page */
+.chat-container .suggestion-card img,
+.chat-container .suggestion-list img,
+.box-ai .suggestion-card img,
+.box-ai .suggestion-list img {
+    display: block !important;
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 5px !important;
+    position: relative !important;
+    z-index: auto !important;
+}
+
+.chat-container,
+.box-ai {
+    z-index: 99998 !important;
+}
+
+.chat-container * {
+    position: relative !important;
+    z-index: auto !important;
+}
+
+/* Ensure AI suggestion images override detail page styles */
+.ai-chat-container .suggestion-list a img,
+.ai-chat-body .suggestion-list a img {
+    display: block !important;
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 5px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-width: none !important;
+    max-height: none !important;
+    position: static !important;
+    z-index: 1 !important;
+}
+
+/* Override any conflicting rules from detail page */
+.ai-chat-container img {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.ai-chat-container .suggestion-list {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.ai-chat-container .suggestion-list a {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.ai-chat-container .suggestion-card {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* CRITICAL: Force AI chatbox suggestion images to display on detail page */
+.ai-chat-container .suggestion-list a img,
+.ai-chat-body .suggestion-list img,
+.ai-chat-container .suggestion-card img {
+    display: block !important;
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 5px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+    position: static !important;
+    z-index: 999999 !important;
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+}
+
+/* Ensure suggestion links are visible */
+.ai-chat-container .suggestion-list a {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 999999 !important;
+}
+
+/* Override any conflicting display rules */
+.ai-chat-container * {
+    max-width: none !important;
+}
+
+.ai-chat-container .suggestion-list {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }

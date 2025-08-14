@@ -260,7 +260,7 @@ def format_product_html(product: Dict) -> str:
     return f"""
     <a href="/detail/{product['id']}" class="suggestion-card product-link">
         <img 
-            src="{image_url}" 
+            src="http://127.0.0.1:8080/{image_url}" 
             alt="{product['name']}" 
             class="product-image"
         />
