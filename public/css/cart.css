@@ -51,6 +51,42 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Checkbox styles for cart items */
+.gh-cart-item-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.gh-cart-item-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer;
+    accent-color: var(--gh-primary);
+    transform: scale(1.2);
+}
+
+.gh-cart-item-checkbox:checked {
+    background-color: var(--gh-primary);
+    border-color: var(--gh-primary);
+}
+
+/* Checkbox animation */
+.gh-cart-item-checkbox {
+    transition: var(--gh-transition-fast);
+}
+
+.gh-cart-item-checkbox:checked {
+    animation: checkboxPulse 0.3s ease-in-out;
+}
+
+@keyframes checkboxPulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1.2); }
+}
+
 /* ========================================
    2. LAYOUT CONTAINER
    ======================================== */
@@ -144,7 +180,9 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     gap: 12px;
 }
 
+/* Styling chung cho tất cả các nút checkout và remove */
 #gh-cart-checkout-selected,
+#gh-cart-checkout-selected-top,
 #gh-cart-remove-selected {
     padding: 12px 20px;
     border: none;
@@ -155,40 +193,91 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     transition: var(--gh-transition);
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     min-height: 44px;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
 }
 
-#gh-cart-checkout-selected {
+/* Styling riêng cho các nút checkout */
+#gh-cart-checkout-selected,
+#gh-cart-checkout-selected-top {
     background: var(--gh-success);
     color: var(--gh-secondary);
 }
 
-#gh-cart-checkout-selected:hover:not(:disabled) {
+/* Hiệu ứng hover cho nút checkout */
+#gh-cart-checkout-selected:hover:not(:disabled),
+#gh-cart-checkout-selected-top:hover:not(:disabled) {
     background: #218838;
     transform: translateY(-2px);
 }
 
-#gh-cart-checkout-selected:disabled {
+/* Trạng thái disabled cho nút checkout */
+#gh-cart-checkout-selected:disabled,
+#gh-cart-checkout-selected-top:disabled {
     background: var(--gh-text-muted);
     cursor: not-allowed;
     transform: none;
 }
 
+/* Icon styling trong nút checkout */
+#gh-cart-checkout-selected i,
+#gh-cart-checkout-selected-top i {
+    font-size: 14px;
+}
+
+/* Loading States - đơn giản */
+.updating {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.updating::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--gh-accent);
+    border-top: 2px solid var(--gh-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styling cho nút remove - nhỏ gọn và không quá nổi bật */
 #gh-cart-remove-selected {
     background: var(--gh-danger);
     color: var(--gh-secondary);
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 38px;
 }
 
 #gh-cart-remove-selected:hover:not(:disabled) {
     background: #c82333;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 #gh-cart-remove-selected:disabled {
     background: var(--gh-text-muted);
     cursor: not-allowed;
     transform: none;
+}
+
+/* Icon styling trong nút remove - nhỏ hơn */
+#gh-cart-remove-selected i {
+    font-size: 13px;
 }
 
 /* ========================================
@@ -378,35 +467,59 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     font-weight: 600;
     background: var(--gh-secondary);
     color: var(--gh-primary);
+    cursor: pointer;
+    transition: var(--gh-transition);
 }
 
 .gh-cart-quantity-input:focus {
     outline: none;
     border-color: var(--gh-primary);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    cursor: text;
 }
 
-/* Remove Button */
+.gh-cart-quantity-input:hover {
+    border-color: var(--gh-primary);
+    background: #f8f9fa;
+}
+
+/* Remove default number input arrows for cleaner look */
+.gh-cart-quantity-input::-webkit-outer-spin-button,
+.gh-cart-quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.gh-cart-quantity-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Remove Button - nhỏ gọn và kín đáo hơn */
 .gh-cart-remove-item {
-    width: 90px;
-    height: 40px;
-    border: none;
-    background: var(--gh-danger);
-    color: var(--gh-secondary);
+    width: 60px;
+    height: 36px;
+    border: 1px solid var(--gh-border);
+    background: var(--gh-secondary);
+    color: var(--gh-text-muted);
     border-radius: var(--gh-radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--gh-transition);
-    font-size: 16px;
+    font-size: 14px;
 }
-.gh-cart-remove-item i{
-    margin-right: 10px;
+.gh-cart-remove-item i {
+    font-size: 14px;
+    margin-right: 5px;
 }
+
 .gh-cart-remove-item:hover {
-    background: #c82333;
-    transform: scale(1.1);
+    background: var(--gh-danger);
+    color: var(--gh-secondary);
+    border-color: var(--gh-danger);
+    transform: scale(1.05);
 }
 
 /* ========================================
@@ -418,7 +531,10 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     height: fit-content;
 }
 
-.ghcart2,
+.ghcart2 {
+    /* Container cho cart summary */
+    margin-top: 16px;
+}
 .ghcart3 {
     background: var(--gh-secondary);
     border-radius: var(--gh-radius);
@@ -476,7 +592,7 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     color: var(--gh-primary);
 }
 
-/* Checkout Button */
+/* Checkout Button trong Summary - đơn giản hơn */
 .gh-cart-checkout-btn {
     width: 100%;
     height: 56px;
@@ -500,6 +616,11 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     background: #333;
     transform: translateY(-2px);
     box-shadow: var(--gh-shadow-lg);
+}
+
+/* Icon styling trong nút checkout summary */
+.gh-cart-checkout-btn i {
+    font-size: 16px;
 }
 
 .gh-cart-continue-shopping {
@@ -1042,10 +1163,20 @@ i.fas, i.far, i.fab, i.fal, i.fa {
     }
 
     #gh-cart-checkout-selected,
-    #gh-cart-remove-selected {
+    #gh-cart-checkout-selected-top {
         width: 100%;
         justify-content: center;
         padding: 14px 20px;
+        font-size: 14px;
+        min-height: 48px;
+    }
+    
+    #gh-cart-remove-selected {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 13px;
+        min-height: 42px;
     }
 
     /* Mobile Suggestions */
@@ -1141,13 +1272,10 @@ i.fas, i.far, i.fab, i.fal, i.fa {
 
     /* Enhanced Touch Targets */
     .gh-cart-remove-item {
-        min-width: 44px;
-        min-height: 44px;
-    }
-    .gh-cart-remove-item {
-        min-width: 80px;
-        min-height: 44px;
-
+        min-width: 40px;
+        min-height: 40px;
+        width: 40px;
+        height: 40px;
     }
 
 

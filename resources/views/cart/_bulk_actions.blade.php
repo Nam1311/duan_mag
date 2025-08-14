@@ -5,7 +5,7 @@
         Chọn tất cả sản phẩm
     </label>
     <div>
-        <button id="gh-cart-checkout-selected" disabled>
+        <button id="gh-cart-checkout-selected-top" disabled>
             <i class="fas fa-credit-card"></i> Thanh toán đã chọn
         </button>
         <button id="gh-cart-remove-selected" disabled>

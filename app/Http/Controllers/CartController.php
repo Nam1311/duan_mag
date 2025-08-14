@@ -368,8 +368,11 @@ class CartController extends Controller
         }
 
         $vouCherCode = $request->input('voucher_code');
+        $selectedVariants = $request->input('selected_variants', []); // Mảng variant IDs được chọn
+        
         if (empty($vouCherCode)) {
             session()->forget('applied_voucher');
+            session()->forget('voucher_selected_variants'); // Xóa thông tin sản phẩm đã chọn cho voucher
             $data = $this->getCartData();
             if ($request->ajax()) {
                 return response()->json([
@@ -407,6 +410,14 @@ class CartController extends Controller
 
         session()->put('applied_voucher', $vouCherCode);
         session()->put('applied_voucher_id', $voucher->id);
+        
+        // Lưu thông tin sản phẩm được chọn cho voucher (nếu có)
+        if (!empty($selectedVariants)) {
+            session()->put('voucher_selected_variants', $selectedVariants);
+        } else {
+            session()->forget('voucher_selected_variants');
+        }
+        
         $data = $this->getCartData();
         if ($request->ajax()) {
             return response()->json([
@@ -887,6 +898,133 @@ class CartController extends Controller
         // Chuyển hướng đến trang thanh toán
         return response()->json([
             'redirect' => route('payment.show')
+        ]);
+    }
+
+    public function getSummaryForSelected(Request $request)
+    {
+        $validated = $request->validate([
+            'variant_ids' => 'required|array|min:1',
+            'variant_ids.*' => 'integer|exists:product_variants,id',
+        ]);
+
+        $variantIds = $validated['variant_ids'];
+
+        // Lấy thông tin các sản phẩm được chọn
+        if (Auth::check()) {
+            $selectedItems = Cart::where('user_id', Auth::id())
+                ->whereIn('product_variant_id', $variantIds)
+                ->with([
+                    'productVariant.product.thumbnail',
+                    'productVariant.product',
+                    'productVariant.size',
+                    'productVariant.color'
+                ])
+                ->get();
+        } else {
+            $sessionCart = session()->get('cart', []);
+            $selectedItems = collect($sessionCart)
+                ->filter(function ($item) use ($variantIds) {
+                    return in_array($item['product_variant_id'], $variantIds);
+                })
+                ->map(function ($item) {
+                    $variant = product_variants::with([
+                        'product.thumbnail',
+                        'product',
+                        'size',
+                        'color'
+                    ])->find($item['product_variant_id']);
+                    
+                    if ($variant && $variant->product) {
+                        return (object) [
+                            'productVariant' => $variant,
+                            'quantity' => $item['quantity'],
+                        ];
+                    }
+                    return null;
+                })
+                ->filter();
+        }
+
+        if ($selectedItems->isEmpty()) {
+            return response()->json([
+                'error' => 'Không có sản phẩm nào được chọn.'
+            ], 422);
+        }
+
+        // Tính toán cho các sản phẩm được chọn
+        $subtotal = $selectedItems->sum(function ($item) {
+            return $item->productVariant->product->price * $item->quantity;
+        });
+
+        // Tính voucher discount cho các sản phẩm được chọn
+        $appliedVoucherCode = session()->get('applied_voucher');
+        $voucherSelectedVariants = session()->get('voucher_selected_variants', []);
+        $voucherDiscount = 0;
+        
+        if ($appliedVoucherCode && Auth::check()) {
+            $voucher = Voucher::where('code', $appliedVoucherCode)
+                ->where('expiration_date', '>=', now())
+                ->where('start_date', '<=', now())
+                ->where('quantity', '>', 0)
+                ->first();
+            
+            if ($voucher) {
+                // Nếu có voucher đã được áp dụng cho sản phẩm cụ thể, chỉ tính toán nếu có sản phẩm đó trong selection
+                if (!empty($voucherSelectedVariants)) {
+                    $voucherApplicableVariants = array_intersect($variantIds, $voucherSelectedVariants);
+                    if (!empty($voucherApplicableVariants)) {
+                        // Tính subtotal chỉ cho những sản phẩm áp dụng voucher
+                        $voucherSubtotal = $selectedItems
+                            ->filter(function($item) use ($voucherApplicableVariants) {
+                                return in_array($item->productVariant->id, $voucherApplicableVariants);
+                            })
+                            ->sum(function ($item) {
+                                return $item->productVariant->product->price * $item->quantity;
+                            });
+                        
+                        if ($voucher->value_type == 'fixed') {
+                            $voucherDiscount = $voucher->discount_amount;
+                        } elseif ($voucher->value_type == 'percent') {
+                            $voucherDiscount = $voucherSubtotal * ($voucher->discount_amount / 100);
+                        }
+                    }
+                } else {
+                    // Nếu voucher áp dụng cho toàn bộ, tính theo subtotal
+                    if ($voucher->value_type == 'fixed') {
+                        $voucherDiscount = $voucher->discount_amount;
+                    } elseif ($voucher->value_type == 'percent') {
+                        $voucherDiscount = $subtotal * ($voucher->discount_amount / 100);
+                    }
+                }
+            }
+        }
+
+        $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
+        $total = $subtotal - $voucherDiscount + $shippingFee;
+
+        // Lấy vouchers có sẵn
+        $availableVouchers = null;
+        if (Auth::check()) {
+            $availableVouchers = Voucher::where('quantity', '>', 0)
+                ->where('start_date', '<=', now())
+                ->where('expiration_date', '>=', now())
+                ->get();
+        }
+
+        $data = compact('subtotal', 'shippingFee', 'voucherDiscount', 'total', 'availableVouchers', 'appliedVoucherCode');
+
+        return response()->json([
+            'summary_html' => view('cart._summary_selected', $data)->render(),
+        ]);
+    }
+
+    public function getSummaryForAll()
+    {
+        $data = $this->getCartData();
+        
+        return response()->json([
+            'summary_html' => view('cart._summary', $data)->render(),
         ]);
     }
 

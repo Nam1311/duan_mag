@@ -62,15 +62,7 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Toggle search input mobile
             const searchButton = document.querySelector(".Search");
-            const searchInputMobile = document.querySelector(".search-input-mobile");
-            if (searchButton && searchInputMobile) {
-                searchButton.addEventListener("click", function () {
-                    searchInputMobile.classList.toggle("active");
-                });
-            }
-
             // Live search setup
             function setupLiveSearch(inputId, formId, suggestionBoxId) {
                 const input = document.getElementById(inputId);
@@ -189,7 +181,7 @@
                                 slideMove: 1,
                                 slideMargin: 10,
                                 adaptiveHeight: true,
-                                enableDrag: false,
+                                enableDrag: true,
                                 controls: true,
                                 pager: true
                             }
