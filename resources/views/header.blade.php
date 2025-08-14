@@ -149,7 +149,4 @@
                 <ul id="suggestion-box-mobile" class="suggestion-list"></ul>
             </form>
         </div>
-
-
-
 </header>
