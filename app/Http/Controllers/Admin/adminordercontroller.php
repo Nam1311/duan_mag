@@ -94,7 +94,7 @@ class AdminOrderController extends Controller
         $oldStatus = $order->status;
 
         if (in_array($order->status, ['Thành công', 'Đang giao hàng']) && $request->status === 'Đã hủy') {
-            return redirect()->route('admin.orders.index')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
+            return redirect()->route('admin.orders.ind ex')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
         }
 
         $order->status = $request->status;
