@@ -193,6 +193,11 @@ Route::get('/payment', [CartController::class, 'proceedToCheckout'])->name('paym
 Route::get('/showpayment', [PaymentController::class, 'showPayment'])->name('payment.show');
 Route::post('/paymentstore', [PaymentController::class, 'paymentStore'])->name('payment.store');
 Route::get('/payment/result', [PaymentController::class, 'result'])->name('payment.result');
+
+// ZaloPay Payment Routes
+Route::post('/payment/zalopay/callback', [PaymentController::class, 'zaloPayCallback'])->name('payment.zalopay.callback');
+Route::get('/payment/zalopay/result', [PaymentController::class, 'zaloPayResult'])->name('payment.zalopay.result');
+
 Route::get('/order/{order_code}', [OrderController::class, 'showPublic'])->name('orders.public.show');
 // momo payment
 // Route::get('/payment/momo/return', [PaymentController::class, 'momoReturn'])->name('payment.momo.return');
@@ -274,6 +279,11 @@ Route::get('/admin/news/edit/{id}', [NewAdminController::class, 'edit'])->name('
 Route::put('/admin/news/update/{id}', [NewAdminController::class, 'update'])->name('admin.new.update');
 Route::delete('/admin/news/delete/{id}', [NewAdminController::class, 'destroy'])->name('admin.new.delete');
 Route::patch('/api/news/{id}/status', [NewAdminController::class, 'updateStatus']);
+
+// Routes cho danh mục tin tức
+Route::post('/admin/news/categories', [NewAdminController::class, 'storeCategory'])->name('admin.news.categories.store');
+Route::put('/admin/news/categories/{id}', [NewAdminController::class, 'updateCategory'])->name('admin.news.categories.update');
+Route::delete('/admin/news/categories/{id}', [NewAdminController::class, 'destroyCategory'])->name('admin.news.categories.destroy');
 
 //admin diep
 

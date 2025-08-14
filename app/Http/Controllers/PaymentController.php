@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Exception;
 use Log;
 
 class PaymentController extends Controller
@@ -24,15 +25,35 @@ class PaymentController extends Controller
     protected $vnp_Returnurl;
     protected $vnp_apiUrl;
     protected $apiUrl;
+    
+    // ZaloPay Configuration
+    protected $zp_app_id;
+    protected $zp_key1;
+    protected $zp_key2;
+    protected $zp_endpoint;
+    protected $zp_callback_url;
+    protected $zp_redirect_url;
+    
     public function __construct()
     {
         date_default_timezone_set('Asia/Ho_Chi_Minh');
+        
+        // VNPay Config
         $this->vnp_TmnCode = "AJT0AAYH"; // Mã định danh merchant
         $this->vnp_HashSecret = "50394OTCASPHF09AVM4EDBEQINVFJCDO"; // Secret key
         $this->vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
         $this->vnp_Returnurl = "http://127.0.0.1:8080/payment/result";
         $this->vnp_apiUrl = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
         $this->apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+        
+        // ZaloPay Config
+        $this->zp_app_id = config('zalopay.app_id');
+        $this->zp_key1 = config('zalopay.key1');
+        $this->zp_key2 = config('zalopay.key2');
+        $environment = config('zalopay.environment');
+        $this->zp_endpoint = config("zalopay.{$environment}.create_order");
+        $this->zp_callback_url = config('zalopay.callback_url');
+        $this->zp_redirect_url = config('zalopay.redirect_url');
     }
 
     public function showPayment()
@@ -227,8 +248,9 @@ class PaymentController extends Controller
             ]);
             
             return redirect($vnp_Url);
-        } elseif ($request->payment == 'Momo') {
-            // Xử lý Momo nếu cần
+        } elseif ($request->payment == 'ZaloPay') {
+            // Xử lý ZaloPay
+            return $this->processZaloPayPayment($order, $total);
         } else { // COD
             $order->status_payment = 'Chờ xử lý'; // Trạng thái phù hợp cho COD
             $order->save();
@@ -386,5 +408,264 @@ class PaymentController extends Controller
         ];
 
         return $errorMessages[$responseCode] ?? 'Giao dịch thất bại. Vui lòng thử lại sau.';
+    }
+
+    /**
+     * Xử lý thanh toán ZaloPay
+     */
+    private function processZaloPayPayment($order, $total)
+    {
+        try {
+            \Log::info('Starting ZaloPay Payment Process', [
+                'order_id' => $order->id,
+                'total' => $total,
+                'app_id' => $this->zp_app_id,
+                'endpoint' => $this->zp_endpoint
+            ]);
+
+            $transID = rand(0, 1000000);
+            $embeddata = "{}"; // Empty JSON object as string
+            $items = "[]"; // Empty array as string
+            
+            // Tạo app_trans_id theo format chuẩn ZaloPay
+            $app_trans_id = date("ymd") . "_" . $transID;
+            
+            // Xử lý tên người dùng - chỉ dùng ký tự an toàn
+            $username = $order->name ? preg_replace('/[^a-zA-Z0-9_]/', '', $order->name) : "user123";
+            if (empty($username) || strlen($username) < 3) {
+                $username = "user" . $order->id;
+            }
+
+            $order_data = [
+                "app_id" => $this->zp_app_id,
+                "app_trans_id" => $app_trans_id,
+                "app_user" => $username,
+                "app_time" => round(microtime(true) * 1000),
+                "item" => $items,
+                "embed_data" => $embeddata,
+                "amount" => (int)$total,
+                "description" => "Thanh toan don hang #" . $order->order_code,
+                "bank_code" => "",
+                "callback_url" => $this->zp_callback_url
+            ];
+
+            // Tạo MAC theo đúng format ZaloPay: app_id|app_trans_id|app_user|amount|app_time|embed_data|item
+            $data = $order_data["app_id"] . "|" . $order_data["app_trans_id"] . "|" . $order_data["app_user"] . "|" . $order_data["amount"] . "|" . $order_data["app_time"] . "|" . $order_data["embed_data"] . "|" . $order_data["item"];
+            $order_data["mac"] = hash_hmac("sha256", $data, $this->zp_key1);
+
+            \Log::info('ZaloPay Order Data Created', [
+                'order_data' => $order_data,
+                'mac_string' => $data,
+                'key1' => substr($this->zp_key1, 0, 8) . '...' // Log một phần key để debug
+            ]);
+
+            // Lưu app_trans_id vào order để tracking
+            $order->app_trans_id = $order_data["app_trans_id"];
+            $order->save();
+
+            // Gọi API ZaloPay với cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $this->zp_endpoint);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($order_data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/x-www-form-urlencoded'
+            ]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            
+            $resp = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                throw new \Exception("cURL Error: " . $error);
+            }
+
+            $result = json_decode($resp, true);
+
+            \Log::info('ZaloPay Create Order Response', [
+                'order_id' => $order->id,
+                'response' => $result,
+                'http_code' => $httpCode,
+                'raw_response' => $resp
+            ]);
+
+            if ($result && isset($result['return_code'])) {
+                if ($result['return_code'] == 1 && isset($result['order_url'])) {
+                    \Log::info('ZaloPay redirect to: ' . $result['order_url']);
+                    return redirect($result['order_url']);
+                } else {
+                    // Map error codes
+                    $errorMessages = [
+                        -1 => 'Tham số không hợp lệ',
+                        -2 => 'Merchant không được phép sử dụng',
+                        -3 => 'Chữ ký MAC không đúng',
+                        -4 => 'Lỗi tham số hoặc chữ ký',
+                        -5 => 'Merchant không tồn tại',
+                        -6 => 'Đơn hàng đã tồn tại'
+                    ];
+                    
+                    $errorMsg = $errorMessages[$result['return_code']] ?? ($result['return_message'] ?? 'Lỗi không xác định');
+                    
+                    \Log::error('ZaloPay API Error', [
+                        'response' => $result,
+                        'order_id' => $order->id,
+                        'error_message' => $errorMsg
+                    ]);
+                    
+                    return back()->with('error', 'Lỗi ZaloPay: ' . $errorMsg . ' (Code: ' . $result['return_code'] . ')');
+                }
+            } else {
+                throw new \Exception("Invalid response from ZaloPay API: " . $resp);
+            }
+        } catch (\Exception $e) {
+            \Log::error('ZaloPay Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'order_id' => $order->id
+            ]);
+            return back()->with('error', 'Có lỗi hệ thống khi xử lý thanh toán ZaloPay: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Xử lý callback từ ZaloPay
+     */
+    public function zaloPayCallback(Request $request)
+    {
+        $result = [];
+        try {
+            $key2 = $this->zp_key2;
+            $postdata = $request->getContent();
+            $postdatajson = json_decode($postdata, true);
+            
+            $mac = hash_hmac("sha256", $postdatajson["data"], $key2);
+            $requestmac = $postdatajson["mac"];
+
+            // Kiểm tra callback hợp lệ (đến từ ZaloPay server)
+            if (strcmp($mac, $requestmac) != 0) {
+                // callback không hợp lệ
+                $result["returncode"] = -1;
+                $result["returnmessage"] = "mac not equal";
+            } else {
+                // Thanh toán thành công
+                $dataJson = json_decode($postdatajson["data"], true);
+                $app_trans_id = $dataJson["apptransid"];
+                
+                // Tìm order theo app_trans_id
+                $order = Order::where('app_trans_id', $app_trans_id)->first();
+                if ($order) {
+                    $order->status_payment = 'Đã thanh toán';
+                    $order->save();
+
+                    // Cập nhật số lượng sản phẩm
+                    foreach ($order->orderDetails as $detail) {
+                        $variant = product_variants::find($detail->product_variant_id);
+                        if ($variant) {
+                            $variant->quantity = max(0, $variant->quantity - $detail->quantity);
+                            $variant->save();
+                        }
+                    }
+
+                    \Log::info("ZaloPay payment updated for order: " . $order->id);
+                }
+
+                $result["returncode"] = 1;
+                $result["returnmessage"] = "success";
+            }
+        } catch (Exception $e) {
+            $result["returncode"] = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
+            $result["returnmessage"] = $e->getMessage();
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Xử lý kết quả thanh toán ZaloPay (redirect từ ZaloPay)
+     */
+    public function zaloPayResult(Request $request)
+    {
+        $app_trans_id = $request->input('apptransid');
+        $status = $request->input('status');
+
+        if ($app_trans_id) {
+            $order = Order::where('app_trans_id', $app_trans_id)->first();
+            
+            if ($order) {
+                if ($status == 1) {
+                    // Thanh toán thành công
+                    $order->status_payment = 'Đã thanh toán';
+                    $order->save();
+
+                    // Xóa giỏ hàng và session
+                    if (Auth::check()) {
+                        Cart::where('user_id', Auth::id())->delete();
+                    }
+                    session()->forget(['cart', 'checkout_data', 'applied_voucher', 'applied_voucher_id']);
+
+                    // Gửi email
+                    $this->sendOrderEmail($order);
+
+                    return view('payment.success');
+                } else {
+                    // Thanh toán thất bại
+                    return view('payment.fail', ['error' => 'Thanh toán ZaloPay không thành công.']);
+                }
+            }
+        }
+
+        return view('payment.error');
+    }
+
+    /**
+     * Kiểm tra trạng thái thanh toán ZaloPay
+     */
+    public function checkZaloPayStatus($app_trans_id)
+    {
+        $data = $this->zp_app_id . "|" . $app_trans_id . "|" . $this->zp_key1;
+        $params = [
+            "appid" => $this->zp_app_id,
+            "apptransid" => $app_trans_id,
+            "mac" => hash_hmac("sha256", $data, $this->zp_key1)
+        ];
+
+        $context = stream_context_create([
+            "http" => [
+                "header" => "Content-type: application/x-www-form-urlencoded\r\n",
+                "method" => "POST",
+                "content" => http_build_query($params)
+            ]
+        ]);
+
+        $resp = file_get_contents("https://sandbox.zalopay.com.vn/v001/tpe/getstatusbyapptransid", false, $context);
+        return json_decode($resp, true);
+    }
+
+    /**
+     * Gửi email hóa đơn
+     */
+    private function sendOrderEmail($order)
+    {
+        $email = null;
+        if (Auth::check() && $order->user && $order->user->email) {
+            $email = $order->user->email;
+        } elseif ($order->address_id) {
+            $shippingAddress = addresses::find($order->address_id);
+            if ($shippingAddress && $shippingAddress->email) {
+                $email = $shippingAddress->email;
+            }
+        }
+
+        if ($email) {
+            try {
+                Mail::to($email)->send(new Bill($order));
+            } catch (\Exception $e) {
+                \Log::error('Email send failed: ' . $e->getMessage());
+            }
+        }
     }
 }
