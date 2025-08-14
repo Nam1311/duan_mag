@@ -89,12 +89,10 @@ const ViewedProductsManager = {
         }
     },
 
-    // Thêm sản phẩm vào lịch sử
     addViewedProduct(product) {
         try {
             let viewed = this.getViewedProducts();
             
-            // Xóa sản phẩm nếu đã tồn tại
             viewed = viewed.filter(item => item.id !== product.id);
             
             // Thêm vào đầu danh sách
@@ -173,7 +171,6 @@ const ViewedProductsManager = {
     }
 };
 
-// Tab switching functionality - Enhanced
 function switchTab(tab) {
     // Remove active from all tabs and buttons
     document.querySelectorAll('.gh-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -314,7 +311,7 @@ function addToCartFromHistory(productId) {
     });
 }
 
-// Function để reload cart content mà không reload toàn trang
+// Function để reload cart content 
 function reloadCartContent() {
     $.ajax({
         url: '/cart',

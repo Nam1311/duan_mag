@@ -527,11 +527,11 @@
         });
     </script>
 
-    {{-- Viewed Products Tracking Script --}}
+    {{-- Script theo dõi sản phẩm đã xem --}}
     <script>
-        // Track viewed product when page loads
+        // Theo dõi sản phẩm đã xem khi trang được tải
         document.addEventListener('DOMContentLoaded', function() {
-            // Get product data from page
+            // Lấy dữ liệu sản phẩm từ trang
             const productData = {
                 id: {{ $product_detail->id }},
                 name: @json($product_detail->name),
@@ -544,11 +544,11 @@
                 viewedAt: new Date().toISOString()
             };
 
-            // Call tracking function if available
+            // Gọi hàm theo dõi nếu có
             if (typeof trackViewedProduct === 'function') {
                 trackViewedProduct(productData.id, productData.name, productData.price, productData.image);
             } else {
-                // Fallback: Store directly in localStorage
+                // Trường hợp dự phòng: Lưu trực tiếp vào localStorage
                 const storageKey = 'viewedProducts';
                 const maxItems = 8;
 
@@ -560,23 +560,16 @@
                     viewed = [];
                 }
 
-                // Remove existing item if present
                 viewed = viewed.filter(item => item.id !== productData.id);
-
-                // Add to beginning
                 viewed.unshift(productData);
-
-                // Limit items
                 if (viewed.length > maxItems) {
                     viewed = viewed.slice(0, maxItems);
                 }
-
-                // Save to localStorage
                 try {
                     localStorage.setItem(storageKey, JSON.stringify(viewed));
-                    console.log('Tracked viewed product:', productData.name);
+                    console.log('Đã theo dõi sản phẩm đã xem:', productData.name);
                 } catch (e) {
-                    console.error('Failed to track viewed product:', e);
+                    console.error('Không thể theo dõi sản phẩm đã xem:', e);
                 }
             }
         });
