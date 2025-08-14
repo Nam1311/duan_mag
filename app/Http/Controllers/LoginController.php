@@ -55,6 +55,20 @@ class LoginController extends Controller
                 ])->withInput();
             }
 
+            switch ($user->role) {
+                case 'admin':
+                    return redirect('/admin');
+                case 'news_manager':
+                    return redirect('/admin/quanlytintuc');
+                case 'products_manager':
+                    return redirect('/admin/products');
+                    // sửa vào trang của chăm sóc khách hàng
+                case 'customer_service':
+                    return redirect('/admin/quanlylienhe');
+                default:
+                    return redirect()->route('home');
+            }
+
             // Đồng bộ giỏ hàng từ session vào database ngay sau khi đăng nhập
             \Log::info('Starting cart sync after login for user: ' . Auth::id());
             $this->syncCartFromSession();

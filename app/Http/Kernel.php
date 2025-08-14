@@ -58,6 +58,9 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'news_manager' => \App\Http\Middleware\CheckNewsManager::class,
+        'products_manager' => \App\Http\Middleware\CheckProductsManager::class,
+        'customer_service' => \App\Http\Middleware\CheckCustomerService::class,
 
         // Thêm middleware phân quyền Admin (tạo ở bước trước)
         'admin' => \App\Http\Middleware\CheckAdmin::class,

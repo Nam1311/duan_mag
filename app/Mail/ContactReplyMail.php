@@ -10,22 +10,21 @@ class ContactReplyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $name;
+    public string $name;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
         return $this->subject('MAG - Phản hồi liên hệ')
-                    ->view('emails.contact_reply');
+            ->view('emails.contact_reply')
+            ->with(['name' => $this->name])
+            ->withSymfonyMessage(function ($message) {
+                // Nhúng ảnh vào email và đặt Content-ID là "mag-logo"
+                $message->embedFromPath(public_path('img/logomail.png'), 'mag-logo');
+            });
     }
 }

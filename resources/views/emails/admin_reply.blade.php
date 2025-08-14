@@ -95,7 +95,7 @@
     <div class="wrapper">
         <div class="email-box">
             <div class="logo">
-                <img src="https://yourdomain.com/logo.png" alt="MAG Logo">
+                <img src="cid:mag-logo" alt="Logo Mail" style="max-height:60px;">
             </div>
 
             <div class="header">Xin chào {{ $name }},</div>
