@@ -5,6 +5,9 @@
       gap: 12px;
       margin-top: 20px;
   }
+  #box-detail-sp img {
+    max-width: 100%;
+  }
 
   .detail-thumbnails .detail-itemimg {
       width: 80px;

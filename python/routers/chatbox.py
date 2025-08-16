@@ -22,7 +22,7 @@ MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
 MYSQL_USER = os.getenv("MYSQL_USER", "root")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-MYSQL_DB = os.getenv("MYSQL_DB", "data_datn")
+MYSQL_DB = os.getenv("MYSQL_DB", "data_new")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
@@ -101,7 +101,7 @@ async def save_question_history(user_ip: str, question: str, answer: str, source
 # gọi ollama API
 async def call_ollama_api(question: str) -> str:
     """Gọi API của Ollama để lấy câu trả lời"""
-    prompt = f"""Bạn là trợ lý thời trang M A G SHOP. 
+    prompt = f"""Bạn là trợ lý thời trang M A G SHOP.
     Trả lời ngắn gọn bằng tiếng Việt (dưới 150 ký tự).
     Câu hỏi: {question}"""
 
@@ -237,7 +237,7 @@ async def find_products(query: str) -> list[Dict]:
                 "price": price,
                 "sizes": set(),
                 "colors": set(),
-                "image_url": image_url 
+                "image_url": image_url
             }
         else:
             # Nếu sp đã có image_url, giữ nguyên ảnh đầu tiên (order=1)
@@ -259,9 +259,9 @@ def format_product_html(product: Dict) -> str:
     price = f"{product['price']:,.0f}".replace(",", ".")
     return f"""
     <a href="/detail/{product['id']}" class="suggestion-card product-link">
-        <img 
-            src="{image_url}" 
-            alt="{product['name']}" 
+        <img
+            src="{image_url}"
+            alt="{product['name']}"
             class="product-image"
         />
         <p class="product-name">{product['name']}</p>

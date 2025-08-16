@@ -183,6 +183,8 @@ Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.c
 Route::put('/cart/update-variant/{variantId}', [CartController::class, 'updateVariant'])->name('cart.updateVariant');
 // thanh toán sản phẩm được chọn
 Route::post('/cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkoutSelected');
+Route::post('/cart/summary-selected', [CartController::class, 'getSummaryForSelected'])->name('cart.summarySelected');
+Route::get('/cart/summary-all', [CartController::class, 'getSummaryForAll'])->name('cart.summaryAll');
 // xóa lịch sử đã xem
 Route::post('/cart/clear-viewed-history', [CartController::class, 'clearViewedHistory'])->name('cart.clearViewedHistory');
 // thanh toán
