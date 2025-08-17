@@ -11,16 +11,50 @@ use Illuminate\Support\Facades\Http;
 
 class TryOnController extends Controller
 {
-    public function showForm()
+    public function showForm(Request $request)
     {
+        $productData = null;
         
-        return view('tryon.form');
+        // Kiểm tra nếu có product_id từ query string
+        if ($request->has('product_id')) {
+            $productId = $request->get('product_id');
+            $product = \App\Models\Products::with('images')->find($productId);
+            
+            if ($product) {
+                $productData = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image' => $product->images->first() ? asset($product->images->first()->path) : null,
+                    'category' => $product->category->name ?? 'clothing'
+                ];
+            }
+        }
+        
+        return view('tryon.form', compact('productData'));
     }
     public function process(Request $request)
     {
+        // Handle product image from URL (when user clicks "Try On" from product page)
+        $clothImagePath = null;
+        if ($request->has('product_image_url') && !$request->hasFile('cloth_image')) {
+            // Download product image from URL
+            try {
+                $productImageUrl = $request->input('product_image_url');
+                $imageContents = file_get_contents($productImageUrl);
+                
+                if ($imageContents !== false) {
+                    $fileName = 'product_' . time() . '_' . uniqid() . '.jpg';
+                    $clothImagePath = 'uploads/' . $fileName;
+                    Storage::disk('public')->put($clothImagePath, $imageContents);
+                }
+            } catch (\Exception $e) {
+                return back()->withErrors(['error' => 'Không thể tải ảnh sản phẩm. Vui lòng upload ảnh thủ công.'])->withInput();
+            }
+        }
+
         $request->validate([
             'person_image' => 'required|image|max:10240', // 10MB max
-            'cloth_image' => 'required|image|max:10240',
+            'cloth_image' => $clothImagePath ? 'nullable' : 'required|image|max:10240',
             'instructions' => 'nullable|string|max:1000',
             'model_type' => 'nullable|string|in:top,bottom,full',
             'gender' => 'nullable|string|in:male,female,unisex',
@@ -31,7 +65,12 @@ class TryOnController extends Controller
         try {
             // Store uploaded images
             $personPath = $request->file('person_image')->store('uploads', 'public');
-            $clothPath = $request->file('cloth_image')->store('uploads', 'public');
+            
+            if (!$clothImagePath) {
+                $clothPath = $request->file('cloth_image')->store('uploads', 'public');
+            } else {
+                $clothPath = $clothImagePath;
+            }
 
             $personFull = storage_path("app/public/{$personPath}");
             $clothFull = storage_path("app/public/{$clothPath}");

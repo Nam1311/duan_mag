@@ -498,6 +498,29 @@
     font-size: 0.875rem;
     color: #6c757d;
 }
+
+/* Notification animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
 </style>
 
 <div class="tryon-container">
@@ -649,6 +672,110 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-load product image if available
+    function loadProductImage() {
+        let productData = null;
+        
+        // First, try to get from server-side data (if passed via URL)
+        @if(isset($productData) && $productData)
+            productData = @json($productData);
+        @else
+            // Fallback: try to get from localStorage (if came from product detail page)
+            try {
+                const storedData = localStorage.getItem('tryOnProduct');
+                if (storedData) {
+                    productData = JSON.parse(storedData);
+                    // Clear from localStorage after use
+                    localStorage.removeItem('tryOnProduct');
+                }
+            } catch (e) {
+                console.log('No product data found in localStorage');
+            }
+        @endif
+        
+        if (productData && productData.image) {
+            console.log('Loading product for try-on:', productData);
+            
+            // Auto-fill the garment image using the correct IDs
+            const garmentPreview = document.getElementById('garmentPreview');
+            const garmentPreviewImage = document.getElementById('garmentPreviewImage');
+            const garmentUploadArea = document.getElementById('garmentUpload');
+            const garmentFileInput = document.getElementById('garmentFileInput');
+            
+            if (garmentPreview && garmentPreviewImage && garmentUploadArea) {
+                // Load image from URL and convert to file
+                fetch(productData.image)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        // Create file from blob
+                        const fileName = `product-${productData.id}.jpg`;
+                        const file = new File([blob], fileName, { type: blob.type });
+                        
+                        // Update file input
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        garmentFileInput.files = dt.files;
+                        
+                        // Show preview
+                        garmentPreviewImage.src = productData.image;
+                        garmentUploadArea.classList.add('hidden');
+                        garmentPreview.classList.remove('hidden');
+                        
+                        console.log('✅ Đã tải ảnh sản phẩm thành công');
+                    })
+                    .catch(error => {
+                        console.error('❌ Lỗi khi tải ảnh sản phẩm:', error);
+                    });
+                
+                // Auto-fill garment type based on category
+                const garmentSelect = document.getElementById('garmentType');
+                if (garmentSelect && productData.category) {
+                    const category = productData.category.toLowerCase();
+                    if (category.includes('áo') || category.includes('shirt') || category.includes('tshirt')) {
+                        garmentSelect.value = 'tshirt';
+                    } else if (category.includes('quần') || category.includes('pants')) {
+                        garmentSelect.value = 'pants';
+                    } else if (category.includes('váy') || category.includes('dress')) {
+                        garmentSelect.value = 'dress';
+                    } else if (category.includes('khoác') || category.includes('jacket')) {
+                        garmentSelect.value = 'jacket';
+                    } else {
+                        garmentSelect.value = 'shirt';
+                    }
+                }
+            }
+        }
+    }
+    
+    // Helper function to show notifications
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Load product image on page load
+    setTimeout(loadProductImage, 500);
+
     // Upload functionality
     function setupUpload(uploadAreaId, fileInputId, previewId, previewImageId, removeBtnId) {
         const uploadArea = document.getElementById(uploadAreaId);

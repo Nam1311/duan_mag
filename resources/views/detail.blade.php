@@ -162,10 +162,12 @@
                         {{-- quantity input exists --}}
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
                     </div>
-                    <div class="detail-try-on">
-                        <a href="/try-on"><i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay</a>
-                        <p>Phòng thử đồ online</p>
-                    </div>
+    <div class="detail-try-on" id="tryOnBtn" onclick="goToTryOn()">
+        <a href="#" onclick="return false;">
+            <i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay
+        </a>
+        <p>Phòng thử đồ online</p>
+    </div>
 
                     {{-- giới thiệu sản phẩm --}}
                     {!! $product_detail->short_description !!}
@@ -571,6 +573,53 @@
                 } catch (e) {
                     console.error('Không thể theo dõi sản phẩm đã xem:', e);
                 }
+            }
+        });
+    </script>
+
+    {{-- Script xử lý thử đồ ảo --}}
+    <script>
+        function goToTryOn() {
+            // Lấy thông tin sản phẩm hiện tại
+            const productData = {
+                id: {{ $product_detail->id }},
+                name: @json($product_detail->name),
+                image: @if ($product_detail->images->first())
+                    @json(asset($product_detail->images->first()->path))
+                @else
+                    null
+                @endif ,
+                category: @json($product_detail->category->name ?? 'clothing')
+            };
+
+            // Lưu thông tin vào localStorage để trang try-on có thể sử dụng
+            try {
+                localStorage.setItem('tryOnProduct', JSON.stringify(productData));
+                console.log('Đã lưu thông tin sản phẩm để thử đồ:', productData);
+                
+                // Chuyển đến trang thử đồ với product_id
+                window.location.href = `/try-on?product_id=${productData.id}`;
+                
+            } catch (e) {
+                console.error('Không thể lưu thông tin sản phẩm:', e);
+                // Fallback: chuyển đến trang thử đồ thông thường
+                window.location.href = '/try-on';
+            }
+        }
+
+        // Thêm visual feedback khi hover
+        document.addEventListener('DOMContentLoaded', function() {
+            const tryOnBtn = document.getElementById('tryOnBtn');
+            if (tryOnBtn) {
+                tryOnBtn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 12px rgba(188, 19, 188, 0.8)';
+                });
+                
+                tryOnBtn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 2px 8px rgba(188, 19, 188, 0.6)';
+                });
             }
         });
     </script>
