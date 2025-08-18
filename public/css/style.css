@@ -2454,7 +2454,16 @@ footer {
     /* font-weight: bold; */
 }
 
-
+.post-item>a>button {
+    background-color: #000;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    margin-top: 5px;
+    /* font-weight: bold; */
+}
 
 
 
@@ -3048,6 +3057,24 @@ footer {
     text-transform: uppercase;
     letter-spacing: 1px;
     box-shadow: 0 5px 15px rgba(164, 164, 164, 0.3);
+}
+.about-text>a>button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(164, 164, 164, 0.3);
+}
+
+.about-text>a>button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(176, 174, 174, 0.4);
 }
 
 .about-text>button:hover {

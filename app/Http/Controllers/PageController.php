@@ -29,7 +29,7 @@ class PageController extends Controller
             ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'views')
             ->take(8)->get();
         $product_categories = Product_categories::all();
-        $news = News::where('views', '>', 190)->take(6)->get();
+        $newhome = News::where('status', '=', 'Đã xuất bản')->orderBy('posted_date', 'desc')->take(6)->get();
         $product_new = Product_categories::with(['products' => function ($query) {
             $query->where('is_active', '>', 0)
                 ->take(8);
@@ -138,7 +138,7 @@ class PageController extends Controller
             'products_sale' => $products_sale,
             'product_categories' => $product_categories,
             'products_is_featured' => $products_is_featured,
-            'news' => $news,
+            'newhome' => $newhome,
             'product_new' => $product_new,
             'flash_sale_products' => $flash_sale_products->unique('id'),
             'countdown' => $countdown,
