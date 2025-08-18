@@ -60,11 +60,11 @@ class ProductAdminController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
+        {
+            $request->validate([
             'name' => 'required|string|max:255',
             'original_price' => 'required|numeric|min:0',
-            'sale' => 'nullable|numeric|min:0|max:100',
+            'base_sale' => 'nullable|numeric|min:0|max:100',
             'category_id' => 'required|exists:product_categories,id',
             'description' => 'nullable|string',
             'variants' => 'required|string',
@@ -73,7 +73,8 @@ class ProductAdminController extends Controller
         ]);
 
         $originalPrice = $request->original_price;
-        $sale = $request->sale ?? 0;
+        $baseSale = $request->base_sale ?? 0;   // 👈 lấy base_sale
+        $sale = $baseSale;                      // 👈 ban đầu sale = base_sale
         $price = round($originalPrice * (1 - $sale / 100));
         $slug = Str::slug($request->name);
 
@@ -83,12 +84,14 @@ class ProductAdminController extends Controller
             'original_price' => $originalPrice,
             'price' => $price,
             'sale' => $sale,
+            'base_sale' => $baseSale,
             'category_id' => $request->category_id,
             'description' => $request->description,
             'is_active' => 1,
             'sku' => $this->generateUniqueCode('MAG-')
         ]);
 
+        // Lưu ảnh sản phẩm
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
                 $fileName = time() . '_' . $index . '_' . Str::slug($file->getClientOriginalName());
@@ -102,6 +105,7 @@ class ProductAdminController extends Controller
             }
         }
 
+        // Lưu biến thể sản phẩm
         $variants = json_decode($request->variants, true);
 
         if (!is_array($variants)) {
@@ -133,6 +137,8 @@ class ProductAdminController extends Controller
                 return response()->json(['success' => false, 'message' => 'Size hoặc màu không hợp lệ'], 400);
             }
         }
+
+        return response()->json(['success' => true, 'message' => 'Sản phẩm đã được tạo thành công!']);
     }
 
     public function destroy($id)
@@ -182,19 +188,33 @@ class ProductAdminController extends Controller
     {
         $product = Products::findOrFail($id);
 
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'original_price' => 'required|numeric|min:0',
+            'base_sale' => 'nullable|numeric|min:0|max:100',
+            'category_id' => 'required|exists:product_categories,id',
+            'description' => 'nullable|string',
+            'is_active' => 'required|boolean',
+        ]);
+
         $originalPrice = $request->original_price;
-        $sale = $request->sale ?? 0;
+        $baseSale = $request->base_sale ?? 0;
+
+        // Khi update sản phẩm, sale = base_sale (trừ khi đang trong flash sale thì CountDownController sẽ xử lý riêng)
+        $sale = $baseSale;
         $price = round($originalPrice * (1 - $sale / 100));
 
         $product->update([
             'name' => $request->name,
             'description' => $request->description,
             'original_price' => $originalPrice,
+            'base_sale' => $baseSale,
             'sale' => $sale,
             'price' => $price,
             'category_id' => $request->category_id,
             'is_active' => $request->is_active,
         ]);
+
         // Cập nhật biến thể
         if ($request->has('variants')) {
             foreach ($request->variants as $variantId => $variantData) {
@@ -205,11 +225,12 @@ class ProductAdminController extends Controller
                 ]);
             }
         }
+
         // Thêm biến thể mới (nếu có)
         if ($request->has('new_variants')) {
             foreach ($request->new_variants as $variant) {
                 product_variants::create([
-                    'product_id' => $product->id, // hoặc $request->product_id
+                    'product_id' => $product->id,
                     'size_id' => $variant['size_id'],
                     'color_id' => $variant['color_id'],
                     'quantity' => $variant['quantity'],
@@ -217,9 +238,9 @@ class ProductAdminController extends Controller
             }
         }
 
-
         return back()->with('success', 'Cập nhật thành công');
     }
+
 
     protected function generateUniqueCode($prefix = 'MAG-', $length = 4)
     {

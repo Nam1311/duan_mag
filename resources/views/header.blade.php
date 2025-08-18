@@ -16,15 +16,8 @@
                 </div>
                 <ul class="list">
                     <li><a class="mobile_link" href="{{asset('/')}}">Trang chủ</a></li>
-                    <li><a class="mobile_link" href="/products">Sản phẩm</a></li>
-                    <li><a class="mobile_link sp" href="#">Áo thun</a></li>
-                    <li><a class="mobile_link sp" href="#">Áo polo</a></li>
-                    <li><a class="mobile_link sp" href="#">Áo sơ mi</a></li>
-                    <li><a class="mobile_link sp" href="#">Áo khoác</a></li>
-                    <li><a class="mobile_link sp" href="#">Quần</a></li>
-                    <li><a class="mobile_link sp" href="#">Phụ kiện</a></li>
+                    <li><a class="mobile_link" href="/san-pham">Sản phẩm</a></li>
                     <li><a class="mobile_link" href="/form.html">Bảng size</a></li>
-                    <li><a class="mobile_link" href="/Returns.html">Chính sách đổi trả</a></li>
                     <li><a class="mobile_link" href="/about.html">Về chúng tôi</a></li>
                     <li><a class="mobile_link" href="/about.html">Yêu thích</a></li>
                     <br><br>
@@ -81,7 +74,7 @@
             <div class="nav-pc">
                 <ul>
                     <li><a href="{{asset('/')}}">Trang chủ</a></li>
-                    <li><a href="{{asset('/products')}}">Sản phẩm</a></li>
+                    <li><a href="{{asset('/san-pham')}}">Sản phẩm</a></li>
                     <li class="nav-item">
                         <a href="{{asset('/try-on')}}">Thử đồ
                         <span class="tag-with-ai">với AI</span></a>

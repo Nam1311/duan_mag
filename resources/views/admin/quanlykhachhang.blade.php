@@ -1,4 +1,56 @@
 @extends('admin.app')
+<style>
+    .d-flex.justify-content-between.flex-fill.d-sm-none {
+        display: none !important;
+    }
+
+    .acustomermanagement-phantrang nav {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .acustomermanagement-phantrang .pagination {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .acustomermanagement-phantrang .pagination li {
+        display: inline-block;
+    }
+
+    .acustomermanagement-phantrang .pagination .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .acustomermanagement-phantrang .pagination .page-link:hover {
+        background-color: #f0f0f0;
+    }
+
+    .acustomermanagement-phantrang .pagination .active .page-link {
+        background-color: #4f46e5;
+        color: #fff;
+        border-color: #4f46e5;
+    }
+
+    .acustomermanagement-phantrang .pagination .disabled .page-link {
+        color: #ccc;
+        pointer-events: none;
+        background-color: #f9f9f9;
+    }
+</style>
 @section('admin.body')
     <link rel="stylesheet" href="{{ asset('css/admin/quanlykhachhang.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -82,10 +134,11 @@
                     @endforeach
                 </tbody>
             </table>
-
-            <div class="acustomermanagement-pagination mt-3">
-                {{ $customers->links() }}
+            <div class="acustomermanagement-phantrang">
+                {{ $customers->onEachSide(1)->links('pagination::bootstrap-5') }}
             </div>
+
+
         </div>
     </div>
 
@@ -223,6 +276,7 @@
                 .then(data => {
                     alert(data.message || "Gửi thành công!");
                     closeSendMailModal();
+                    location.reload();
                 })
                 .catch(() => alert("Gửi thất bại"));
         });

@@ -5,7 +5,7 @@
         <div class="adnews-header">
             <div class="adnews-search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Tìm kiếm tin tức..." id="adnews-searchInput">
+                <input type="text" placeholder="Tìm kiếm tin tức..." id="adnews-searchInput" onkeyup="searchNews()" oninput="searchNews()">
             </div>
             <div class="adnews-user-profile">
                 <div class="adnews-notification-bell adnews-tooltip" data-tooltip="Thông báo"><i class="fas fa-bell"></i>
@@ -20,7 +20,7 @@
             <button class="adnews-tab-btn" data-tab="adnews-stats">Thống kê</button>
             <button class="adnews-tab-btn" data-tab="adnews-chat">Chat tạo tin tức</button>
 
-            <button class="adnews-tab-btn" data-tab="adnews-settings">Cài đặt tin tức</button>
+            <button class="adnews-tab-btn" data-tab="adnews-settings">Quản lý danh mục</button>
         </div>
         <div class="adnews-tab-content adnews-active" id="adnews-list">
             <div class="adnews-actions">
@@ -299,45 +299,105 @@
 
 
 
-        {{-- setting --}}
+        {{-- Quản lý danh mục --}}
         <div class="adnews-tab-content" id="adnews-settings">
-            <div class="adnews-form-group">
-                <label>Số bài mỗi trang <i class="fas fa-list-ol"></i></label>
-                <select id="adnews-postsPerPage">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                </select>
+            <h2 class="section-title"><i class="fas fa-tags"></i> Quản lý danh mục tin tức</h2>
+            
+            <!-- Form thêm danh mục mới -->
+            <div class="adnews-data-card">
+                <h3>Thêm danh mục mới</h3>
+                <form id="addCategoryForm" class="category-form">
+                    @csrf
+                    <div class="adnews-form-row">
+                        <div class="adnews-form-group">
+                            <label for="categoryName">Tên danh mục <span class="required">*</span></label>
+                            <input type="text" id="categoryName" name="name" placeholder="Nhập tên danh mục" required>
+                        </div>
+                        <div class="adnews-form-group">
+                            <label for="categoryDescription">Mô tả</label>
+                            <textarea id="categoryDescription" name="description" placeholder="Nhập mô tả danh mục" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="adnews-form-actions">
+                        <button type="submit" class="adnews-btn adnews-btn-primary">
+                            <i class="fas fa-plus"></i> Thêm danh mục
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="adnews-form-group adnews-checkbox-group">
-                <label><input type="checkbox" checked> Cho phép bình luận</label>
-                <label><input type="checkbox"> Tự động duyệt bình luận</label>
-            </div>
-            <div class="adnews-form-group">
-                <label>Thêm danh mục mới <i class="fas fa-plus"></i></label>
-                <input type="text" id="adnews-newCategory" placeholder="Nhập tên danh mục">
-                <button class="adnews-btn adnews-btn-primary" onclick="adnewsAddCategory()">Thêm</button>
-            </div>
-            <div class="adnews-category-list">
-                <div class="adnews-category-item">
-                    <span>Khuyến mãi</span>
-                    <button class="adnews-btn adnews-btn-outline" onclick="adnewsDeleteCategory('Khuyến mãi')">Xóa</button>
+
+            <!-- Danh sách danh mục -->
+            <div class="adnews-data-card">
+                <div class="category-header">
+                    <h3>Danh sách danh mục</h3>
+                    <div class="category-search">
+                        <input type="text" id="categorySearchInput" placeholder="Tìm kiếm danh mục..." class="search-input" onkeyup="searchCategories()">
+                        <button type="button" class="search-btn" onclick="searchCategories()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="adnews-category-item">
-                    <span>Bộ sưu tập</span>
-                    <button class="adnews-btn adnews-btn-outline" onclick="adnewsDeleteCategory('Bộ sưu tập')">Xóa</button>
-                </div>
-                <div class="adnews-category-item">
-                    <span>Tin tức chung</span>
-                    <button class="adnews-btn adnews-btn-outline"
-                        onclick="adnewsDeleteCategory('Tin tức chung')">Xóa</button>
+                <div class="adnews-table-container">
+                    <table class="adnews-data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên danh mục</th>
+                                <th>Mô tả</th>
+                                <th>Số bài viết</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            @foreach($categories as $category)
+                            <tr data-id="{{ $category->id }}">
+                                <td>{{ $category->id }}</td>
+                                <td class="category-name">{{ $category->name }}</td>
+                                <td class="category-description">{{ $category->description ?? 'Không có mô tả' }}</td>
+                                <td>
+                                    <span class="badge badge-info">{{ $category->news_count }} bài</span>
+                                </td>
+                                <td>{{ $category->created_at ? $category->created_at->format('d/m/Y') : 'N/A' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="adnews-btn adnews-btn-outline adnews-btn-sm" onclick="editCategory({{ $category->id }}, '{{ $category->name }}', '{{ $category->description }}')">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+                                        <button class="adnews-btn adnews-btn-danger adnews-btn-sm" onclick="deleteCategory({{ $category->id }}, '{{ $category->name }}', {{ $category->news_count }})">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="adnews-form-actions">
-                <button class="adnews-btn adnews-btn-primary adnews-tooltip" data-tooltip="Lưu cài đặt"
-                    onclick="adnewsSaveSettings()">Lưu</button>
-                <button class="adnews-btn adnews-btn-secondary adnews-tooltip" data-tooltip="Hủy"
-                    onclick="adnewsCancelSettings()">Hủy</button>
+        </div>
+
+        <!-- Modal sửa danh mục -->
+        <div class="adnews-modal" id="editCategoryModal" style="display: none;">
+            <div class="adnews-modal-content">
+                <h2>Chỉnh sửa danh mục</h2>
+                <form id="editCategoryForm">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="editCategoryId">
+                    <div class="adnews-form-group">
+                        <label for="editCategoryName">Tên danh mục <span class="required">*</span></label>
+                        <input type="text" id="editCategoryName" name="name" required>
+                    </div>
+                    <div class="adnews-form-group">
+                        <label for="editCategoryDescription">Mô tả</label>
+                        <textarea id="editCategoryDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="adnews-modal-actions">
+                        <button type="button" class="adnews-btn adnews-btn-secondary" onclick="closeEditCategoryModal()">Hủy</button>
+                        <button type="submit" class="adnews-btn adnews-btn-primary">Cập nhật</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -484,8 +544,344 @@
         </div>
 
 
+        <style>
+            /* Search bar enhancements */
+            .adnews-search-bar {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
 
+            .adnews-search-bar #adnews-searchInput {
+                transition: all 0.3s ease;
+                border-radius: 25px;
+                padding-left: 45px;
+                padding-right: 45px;
+            }
 
+         
+
+            .adnews-search-bar .fas.fa-search {
+                position: absolute;
+                left: 15px;
+                color: #6c757d;
+                z-index: 2;
+            }
+
+            .search-clear-btn:hover {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+            }
+
+            .search-result-message {
+                animation: slideDown 0.3s ease;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Highlight search results */
+            .adnews-data-table tr:not([style*="display: none"]) {
+                transition: background-color 0.3s ease;
+            }
+
+            .adnews-data-table tr:not([style*="display: none"]):hover {
+                background-color: #f8f9fa;
+            }
+
+            /* CSS cho quản lý danh mục */
+            .category-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .category-search {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+
+            .search-input {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                width: 250px;
+                font-size: 14px;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #007bff;
+                box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+            }
+
+            .search-btn {
+                padding: 8px 12px;
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .search-btn:hover {
+                background: #0056b3;
+            }
+            .category-form {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            
+            .adnews-form-row {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 20px;
+                margin-bottom: 15px;
+            }
+            
+            .section-title {
+                color: #333;
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+                font-weight: 600;
+            }
+            
+            .required {
+                color: #dc3545;
+            }
+            
+            .badge {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            
+            .badge-info {
+                background-color: #d1ecf1;
+                color: #0c5460;
+            }
+            
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
+            
+            .adnews-btn-sm {
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
+            
+            .adnews-btn-danger {
+                background-color: #dc3545;
+                color: white;
+                border: 1px solid #dc3545;
+            }
+            
+            .adnews-btn-danger:hover {
+                background-color: #c82333;
+                border-color: #bd2130;
+            }
+            
+            .adnews-table-container {
+                overflow-x: auto;
+            }
+            
+            .adnews-data-table th,
+            .adnews-data-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .adnews-data-table th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                color: #495057;
+            }
+            
+            .category-name {
+                font-weight: 500;
+                color: #007bff;
+            }
+            
+            .category-description {
+                color: #6c757d;
+                font-style: italic;
+            }
+
+            /* Toast styles từ hệ thống có sẵn */
+            .custom-toast {
+                position: fixed;
+                top: 24px;
+                right: 24px;
+                background: #fff;
+                color: #1f2937;
+                padding: 0;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                font-size: 14px;
+                animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                z-index: 9999;
+                width: 350px;
+                overflow: hidden;
+                border: 1px solid #e5e7eb;
+                transition: all 0.3s ease;
+            }
+
+            .custom-toast:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            }
+
+            .toast-content {
+                display: flex;
+                align-items: center;
+                padding: 16px;
+                position: relative;
+            }
+
+            .toast-icon {
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #10b981;
+                border-radius: 50%;
+                color: white;
+                flex-shrink: 0;
+                margin-right: 12px;
+                padding: 4px;
+            }
+
+            .toast-icon-error {
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #ef4444;
+                border-radius: 50%;
+                color: white;
+                flex-shrink: 0;
+                margin-right: 12px;
+                padding: 4px;
+            }
+
+            .toast-icon-warning {
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #f59e0b;
+                border-radius: 50%;
+                color: white;
+                flex-shrink: 0;
+                margin-right: 12px;
+                padding: 4px;
+            }
+
+            .toast-icon-info {
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #3b82f6;
+                border-radius: 50%;
+                color: white;
+                flex-shrink: 0;
+                margin-right: 12px;
+                padding: 4px;
+            }
+
+            .toast-icon svg,
+            .toast-icon-error svg,
+            .toast-icon-warning svg,
+            .toast-icon-info svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .toast-message {
+                flex: 1;
+                line-height: 1.5;
+                padding-right: 8px;
+            }
+
+            .toast-close {
+                background: none;
+                border: none;
+                color: #9ca3af;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: color 0.2s ease;
+            }
+
+            .toast-close:hover {
+                color: #6b7280;
+            }
+
+            .toast-close svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .toast-progress {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #10b981, #34d399);
+                animation: progress 5s linear;
+                border-radius: 0 0 12px 12px;
+            }
+
+            @keyframes progress {
+                from { width: 100%; }
+                to { width: 0%; }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        </style>
 
 
         <script>
@@ -568,7 +964,7 @@
                         .then(data => {
                             if (data.success) {
                                 document.querySelector(`tr[data-id="${id}"]`).remove();
-                                alert('Tin tức đã được xóa.');
+                                showNotification('Tin tức đã được xóa.', 'success');
                             }
                         });
                 }
@@ -691,7 +1087,7 @@
                     })
                     .catch(err => {
                         console.error(err);
-                        alert(err);
+                        showNotification(err, 'error');
                     });
             };
 
@@ -699,28 +1095,396 @@
             window.adnewsAddCategory = function () {
                 const newCategory = document.getElementById('adnews-newCategory').value.trim();
                 if (newCategory) {
-                    alert(`Danh mục "${newCategory}" đã được thêm (demo, không lưu thực tế).`);
+                    // Demo function - đã được thay thế bằng AJAX thực
                     document.getElementById('adnews-newCategory').value = '';
                 } else {
-                    alert('Vui lòng nhập tên danh mục.');
+                    showNotification('Vui lòng nhập tên danh mục.', 'error');
                 }
             };
-
 
             // Delete category
             window.adnewsDeleteCategory = function (category) {
                 if (confirm(`Bạn có chắc muốn xóa danh mục "${category}"?`)) {
-                    alert(`Danh mục "${category}" đã được xóa (demo, không xóa thực tế).`);
+                    // Demo function - đã được thay thế bằng AJAX thực
                 }
             };
+
             // Cancel settings
             window.adnewsCancelSettings = function () {
-                alert('Đã hủy thay đổi cài đặt.');
+                showNotification('Đã hủy thay đổi cài đặt.', 'info');
                 document.getElementById('adnews-postsPerPage').value = '10';
                 document.querySelectorAll('#adnews-settings input[type="checkbox"]').forEach(cb => cb.checked = cb.defaultChecked);
                 document.getElementById('adnews-newCategory').value = '';
                 adnewsPostsPerPage = 10;
                 adnewsUpdateTable();
+            };
+
+            // ==== TÌM KIẾM TIN TỨC ====
+            
+            // Chức năng tìm kiếm tin tức
+            window.searchNews = function() {
+                const searchTerm = document.getElementById('adnews-searchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#adnews-newsTableBody tr');
+                let visibleCount = 0;
+                
+                rows.forEach(row => {
+                    const title = row.querySelector('td:nth-child(2)').textContent.toLowerCase(); // Tiêu đề
+                    const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Danh mục
+                    const author = row.querySelector('td:nth-child(4)').textContent.toLowerCase(); // Tác giả
+                    const status = row.querySelector('td:nth-child(8)').textContent.toLowerCase(); // Trạng thái
+                    
+                    // Tìm kiếm trong tiêu đề, danh mục, tác giả và trạng thái
+                    if (searchTerm.trim() === '' || 
+                        title.includes(searchTerm) || 
+                        category.includes(searchTerm) || 
+                        author.includes(searchTerm) ||
+                        status.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                        
+                        // Highlight từ khóa nếu có tìm kiếm
+                        if (searchTerm.trim() !== '') {
+                            highlightText(row, searchTerm);
+                        } else {
+                            removeHighlight(row);
+                        }
+                    } else {
+                        row.style.display = 'none';
+                        removeHighlight(row);
+                    }
+                });
+                
+                // Hiển thị thông báo nếu có tìm kiếm
+                if (searchTerm.trim() !== '') {
+                    showSearchResult(visibleCount, searchTerm);
+                } else {
+                    // Xóa thông báo khi không có tìm kiếm
+                    const existingMessage = document.querySelector('.search-result-message');
+                    if (existingMessage) {
+                        existingMessage.remove();
+                    }
+                }
+            };
+
+            // Highlight từ khóa tìm kiếm
+            function highlightText(row, searchTerm) {
+                const textColumns = [2, 3, 4, 8]; // Tiêu đề, danh mục, tác giả, trạng thái
+                
+                textColumns.forEach(columnIndex => {
+                    const cell = row.querySelector(`td:nth-child(${columnIndex})`);
+                    if (cell) {
+                        let originalText = cell.getAttribute('data-original-text');
+                        if (!originalText) {
+                            originalText = cell.textContent;
+                            cell.setAttribute('data-original-text', originalText);
+                        }
+                        
+                        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                        const highlightedText = originalText.replace(regex, '<mark style="background-color: #fff3cd; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+                        cell.innerHTML = highlightedText;
+                    }
+                });
+            }
+
+            // Xóa highlight
+            function removeHighlight(row) {
+                const textColumns = [2, 3, 4, 8];
+                
+                textColumns.forEach(columnIndex => {
+                    const cell = row.querySelector(`td:nth-child(${columnIndex})`);
+                    if (cell) {
+                        const originalText = cell.getAttribute('data-original-text');
+                        if (originalText) {
+                            cell.textContent = originalText;
+                        }
+                    }
+                });
+            }
+
+            // Escape special regex characters
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            // Hiển thị kết quả tìm kiếm
+            function showSearchResult(count, searchTerm) {
+                // Xóa thông báo cũ nếu có
+                const existingMessage = document.querySelector('.search-result-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                if (searchTerm.trim() === '') {
+                    return; // Không hiển thị gì khi search rỗng
+                }
+
+                // Tạo thông báo kết quả
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'search-result-message';
+                messageDiv.style.cssText = `
+                    background: #f8f9fa;
+                    border: 1px solid #dee2e6;
+                    border-radius: 6px;
+                    padding: 12px 16px;
+                    margin: 10px 0;
+                    color: #495057;
+                    font-size: 14px;
+                `;
+
+                if (count === 0) {
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-search" style="color: #6c757d; margin-right: 8px;"></i>
+                        Không tìm thấy tin tức nào với từ khóa "<strong>${searchTerm}</strong>"
+                    `;
+                    messageDiv.style.borderColor = '#ffc107';
+                    messageDiv.style.background = '#fff3cd';
+                } else {
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle" style="color: #28a745; margin-right: 8px;"></i>
+                        Tìm thấy <strong>${count}</strong> tin tức với từ khóa "<strong>${searchTerm}</strong>"
+                    `;
+                    messageDiv.style.borderColor = '#28a745';
+                    messageDiv.style.background = '#d4edda';
+                }
+
+                // Thêm vào trước bảng
+                const tableContainer = document.querySelector('.adnews-data-card');
+                tableContainer.insertBefore(messageDiv, tableContainer.firstChild);
+
+                // Tự động xóa sau 3 giây
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000);
+            }
+
+            // Reset tìm kiếm khi clear input
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('adnews-searchInput');
+                
+                // Keyboard shortcuts
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        this.value = '';
+                        searchNews();
+                        this.blur();
+                        showNotification('Đã xóa tìm kiếm', 'info');
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const visibleRows = document.querySelectorAll('#adnews-newsTableBody tr:not([style*="display: none"])');
+                        if (visibleRows.length === 1) {
+                            // Nếu chỉ có 1 kết quả, tự động mở xem chi tiết
+                            const newsId = visibleRows[0].getAttribute('data-id');
+                            if (newsId) {
+                                adnewsPreviewNews(newsId);
+                                showNotification('Đã mở tin tức duy nhất tìm thấy', 'success');
+                            }
+                        }
+                    }
+                });
+
+                // Global search shortcut (Ctrl + F)
+                document.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey && e.key === 'f') {
+                        e.preventDefault();
+                        searchInput.focus();
+                        searchInput.select();
+                        showNotification('Sử dụng tìm kiếm nhanh', 'info');
+                    }
+                });
+
+                // Thêm nút clear cho search input
+                const searchBar = document.querySelector('.adnews-search-bar');
+                const clearBtn = document.createElement('button');
+                clearBtn.innerHTML = '<i class="fas fa-times"></i>';
+                clearBtn.className = 'search-clear-btn';
+                clearBtn.title = 'Xóa tìm kiếm (ESC)';
+                clearBtn.style.cssText = `
+                    position: absolute;
+                    right: 40px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    color: #6c757d;
+                    cursor: pointer;
+                    padding: 5px;
+                    border-radius: 3px;
+                    display: none;
+                    transition: all 0.3s ease;
+                `;
+                clearBtn.onclick = function() {
+                    searchInput.value = '';
+                    searchNews();
+                    searchInput.focus();
+                    this.style.display = 'none';
+                    showNotification('Đã xóa tìm kiếm', 'info');
+                };
+                
+                searchBar.style.position = 'relative';
+                searchBar.appendChild(clearBtn);
+
+                // Hiển thị/ẩn nút clear
+                searchInput.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        clearBtn.style.display = 'block';
+                    } else {
+                        clearBtn.style.display = 'none';
+                    }
+                });
+
+                // Thêm placeholder animation
+                let placeholderTexts = [
+                    'Tìm kiếm tin tức...',
+                    'Tìm theo tiêu đề...',
+                    'Tìm theo tác giả...',
+                    'Tìm theo danh mục...',
+                    'Tìm theo trạng thái...'
+                ];
+                let currentPlaceholder = 0;
+                
+                setInterval(() => {
+                    if (!searchInput.matches(':focus') && searchInput.value === '') {
+                        searchInput.placeholder = placeholderTexts[currentPlaceholder];
+                        currentPlaceholder = (currentPlaceholder + 1) % placeholderTexts.length;
+                    }
+                }, 2000);
+
+                // Thêm tooltip cho search input
+                searchInput.title = 'Tìm kiếm tin tức theo tiêu đề, tác giả, danh mục hoặc trạng thái.\nShortcuts: Ctrl+F để focus, ESC để xóa, Enter để mở tin duy nhất';
+            });
+
+            // ==== QUẢN LÝ DANH MỤC ====
+            
+            // Chức năng tìm kiếm danh mục
+            window.searchCategories = function() {
+                const searchTerm = document.getElementById('categorySearchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#categoriesTableBody tr');
+                
+                rows.forEach(row => {
+                    const categoryName = row.querySelector('.category-name').textContent.toLowerCase();
+                    const categoryDescription = row.querySelector('.category-description').textContent.toLowerCase();
+                    
+                    if (categoryName.includes(searchTerm) || categoryDescription.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            };
+            
+            // Thêm danh mục mới
+            document.getElementById('addCategoryForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                
+                try {
+                    const response = await fetch('/admin/news/categories', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        this.reset(); // Reset form
+                        setTimeout(() => location.reload(), 1500); // Reload sau 1.5s để user thấy thông báo
+                    } else {
+                        showNotification('Có lỗi xảy ra: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('Có lỗi xảy ra khi thêm danh mục', 'error');
+                    console.error(error);
+                }
+            });
+
+            // Mở modal sửa danh mục
+            window.editCategory = function(id, name, description) {
+                document.getElementById('editCategoryId').value = id;
+                document.getElementById('editCategoryName').value = name;
+                document.getElementById('editCategoryDescription').value = description || '';
+                document.getElementById('editCategoryModal').style.display = 'flex';
+            };
+
+            // Đóng modal sửa danh mục
+            window.closeEditCategoryModal = function() {
+                document.getElementById('editCategoryModal').style.display = 'none';
+            };
+
+            // Xử lý sửa danh mục
+            document.getElementById('editCategoryForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const categoryId = document.getElementById('editCategoryId').value;
+                const formData = new FormData(this);
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                
+                try {
+                    const response = await fetch(`/admin/news/categories/${categoryId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: formData.get('name'),
+                            description: formData.get('description')
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        closeEditCategoryModal();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification('Có lỗi xảy ra: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    showNotification('Có lỗi xảy ra khi cập nhật danh mục', 'error');
+                    console.error(error);
+                }
+            });
+
+            // Xóa danh mục
+            window.deleteCategory = function(id, name, newsCount) {
+                if (newsCount > 0) {
+                    showNotification(`Không thể xóa danh mục "${name}" vì đang có ${newsCount} bài viết sử dụng danh mục này.`, 'error');
+                    return;
+                }
+                
+                if (confirm(`Bạn có chắc muốn xóa danh mục "${name}"?`)) {
+                    const token = document.querySelector('meta[name="csrf-token"]').content;
+                    
+                    fetch(`/admin/news/categories/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            showNotification(result.message, 'success');
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showNotification('Có lỗi xảy ra: ' + result.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Có lỗi xảy ra khi xóa danh mục', 'error');
+                        console.error(error);
+                    });
+                }
             };
 
 
@@ -843,12 +1607,130 @@
                 }
             });
 
-            // Hàm hiển thị thông báo
-            function showNotification(message, type) {
-                notificationArea.innerHTML = `<div class="notification ${type}">${message}</div>`;
-                setTimeout(() => {
-                    notificationArea.innerHTML = '';
+            // Hàm hiển thị thông báo sử dụng toast system của web
+            function showNotification(message, type = 'info') {
+                // Xóa toast cũ nếu có
+                const existingToasts = document.querySelectorAll('.custom-toast');
+                existingToasts.forEach(toast => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                });
+
+                // Tạo toast mới theo template của web
+                const toast = document.createElement('div');
+                toast.className = 'custom-toast';
+                toast.id = `toast-${type}`;
+                
+                const iconSvg = getIconSvgForType(type);
+                const iconClass = getIconClassForType(type);
+                
+                toast.innerHTML = `
+                    <div class="toast-content">
+                        <div class="${iconClass}">
+                            ${iconSvg}
+                        </div>
+                        <div class="toast-message">${message}</div>
+                        <button class="toast-close" aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="toast-progress"></div>
+                `;
+                
+                // Thêm vào body
+                document.body.appendChild(toast);
+                
+                // Auto dismiss sau 5 giây
+                const dismissTimeout = setTimeout(() => {
+                    dismissToast();
                 }, 5000);
+
+                // Click để đóng
+                const closeButton = toast.querySelector('.toast-close');
+                closeButton.addEventListener('click', () => {
+                    clearTimeout(dismissTimeout);
+                    dismissToast();
+                });
+
+                // Hàm đóng toast
+                function dismissToast() {
+                    toast.style.animation = 'slideOutRight 0.5s ease forwards';
+                    toast.addEventListener('animationend', () => {
+                        if (toast.parentNode) {
+                            toast.remove();
+                        }
+                    }, { once: true });
+                }
+
+                // Pause progress khi hover
+                toast.addEventListener('mouseenter', () => {
+                    const progress = toast.querySelector('.toast-progress');
+                    if (progress) {
+                        progress.style.animationPlayState = 'paused';
+                    }
+                });
+
+                toast.addEventListener('mouseleave', () => {
+                    const progress = toast.querySelector('.toast-progress');
+                    if (progress) {
+                        progress.style.animationPlayState = 'running';
+                    }
+                });
+            }
+
+            // Hàm lấy SVG icon theo loại
+            function getIconSvgForType(type) {
+                switch(type) {
+                    case 'success':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>`;
+                    case 'error':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>`;
+                    case 'warning':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>`;
+                    case 'info':
+                    default:
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>`;
+                }
+            }
+
+            // Hàm lấy class cho icon
+            function getIconClassForType(type) {
+                switch(type) {
+                    case 'success': return 'toast-icon';
+                    case 'error': return 'toast-icon-error';
+                    case 'warning': return 'toast-icon-warning';
+                    case 'info': 
+                    default: return 'toast-icon-info';
+                }
             }
 
 

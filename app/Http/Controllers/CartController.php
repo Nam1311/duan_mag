@@ -84,7 +84,7 @@ class CartController extends Controller
                 session()->forget('applied_voucher');
             }
         }
-        // Lấy phí vận chuyển từ bảng settings (cột ship_price), nếu không có thì mặc định 40000
+        
         $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
         $total = $subtotal - $voucherDiscount + $shippingFee;
         $data = $this->getCartData();
@@ -220,7 +220,6 @@ class CartController extends Controller
         return response()->json(['message' => 'Thêm vào giỏ hàng thành công']);
     }
 
-    // mua ở trang chủ
     public function BuyInHome(Request $request)
     {
         $validated = $request->validate([
@@ -742,8 +741,6 @@ class CartController extends Controller
             return redirect()->route('cart.view')->with('error', 'Có lỗi xảy ra khi cập nhật biến thể.');
         }
     }
-
-
     public function proceedToCheckout(Request $request)
     {
         $validated = $request->validate([
@@ -820,13 +817,10 @@ class CartController extends Controller
             }
         }
 
-        // Tính phí vận chuyển (giả sử cố định là 40,000 VND)
         $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
 
-        // Tính tổng cộng
         $total = $subtotal - $voucherDiscount + $shippingFee;
 
-        // Bước 3: Lưu thông tin vào session và chuyển hướng
         session()->put('checkout_data', [
             'cartDetails' => $cartDetails,
             'subtotal' => $subtotal,
@@ -853,7 +847,6 @@ class CartController extends Controller
             'color'
         ])->find($validated['product_variant_id']);
 
-        // Kiểm tra tồn kho chặt chẽ hơn
         if (!$variant) {
             return response()->json([
                 'error' => 'Biến thể sản phẩm không tồn tại'
@@ -866,24 +859,18 @@ class CartController extends Controller
             ], 422);
         }
 
-        // Xử lý đăng nhập/chưa đăng nhập
         if (Auth::check()) {
             $userId = Auth::id();
 
-            // Xóa toàn bộ giỏ hàng cũ trước khi thêm sản phẩm mới
             Cart::where('user_id', $userId)->delete();
 
-            // Tạo cart item mới
             $cartItem = new Cart();
             $cartItem->user_id = $userId;
             $cartItem->product_variant_id = $validated['product_variant_id'];
             $cartItem->quantity = $validated['quantity'];
             $cartItem->save();
         } else {
-            // Xóa toàn bộ giỏ hàng trong session
             session()->forget('cart');
-
-            // Tạo giỏ hàng mới chỉ với sản phẩm hiện tại
             session()->put('cart', [
                 [
                     'product_variant_id' => $validated['product_variant_id'],
@@ -892,10 +879,8 @@ class CartController extends Controller
             ]);
         }
 
-        // Tạo dữ liệu thanh toán trực tiếp
         $this->createDirectCheckoutData($variant, $validated['quantity']);
 
-        // Chuyển hướng đến trang thanh toán
         return response()->json([
             'redirect' => route('payment.show')
         ]);
@@ -910,7 +895,6 @@ class CartController extends Controller
 
         $variantIds = $validated['variant_ids'];
 
-        // Lấy thông tin các sản phẩm được chọn
         if (Auth::check()) {
             $selectedItems = Cart::where('user_id', Auth::id())
                 ->whereIn('product_variant_id', $variantIds)
@@ -952,12 +936,10 @@ class CartController extends Controller
             ], 422);
         }
 
-        // Tính toán cho các sản phẩm được chọn
         $subtotal = $selectedItems->sum(function ($item) {
             return $item->productVariant->product->price * $item->quantity;
         });
 
-        // Tính voucher discount cho các sản phẩm được chọn
         $appliedVoucherCode = session()->get('applied_voucher');
         $voucherSelectedVariants = session()->get('voucher_selected_variants', []);
         $voucherDiscount = 0;
@@ -970,7 +952,6 @@ class CartController extends Controller
                 ->first();
             
             if ($voucher) {
-                // Nếu có voucher đã được áp dụng cho sản phẩm cụ thể, chỉ tính toán nếu có sản phẩm đó trong selection
                 if (!empty($voucherSelectedVariants)) {
                     $voucherApplicableVariants = array_intersect($variantIds, $voucherSelectedVariants);
                     if (!empty($voucherApplicableVariants)) {
@@ -1157,7 +1138,6 @@ class CartController extends Controller
 
     private function getSuggestedProducts($cartItems)
     {
-        // Nếu giỏ hàng trống, hiển thị sản phẩm nổi bật
         if ($cartItems->isEmpty()) {
             return \App\Models\Products::with('thumbnail')
                 ->active()
@@ -1167,7 +1147,6 @@ class CartController extends Controller
                 ->get();
         }
 
-        // Lấy danh mục của sản phẩm trong giỏ hàng
         $cartCategoryIds = $cartItems->pluck('productVariant.product.category_id')->unique();
         
         // Logic gợi ý sản phẩm

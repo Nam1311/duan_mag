@@ -102,7 +102,7 @@
                         <div class="user-info-section-header">
                             <div class="user-info-order-filter-tags">
                                 <span class="user-info-order-filter-tag active" data-status="all">Tất cả</span>
-                                <span class="user-info-order-filter-tag" data-status="Chờ xử lý">Chờ xác nhận</span>
+                                <span class="user-info-order-filter-tag" data-status="Chờ xác nhận">Chờ xác nhận</span>
                                 <span class="user-info-order-filter-tag" data-status="Đã xác nhận">Đã xác nhận</span>
                                 <span class="user-info-order-filter-tag" data-status="Đang giao hàng">Đang giao hàng</span>
                                 <span class="user-info-order-filter-tag" data-status="Thành công">Thành công</span>
@@ -111,12 +111,12 @@
                         </div>
                         <div class="user-info-section-content">
                             <div class="user-info-orders-list">
-                                @foreach ($order as $order)
-                                    <div class="user-info-order-item" data-status="{{ $order->status }}">
+                                @foreach ($order as $orderItem)
+                                    <div class="user-info-order-item" data-status="{{ $orderItem->status }}">
                                         <div class="user-info-order-header">
-                                            <span class="user-info-order-id">#{{ $order->id }}MAG</span>
+                                            <span class="user-info-order-id">#{{ $orderItem->order_code ?? $orderItem->id . 'MAG' }}</span>
                                             <span
-                                                class="user-info-order-date">{{ $order->updated_at->format('d-m-Y') }}</span>
+                                                class="user-info-order-date">{{ $orderItem->updated_at->format('d-m-Y') }}</span>
                                             @php
                                                 $statusColors = [
                                                     'Chờ xác nhận' => 'gray',
@@ -126,26 +126,26 @@
                                                     'Đã hủy' => 'red',
                                                 ];
 
-                                                $color = $statusColors[$order->status] ?? 'dark';
+                                                $color = $statusColors[$orderItem->status] ?? 'dark';
                                             @endphp
                                             <span class="user-info-order-status status-{{ $color }}">
-                                                {{ $order->status }}
+                                                {{ $orderItem->status }}
                                             </span>
                                         </div>
                                         <div class="user-info-order-details">
                                             <div class="user-info-order-products">
-                                                {{ $order->orderDetails->pluck('productVariant.product.name')->join(', ') }}
+                                                {{ $orderItem->orderDetails->pluck('productVariant.product.name')->join(', ') }}
                                             </div>
                                             <div class="user-info-order-total">
-                                                {{ number_format($order->total_final, 0, ',', '.') }} đ</div>
+                                                {{ number_format($orderItem->orderDetails->sum('total_final'), 0, ',', '.') }} đ</div>
                                         </div>
                                         <div class="user-info-order-actions">
                                             <a class="user-info-order-detail-btn"
-                                                href="{{ '/info-ctdh/' . $order->id }}"><i class="fas fa-eye"></i> Xem
+                                                href="{{ '/info-ctdh/' . $orderItem->id }}"><i class="fas fa-eye"></i> Xem
                                                 chi tiết</a>
                                             @php
-                                                $isCompleted = $order->status === 'Thành công';
-                                                $isReviewed = $order->orderDetails->every(function ($detail) {
+                                                $isCompleted = $orderItem->status === 'Thành công';
+                                                $isReviewed = $orderItem->orderDetails->every(function ($detail) {
                                                     return $detail->productVariant->product
                                                         ->reviews()
                                                         ->where('user_id', auth()->id())
@@ -155,20 +155,20 @@
                                             @endphp
 
                                             @if ($isCompleted && !$isReviewed)
-                                                <a href="{{ route('review.form', $order->id) }}"
+                                                <a href="{{ route('review.form', $orderItem->id) }}"
                                                     class="user-info-order-review-btn">
                                                     <i class="fas fa-star"></i> Đánh giá
                                                 </a>
                                             @endif
 
                                             @php
-                                                $hideCancelButton = in_array($order->status, [
+                                                $hideCancelButton = in_array($orderItem->status, [
                                                     'Đang giao hàng',
                                                     'Thành công',
                                                     'Đã hủy',
                                                 ]);
                                             @endphp
-                                            <a href="{{ '/huydon/' . $order->id }}"
+                                            <a href="{{ '/huydon/' . $orderItem->id }}"
                                                 class="user-info-order-cancel-btn {{ $hideCancelButton ? 'an_huy' : '' }}">
                                                 <i class="fas fa-times"></i> Hủy đơn hàng
                                             </a>

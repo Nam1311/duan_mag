@@ -259,9 +259,15 @@ def format_product_html(product: Dict) -> str:
     price = f"{product['price']:,.0f}".replace(",", ".")
     return f"""
     <a href="/detail/{product['id']}" class="suggestion-card product-link">
+<<<<<<< HEAD
         <img
             src="{image_url}"
             alt="{product['name']}"
+=======
+        <img 
+            src="http://127.0.0.1:8080/{image_url}" 
+            alt="{product['name']}" 
+>>>>>>> 610089186eb5925a6a59910035ad1d73ff49a39e
             class="product-image"
         />
         <p class="product-name">{product['name']}</p>

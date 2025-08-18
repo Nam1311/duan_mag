@@ -10,29 +10,33 @@ use Illuminate\Support\Facades\Mail;
 class ContactAdminController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Contact::query();
+    {
+        $query = Contact::query();
 
-    // Tìm kiếm theo keyword (name, email)
-    if ($request->filled('keyword')) {
-        $keyword = $request->keyword;
-        $query->where(function($q) use ($keyword) {
-            $q->where('name', 'like', "%$keyword%")
-              ->orWhere('email', 'like', "%$keyword%");
-        });
+        // Tìm kiếm theo keyword (name, email)
+        if ($request->filled('keyword')) {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhere('email', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Lọc theo trạng thái (nếu có)
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        // Sắp xếp: chưa phản hồi (0 hoặc NULL) trước, rồi đã phản hồi (1);
+        // trong từng nhóm: mới nhất trước
+        $contacts = $query
+            ->orderByRaw('COALESCE(status, 0) ASC')  // 0/NULL trước, 1 sau
+            ->orderByDesc('created_at')              // mới -> cũ
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.contact.index', compact('contacts'));
     }
-
-    // Lọc theo trạng thái
-    if ($request->has('status') && $request->status !== '') {
-        $query->where('status', $request->status);
-    }
-
-  $contacts = $query->orderBy('id', 'asc')->paginate(10); // mỗi trang 10 mục
-
-
-    return view('admin.contact.index', compact('contacts'));
-}
-
 
     public function show($id)
     {
@@ -48,20 +52,24 @@ class ContactAdminController extends Controller
 
         $contact = Contact::findOrFail($id);
         $contact->reply = $request->reply;
-        $contact->status = 1;
+        $contact->status = 1; // đã phản hồi
         $contact->save();
 
-        // Gửi email phản hồi
-      Mail::send('emails.admin_reply', [
-    'name' => $contact->name,
-    'reply' => $request->reply
-], function ($message) use ($contact) {
-    $message->to($contact->email)
-            ->subject('Phản hồi từ Admin - MAG');
-});
+        // Gửi email phản hồi + NHÚNG LOGO bằng CID
+        Mail::send('emails.admin_reply', [
+            'name'  => $contact->name,
+            'reply' => $request->reply,
+        ], function ($message) use ($contact) {
+            $message->to($contact->email)
+                    ->subject('Phản hồi từ Admin - MAG');
 
+            // Nhúng ảnh và đặt Content-ID là "mag-logo"
+            $message->getSymfonyMessage()
+                    ->embedFromPath(public_path('img/logomail.png'), 'mag-logo');
+        });
 
-        return redirect()->route('admin.quanlylienhe.index')->with('success', 'Đã phản hồi liên hệ!');
+        return redirect()->route('admin.quanlylienhe.index')
+            ->with('success', 'Đã phản hồi liên hệ!');
     }
 
     public function destroy($id)

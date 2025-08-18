@@ -45,7 +45,7 @@
                 <div class="aorders-profile-avatar">QT</div>
             </div>
         </div>
-        <h1 class="aorders-page-title">Chi tiết đơn hàng #DH-{{ $order->id }}</h1>
+        <h1 class="aorders-page-title">Chi tiết đơn hàng: {{ $order->order_code }}</h1>
         <p class="aorders-page-subtitle">
             Thông tin chi tiết về đơn hàng và sản phẩm
         </p>
@@ -64,28 +64,28 @@
         <div class="aorders-data-card">
             <div class="aorders-order-details">
                 <h2>Thông tin đơn hàng</h2>
-                <p><strong>Mã đơn:</strong> #DH-{{ $order->id }}</p>
-                <p><strong>Khách hàng:</strong> 
+                <p><strong>Mã đơn:</strong> {{ $order->order_code }}</p>
+                <p><strong>Khách hàng:</strong>
                     {{ !empty($order->address_details['receiver_name']) ? $order->address_details['receiver_name'] : ($order->name ?? ($order->user->name ?? 'Không xác định')) }}
                 </p>
                 <p><strong>Ngày đặt:</strong> {{ $order->created_at->format('d-m-Y') }}</p>
-                <p><strong>Trạng thái:</strong> 
+                <p><strong>Trạng thái:</strong>
                     <span class="aorders-status-badge {{ $order->status == 'Đã hủy' ? 'aorders-status-inactive' : 'aorders-status-active' }}">
                         {{ $order->status }}
                     </span>
                 </p>
-                <p><strong>Số điện thoại:</strong> 
+                <p><strong>Số điện thoại:</strong>
                     {{ !empty($order->address_details['phone']) ? $order->address_details['phone'] : ($order->phone ?? ($order->user->phone ?? 'N/A')) }}
                 </p>
                 @if ($order->address_details && $order->address_details['province_name'] !== 'Không xác định')
-                    <p><strong>Địa chỉ:</strong> 
-                        {{ $order->address_details['address'] . ', ' . 
-                           $order->address_details['ward_name'] . ', ' . 
-                           $order->address_details['district_name'] . ', ' . 
+                    <p><strong>Địa chỉ:</strong>
+                        {{ $order->address_details['address'] . ', ' .
+                           $order->address_details['ward_name'] . ', ' .
+                           $order->address_details['district_name'] . ', ' .
                            $order->address_details['province_name'] }}
                     </p>
                 @else
-                    <p><strong>Địa chỉ:</strong> {{ $order->address_text ?? 'Không xác định' }}</p>
+                    <p><strong>Địa chỉ:</strong> {{ $order->address ?? 'Không xác định' }}</p>
                 @endif
             </div>
 
@@ -122,15 +122,8 @@
             </div>
 
             <div style="margin-top: 16px; text-align: right;">
-                <div style="display: inline-block; padding: 10px 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
-                    <div style="margin-bottom: 5px;"><strong>Tổng sản phẩm:</strong> {{ number_format($order->orderDetails->sum('total') - $order->orderDetails->sum('ship_price'), 0, ',', '.') }}đ</div>
-                    <div style="margin-bottom: 5px;"><strong>Phí vận chuyển:</strong> {{ number_format($order->orderDetails->sum('ship_price'), 0, ',', '.') }}đ</div>
-                    @if($order->orderDetails->sum('voucher_discount') > 0)
-                        <div style="margin-bottom: 5px; color: #dc3545;"><strong>Giảm giá:</strong> -{{ number_format($order->orderDetails->sum('voucher_discount'), 0, ',', '.') }}đ</div>
-                    @endif
-                    <div style="padding-top: 5px; border-top: 1px solid #ddd; font-weight: bold; font-size: 16px;">
-                        <strong>Tổng tiền đơn hàng:</strong> {{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }}đ
-                    </div>
+                <div style="display: inline-block; padding: 10px 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; font-weight: bold;">
+                    Tổng tiền đơn hàng: {{ number_format($order->total_price, 0, ',', '.') }}đ
                 </div>
             </div>
 

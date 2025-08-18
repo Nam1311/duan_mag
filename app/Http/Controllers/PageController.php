@@ -23,7 +23,7 @@ class PageController extends Controller
 {
     public function home()
     {
-        $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 30)->take(8)->get();
+        $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 15)->take(8)->get();
         $products_is_featured = Products::with(['images', 'variants'])
             ->orderBy('views', 'desc')
             ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'views')

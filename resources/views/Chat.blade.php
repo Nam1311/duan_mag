@@ -26,6 +26,7 @@
                 <p>Trợ lý ảo thời trang thông minh</p>
             </div>
             <div class="close-chat" style="cursor: pointer">x</div>
+            <div class="clear-chat" style="cursor: pointer; margin-left: 10px; font-size: 14px; opacity: 0.8;" title="Xóa lịch sử chat">🗑️</div>
 
         </div>
 
@@ -66,8 +67,85 @@
             const actionButtons = document.querySelectorAll('.action-btn');
             const dynamicSuggestions = document.getElementById('dynamic-suggestions');
 
+            // Load chat history from localStorage
+            loadChatHistory();
+
             function scrollToBottom() {
+                // Multiple methods to ensure scrolling works
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Fallback method
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 50);
+                
+                // Force scroll with smooth behavior
+                setTimeout(() => {
+                    chatMessages.scrollTo({
+                        top: chatMessages.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            }
+
+            function saveChatHistory() {
+                const messages = Array.from(chatMessages.children).map(element => {
+                    if (element.classList.contains('message')) {
+                        return {
+                            content: element.innerHTML,
+                            isReceived: element.classList.contains('received'),
+                            timestamp: Date.now()
+                        };
+                    } else if (element.classList.contains('suggestion-section')) {
+                        return {
+                            content: element.innerHTML,
+                            type: 'suggestion-section',
+                            timestamp: Date.now()
+                        };
+                    }
+                    return null;
+                }).filter(item => item !== null);
+
+                localStorage.setItem('chatHistory', JSON.stringify(messages));
+            }
+
+            function loadChatHistory() {
+                try {
+                    const savedHistory = localStorage.getItem('chatHistory');
+                    if (savedHistory) {
+                        const messages = JSON.parse(savedHistory);
+                        
+                        // Clear current messages except welcome message
+                        const welcomeMessage = chatMessages.querySelector('.message.received.ai-response');
+                        chatMessages.innerHTML = '';
+                        if (welcomeMessage) {
+                            chatMessages.appendChild(welcomeMessage);
+                        }
+
+                        // Restore messages
+                        messages.forEach(msg => {
+                            const messageDiv = document.createElement('div');
+                            if (msg.type === 'suggestion-section') {
+                                messageDiv.classList.add('suggestion-section');
+                            } else {
+                                messageDiv.classList.add('message');
+                                messageDiv.classList.add(msg.isReceived ? 'received' : 'sent');
+                                if (msg.isReceived) {
+                                    messageDiv.classList.add('ai-response');
+                                }
+                            }
+                            messageDiv.innerHTML = msg.content;
+                            chatMessages.appendChild(messageDiv);
+                        });
+
+                        // Auto scroll to bottom after loading history
+                        setTimeout(() => {
+                            scrollToBottom();
+                        }, 100);
+                    }
+                } catch (error) {
+                    console.error('Error loading chat history:', error);
+                }
             }
 
             function addMessage(message, isReceived) {
@@ -88,6 +166,9 @@
                 }
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
+                
+                // Save chat history after adding message
+                saveChatHistory();
             }
 
             async function sendMessage() {
@@ -130,7 +211,14 @@
                                 block.classList.add('suggestion-section');
                                 block.innerHTML = data.suggestions;
                                 chatMessages.appendChild(block);
-                                scrollToBottom();
+                                
+                                // Auto scroll after adding suggestions
+                                setTimeout(() => {
+                                    scrollToBottom();
+                                }, 100);
+                                
+                                // Save chat history after adding suggestions
+                                saveChatHistory();
                             }
                             updateDynamicSuggestions(data.suggestions);
                         } else {
@@ -176,6 +264,40 @@
                     sendMessage();
                 });
             });
+
+            // Clear chat history functionality
+            const clearChatBtn = document.querySelector('.clear-chat');
+            if (clearChatBtn) {
+                clearChatBtn.addEventListener('click', function() {
+                    if (confirm('Bạn có muốn xóa toàn bộ lịch sử chat không?')) {
+                        localStorage.removeItem('chatHistory');
+                        
+                        // Reset to welcome message only
+                        chatMessages.innerHTML = `
+                            <div class="message received ai-response">
+                                Xin chào! Tôi là CSKH MAG - trợ lý ảo thời trang. Tôi có thể giúp gì cho bạn hôm nay? 😊
+                                <div class="suggestions">
+                                    <div class="suggestion-chip">Tìm váy dự tiệc</div>
+                                    <div class="suggestion-chip">Áo khoác nam mới</div>
+                                    <div class="suggestion-chip">Tư vấn kích cỡ</div>
+                                    <div class="suggestion-chip">Phối đồ với quần jeans</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Re-bind suggestion chips
+                        const newSuggestionChips = document.querySelectorAll('.suggestion-chip');
+                        newSuggestionChips.forEach(chip => {
+                            chip.addEventListener('click', function () {
+                                messageInput.value = this.textContent;
+                                sendMessage();
+                            });
+                        });
+                        
+                        scrollToBottom();
+                    }
+                });
+            }
 
             scrollToBottom();
         });

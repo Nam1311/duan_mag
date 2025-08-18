@@ -10,7 +10,7 @@ class Products extends Model
 {
     use SoftDeletes;
     public $timestamps = false;
-    protected $fillable = ['name','sku', 'price', 'slug', 'category_id', 'description', 'original_price', 'sale', 'sold_count', 'is_featured', 'is_active'];
+    protected $fillable = ['name','sku', 'price', 'slug', 'category_id', 'description', 'original_price', 'sale', 'base_sale' , 'sold_count', 'is_featured', 'is_active'];
     protected $dates = ['deleted_at'];
 
     // Scope để lấy sản phẩm active

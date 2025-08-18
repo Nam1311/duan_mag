@@ -1,6 +1,14 @@
 @extends('admin.app')
 
 @section('admin.body')
+    <link rel="stylesheet" href="{{ asset('/css/admin/products.css') }}">
+
+    @if ($errors->any())
+        @php
+            session()->flash('error', $errors->first());
+        @endphp
+    @endif
+
     <style>
         /* CSS cho các trạng thái */
         .status-badge {
@@ -28,13 +36,42 @@
             color: #f79009;
             border: 1px solid #f79009;
         }
+
+        /* CSS cho status  */
+        .voucher-status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .voucher-status-not-started {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #ca8a04;
+        }
+
+        .voucher-status-running {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .voucher-status-ended {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
     </style>
     <div class="apromotions-main-content">
         <div class="aindex-header">
-            {{-- <div class="aindex-search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Tìm kiếm sản phẩm, đơn hàng..." />
-            </div> --}}
+            <div class="aindex-search-bar">
+                <form action="{{ route('admin.vouchers.search') }}" method="GET">
+                    <button style="background-color: rgba(255, 255, 255, 0); border: none; cursor: pointer;" type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                    <input type="text" name="keyword" id="searchInput" placeholder="Tìm kiếm mã voucher..." value="{{ request('keyword') }}" />
+
+
+
+                </form>
+            </div>
             <div></div>
             <div class="aindex-user-profile">
                 <div class="aindex-notification-bell">
@@ -47,6 +84,28 @@
         <p class="aindex-dashboard-subtitle">
             Tạo và quản lý các voucher của shop.
         </p>
+
+{{-- <form method="GET" action="" class="amanagementimg-filter-bar">
+            <div class="amanagementimg-filter-bar">
+                <select name="category" class="amanagementimg-filter-select">
+                    <option value="">Tất cả danh mục</option>
+
+                        <option value="ff" >
+
+                </select>
+
+                <select name="count" class="amanagementimg-filter-select" id="amanagementimg-imageCountFilter">
+                    <option value="">Số lượng hình ảnh</option>
+                    <option value="1">1 hình</option>
+                    <option value="2">2 hình</option>
+                    <option value="3">3 hình</option>
+                    <option value="4">4 hình</option>
+                    <option value="5">5 hình</option>
+                </select>
+                <button style="background-color: rgb(229, 115, 115)" class="amanagementimg-filter-select" type="submit">Lọc</button>
+            </div>
+        </form> --}}
+
         <div class="apromotions-actions-container">
             <button class="apromotions-btn apromotions-btn-primary"
                 onclick="document.getElementById('createModal').style.display='flex'">
@@ -68,15 +127,31 @@
             </thead>
             <tbody>
                 @foreach ($vouchers as $voucher)
-                    {{-- xử lý cột hành động --}}
-                    @php
+                    {{-- Xử lý cái kết thúc --}}
+                    {{-- @php
                         $now = now();
+                        //gt
                         if ($now->lt($voucher->start_date)) {
                             $voucher->status = 'Chưa bắt đầu';
                         } elseif ($now->between($voucher->start_date, $voucher->expiration_date)) {
                             $voucher->status = 'Đang chạy';
                         } else {
                             $voucher->status = 'Đã kết thúc';
+                        }
+                    @endphp --}}
+
+                    @php
+                        $now = now();
+
+                        if ($now->lt($voucher->start_date)) {
+                            $statusClass = 'voucher-status-not-started';
+                            $statusText = 'Chưa bắt đầu';
+                        } elseif ($now->between($voucher->start_date, $voucher->expiration_date)) {
+                            $statusClass = 'voucher-status-running';
+                            $statusText = 'Đang chạy';
+                        } else {
+                            $statusClass = 'voucher-status-ended';
+                            $statusText = 'Đã kết thúc';
                         }
                     @endphp
 
@@ -89,7 +164,11 @@
                         <td>{{ $voucher->start_date }}</td>
                         <td>{{ $voucher->expiration_date }}</td>
                         <td>{{ $voucher->quantity }}</td>
-                        <td class="status-cell">{{ $voucher->status }}</td>
+                        <td class="status-cell">
+                            <span class="voucher-status-badge {{ $statusClass }}">
+                                {{ $statusText }}
+                            </span>
+                        </td>
                         <td class="actions">
                             <button class="apromotions-btn apromotions-btn-primary btn-edit" data-id="{{ $voucher->id }}"
                                 data-code="{{ $voucher->code }}" data-amount="{{ $voucher->discount_amount }}"
@@ -102,7 +181,7 @@
 
 
                             <form action="{{ route('admin.vouchers.destroy', $voucher->id) }}" method="POST"
-                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa ảnh này không?')">
+                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa voucher này không?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="apromotions-btn apromotions-btn-danger delete-btn"

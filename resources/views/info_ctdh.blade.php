@@ -5,7 +5,7 @@
         <div class="ctdh-container">
             @foreach ($order as $order)
                 <div class="ctdh-header">
-                    <h1 class="ctdh-title">Đơn hàng #{{ $order->id }}MAG</h1>
+                    <h1 class="ctdh-title">Đơn hàng #{{ $order->order_code ?? $order->id . 'MAG' }}</h1>
                     <a href="../infouser" class="ctdh-back-btn">
                         <i class="fas fa-arrow-left"></i> Quay lại hồ sơ
                     </a>
@@ -43,11 +43,11 @@
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label"><i class="fas fa-credit-card"></i> Phương thức thanh toán</div>
-                            <div class="ctdh-summary-value">Chuyển khoản ngân hàng</div>
+                            <div class="ctdh-summary-value">{{ $order->payment_methods ?? 'Chuyển khoản ngân hàng' }}</div>
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label"><i class="fas fa-receipt"></i> Tổng cộng</div>
-                            <div class="ctdh-summary-value">{{ number_format($order->total_final, 0, ',', '.') }} đ</div>
+                            <div class="ctdh-summary-value">{{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }} đ</div>
                         </div>
                     </div>
                 </div>
@@ -67,15 +67,13 @@
                     @php
                         $tong = 0;
                     @endphp
-                    @foreach ($orderdetail as $orderdetail)
+                    @foreach ($orderdetail as $orderDetailItem)
                         @php
-                            $price = $orderdetail->productVariant->product->price;
-                            $sale = $orderdetail->productVariant->product->sale;
-                            $quantity = $orderdetail->quantity;
-                            $thanhtien = $price * (1 - $sale / 100) * $quantity;
+                            // Sử dụng giá từ total_final từ OrderDetail thay vì tính lại
+                            $thanhtien = $orderDetailItem->total_final;
                             $tong += $thanhtien;
 
-                            $images = $orderdetail->productVariant->product->images ?? collect();
+                            $images = $orderDetailItem->productVariant->product->images ?? collect();
                         @endphp
 
                         <tbody>
@@ -85,19 +83,19 @@
                                             <img src="{{ asset($images->first()->path ?? 'img/default.jpg') }}"
                                                 alt="Ảnh sản phẩm" class="ctdh-product-image">
                                             <div class="ctdh-product-info">
-                                                <div class="ctdh-product-name">{{ $orderdetail->productVariant->product->name }}
+                                                <div class="ctdh-product-name">{{ $orderDetailItem->productVariant->product->name }}
                                                 </div>
-                                                <div class="ctdh-product-sku">Mã: {{ $orderdetail->productVariant->sku }}</div>
+                                                <div class="ctdh-product-sku">Mã: {{ $orderDetailItem->productVariant->sku }}</div>
                                                 <div class="ctdh-product-price">
-                                                    {{ number_format($price * (1 - $sale / 100), 0, ',', '.') }}đ
+                                                    {{ number_format(($orderDetailItem->total_final / $orderDetailItem->quantity), 0, ',', '.') }}đ
                                                 </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="ctdh-product-price ctdh-pc">
-                                    {{ number_format($price * (1 - $sale / 100), 0, ',', '.') }}đ
+                                    {{ number_format(($orderDetailItem->total_final / $orderDetailItem->quantity), 0, ',', '.') }}đ
                                 </td>
-                                <td class="ctdh-product-quantity ctdh-pc">{{ $quantity }}</td>
+                                <td class="ctdh-product-quantity ctdh-pc">{{ $orderDetailItem->quantity }}</td>
                                 <td class="ctdh-product-total ctdh-pc">
                                     {{ number_format($thanhtien, 0, ',', '.') }}₫
                                 </td>
@@ -113,22 +111,21 @@
                 <div class="ctdh-totals-grid">
                     <div>
                         <h2 class="ctdh-section-title"><i class="fas fa-truck"></i> Thông tin giao hàng</h2>
+                        @php
+                            // Lấy order đầu tiên từ collection
+                            $orderData = $order->first();
+                        @endphp
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label">Người nhận</div>
-                            <div class="ctdh-summary-value">{{ $user->name }}</div>
+                            <div class="ctdh-summary-value">{{ $orderData->name ?? $user->name }}</div>
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label">Địa chỉ</div>
-                            @foreach ($addresses as $addresses)
-                                <div class="ctdh-summary-value">{{ $addresses->address }} /
-                                    {{ $addresses->ward }} /
-                                    {{ $addresses->district }} <br>
-                                    {{ $addresses->province }}</div>
-                            @endforeach
+                            <div class="ctdh-summary-value">{{ $orderData->address_text ?? 'Địa chỉ mặc định' }}</div>
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label">Số điện thoại</div>
-                            <div class="ctdh-summary-value">0{{ $user->phone }}</div>
+                            <div class="ctdh-summary-value">{{ $orderData->phone ?? $user->phone }}</div>
                         </div>
                         <div class="ctdh-summary-item">
                             <div class="ctdh-summary-label">Phương thức vận chuyển</div>
@@ -138,22 +135,29 @@
 
                     <div>
                         <h2 class="ctdh-section-title"><i class="fas fa-receipt"></i> Tổng thanh toán</h2>
+                        @php
+                            $orderData = $order->first();
+                            $subtotalFromDetails = $orderData->orderDetails->sum('total_final');
+                            $shippingFromDetails = $orderData->orderDetails->sum('ship_price');
+                            $voucherDiscountFromDetails = $orderData->orderDetails->sum('voucher_discount');
+                            $productsTotal = $subtotalFromDetails - $shippingFromDetails;
+                        @endphp
                         <table class="ctdh-totals-table">
                             <tr>
                                 <td class="ctdh-totals-label">Tạm tính</td>
-                                <td class="ctdh-totals-value">{{ number_format($tong, 0, ',', '.') }}₫</td>
+                                <td class="ctdh-totals-value">{{ number_format($productsTotal, 0, ',', '.') }}₫</td>
                             </tr>
                             <tr>
                                 <td class="ctdh-totals-label">Phí vận chuyển</td>
-                                <td class="ctdh-totals-value">0₫</td>
+                                <td class="ctdh-totals-value">{{ number_format($shippingFromDetails, 0, ',', '.') }}₫</td>
                             </tr>
                             <tr>
                                 <td class="ctdh-totals-label">Giảm giá</td>
-                                <td class="ctdh-totals-value">-0₫</td>
+                                <td class="ctdh-totals-value">-{{ number_format($voucherDiscountFromDetails, 0, ',', '.') }}₫</td>
                             </tr>
                             <tr>
                                 <td class="ctdh-totals-label">Tổng cộng</td>
-                                <td class="ctdh-totals-value ctdh-totals-total">{{ number_format($tong, 0, ',', '.') }}₫
+                                <td class="ctdh-totals-value ctdh-totals-total">{{ number_format($subtotalFromDetails, 0, ',', '.') }}₫
                                 </td>
                             </tr>
                         </table>

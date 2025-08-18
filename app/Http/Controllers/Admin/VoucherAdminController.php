@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class VoucherAdminController extends Controller
 {
@@ -14,8 +15,9 @@ class VoucherAdminController extends Controller
     public function index()
     {
         $vouchers = Voucher::paginate(5);
-        return view('admin.khuyenmai', compact('vouchers'));
-    }
+        return view(
+            'admin.khuyenmai',['vouchers' => $vouchers,]);
+        }
 
 
 
@@ -41,11 +43,10 @@ class VoucherAdminController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $exists = Voucher::withTrashed()
-            ->where('code', $validated['code'])
+        $exists = Voucher::where('code', $validated['code'])
             ->exists();
 
-        if (Voucher::withTrashed()->where('code', $validated['code'])->exists()) {
+        if (Voucher::where('code', $validated['code'])->exists()) {
             return redirect()->back()->with('error', 'Voucher bạn tạo đã tồn tại!');
         }
 
@@ -83,22 +84,31 @@ class VoucherAdminController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:255',
-            'discount_amount' => 'required|numeric|min:0',
-            'value_type' => 'required|in:percent,fixed',
-            'start_date' => 'required|date',
-            'expiration_date' => 'required|date|after_or_equal:start_date',
-            'quantity' => 'required|integer|min:1',
-        ]);
 
-        $exists = Voucher::withTrashed()
-            ->where('code', $validated['code'])
+        $exists = Voucher::where('code', $request->code)
+            ->where('id', '!=', $id) // khác code
             ->exists();
 
-        if (Voucher::withTrashed()->where('code', $validated['code'])->exists()) {
-            return redirect()->back()->with('error', 'Voucher bạn tạo đã tồn tại!');
+        if ($exists) {
+            return back()
+                ->with('error', 'Mã voucher đã tồn tại.')
+                ->withInput();
         }
+        $validated = $request->validate(
+            [
+                'code' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('vouchers')->ignore($id), // bỏ qua voucher trùng id
+                ],
+                'discount_amount' => 'required|numeric|min:0',
+                'value_type' => 'required|in:percent,fixed',
+                'start_date' => 'required|date',
+                'expiration_date' => 'required|date|after_or_equal:start_date',
+                'quantity' => 'required|integer|min:1',
+            ]
+        );
 
 
         $voucher = Voucher::findOrFail($id);
@@ -123,5 +133,23 @@ class VoucherAdminController extends Controller
 
         $voucher->delete();
         return redirect()->back()->with('success', 'Xóa voucher thành công.');
+    }
+
+
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $vouchers = Voucher::query()
+            ->where('code', 'like', '%' . $keyword . '%')
+            ->orWhere('discount_amount', 'like', '%' . $keyword . '%')
+            ->paginate(5);
+
+        $data = [
+            'vouchers' => $vouchers,
+            'keyword' => $keyword
+        ];
+
+        return view('admin.khuyenmai', $data);
     }
 }

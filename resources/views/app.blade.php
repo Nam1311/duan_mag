@@ -34,6 +34,22 @@
     <div class="avatar" id="avatar">
         <i class="fas fa-robot"></i>
     </div>
+    
+    <!-- AI Introduction Bubble -->
+    <div class="ai-intro-bubble" id="ai-intro-bubble" style="display: none;">
+        <div class="bubble-content">
+            <i class="fas fa-sparkles bubble-icon"></i>
+            <div class="bubble-text">
+                <strong>Xin chào! 👋</strong><br>
+                Tôi có thể giúp bạn tư vấn chọn đồ, tìm kiếm sản phẩm phù hợp và trả lời mọi câu hỏi!
+            </div>
+            <button class="bubble-close" onclick="hideAIBubble()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="bubble-arrow"></div>
+    </div>
+    
     <div class="box-ai" id="box-ai">
         @include('chat')
     </div>
@@ -43,12 +59,12 @@
 
     @include('footer')
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/js/lightslider.min.js"></script>
+    
     <script src="js/slider.js"></script>
     <script src="js/main.js"></script>
     <script src="js/AI.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/js/lightslider.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -56,8 +72,69 @@
             if (aiLabel) {
                 setTimeout(() => {
                     aiLabel.classList.add('hidden');
-                }, 5000); // Hide after 10 seconds
+                }, 5000); // Hide after 5 seconds
             }
+
+            // AI Bubble Management
+            const aiBubble = document.getElementById('ai-intro-bubble');
+            const avatar = document.getElementById('avatar');
+            
+            // Show bubble immediately when page loads
+            if (aiBubble && !localStorage.getItem('ai-bubble-dismissed')) {
+                aiBubble.style.display = 'block';
+                if (avatar) {
+                    avatar.classList.add('has-notification');
+                }
+            }
+
+            // Auto hide bubble after 15 seconds
+            setTimeout(() => {
+                if (aiBubble && !localStorage.getItem('ai-bubble-dismissed')) {
+                    hideAIBubble();
+                }
+            }, 15000);
+
+            // Show bubble when hover over AI avatar
+            if (avatar && aiBubble) {
+                avatar.addEventListener('mouseenter', () => {
+                    if (!localStorage.getItem('ai-bubble-dismissed')) {
+                        aiBubble.style.display = 'block';
+                        aiBubble.classList.remove('hiding');
+                    }
+                });
+
+                // Remove notification effect when avatar is clicked
+                avatar.addEventListener('click', () => {
+                    avatar.classList.remove('has-notification');
+                    // Hide the bubble when avatar is clicked
+                    if (aiBubble) {
+                        hideAIBubble();
+                    }
+                });
+            }
+        });
+
+        // Function to hide AI bubble
+        function hideAIBubble() {
+            const aiBubble = document.getElementById('ai-intro-bubble');
+            const avatar = document.getElementById('avatar');
+            
+            if (aiBubble) {
+                aiBubble.classList.add('hiding');
+                setTimeout(() => {
+                    aiBubble.style.display = 'none';
+                    localStorage.setItem('ai-bubble-dismissed', 'true');
+                }, 300);
+            }
+            
+            if (avatar) {
+                avatar.classList.remove('has-notification');
+            }
+        }
+
+        // Reset bubble for new sessions (optional)
+        window.addEventListener('beforeunload', () => {
+            localStorage.removeItem('ai-bubble-dismissed');
         });
     </script>
     <script>
