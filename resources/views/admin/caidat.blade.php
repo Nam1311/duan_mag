@@ -2,16 +2,6 @@
 
 @section('admin.body')
 <div class="adsupot-main-content">
-    <div class="adsupot-header">
-        <div class="adsupot-search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Tìm kiếm cài đặt..." id="adsupot-searchInput">
-        </div>
-        <div class="adsupot-user-profile">
-            <div class="adsupot-notification-bell adsupot-tooltip" data-tooltip="Thông báo"><i class="fas fa-bell"></i></div>
-            <div class="adsupot-profile-avatar">QT</div>
-        </div>
-    </div>
     <h1 class="adsupot-page-title">Cài đặt cửa hàng</h1>
     <p class="adsupot-page-subtitle">Quản lý thông tin, tùy chỉnh và bảo mật cửa hàng</p>
 
@@ -21,7 +11,7 @@
     </div>
 
     {{-- Form --}}
-    <form id="settingsForm" enctype="multipart/form-data">
+    <form action="{{ route('admin.settings.update') }}" method="POST" id="settingsForm" enctype="multipart/form-data">
         @csrf
         {{-- Tab 1 --}}
         <div class="adsupot-tab-content adsupot-active" id="adsupot-store-info">
@@ -89,30 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
             tabContents.forEach(c => c.classList.remove("adsupot-active"));
             btn.classList.add("adsupot-active");
             document.getElementById(btn.dataset.tab).classList.add("adsupot-active");
-        });
-    });
-
-    // Submit form via AJAX
-    document.getElementById('settingsForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-
-        fetch("{{ route('admin.settings.update') }}", {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success'){
-                alert(data.message);
-                location.reload();
-            } else {
-                alert('Lỗi: ' + (data.message ?? 'Không xác định'));
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Có lỗi kết nối máy chủ!');
         });
     });
 });

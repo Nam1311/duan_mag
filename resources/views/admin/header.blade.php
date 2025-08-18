@@ -1,7 +1,11 @@
 <!-- sidebar.html -->
 <div class="adbl-sidebar">
     <div class="adbl-sidebar-header">
-        <h2><i class="fas fa-tshirt"></i> <span>Fashion Store</span></h2>
+        <h2><i class="fas fa-tshirt"></i>
+            @foreach ($settings as $data )
+            <span>{{$data->store_name}}</span>
+            @endforeach
+        </h2>
     </div>
     <div class="adbl-sidebar-section">
         <h3>Bảng điều khiển</h3>

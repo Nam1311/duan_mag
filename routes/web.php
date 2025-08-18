@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminBaocaoController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\SettingController;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckCustomerService;
 use App\Http\Middleware\CheckNewsManager;
@@ -158,6 +159,9 @@ Route::get('/search', [ProductController::class, 'search'])->name('search');
 
 // page -> home
 Route::get('/', [PageController::class, 'home'])->name('home');
+
+// Route::get('/', [SettingController::class, 'show']);
+
 // detail product
 Route::get('/detail/{id}', [PageController::class, 'detail']);
 // Route::get('/detail/{id}', [ProductController::class, 'show']);

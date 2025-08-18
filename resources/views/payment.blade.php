@@ -124,13 +124,13 @@
                             <label for="banking">Chuyển khoản ngân hàng</label>
                         </div>
 
-                        <!-- <div class="tt-payment-option">
+                        <div class="tt-payment-option">
                             <input type="radio" id="zalopay" name="payment" class="tt-radio" value="ZaloPay">
                             <label for="zalopay">
                                 <img src="{{ asset('zalopay/images/logo-zalopay.svg') }}" alt="ZaloPay" style="height: 20px; margin-right: 8px;">
                                 Ví ZaloPay
                             </label>
-                        </div> -->
+                        </div>
 
 
                     </div>

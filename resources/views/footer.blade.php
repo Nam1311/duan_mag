@@ -37,15 +37,17 @@
             <div class="footer-col footer-contact">
                 <h3>Liên hệ</h3>
                 <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> 391 Đường Tô ký, Quận 12, TP.HCM</li>
-                    <li><i class="fas fa-phone"></i> 0325132746</li>
-                    <li><i class="fas fa-envelope"></i> manhsvps38793@gmail.com</li>
-                    <li><i class="fas fa-clock"></i> Thứ 2 - Thứ 6: 9:00 - 18:00</li>
+                    @foreach ($settings as $data )
+                    <li><i class="fas fa-map-marker-alt"></i>{{$data->address}}</li>
+                    <li><i class="fas fa-phone"></i>{{$data->phone}}</li>
+                    <li><i class="fas fa-envelope"></i>{{$data->email}}</li>
+                    <li><i class="fas fa-clock"></i>{{$data->working_hours}}</li>
+                    @endforeach
                 </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2023 M A G. Tất cả quyền được bảo lưu.</p>
+            <p>&copy; 2025 M A G. Bản quyền thuộc về chúng tôi.</p>
         </div>
     </footer>

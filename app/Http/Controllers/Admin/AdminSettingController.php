@@ -41,9 +41,7 @@ class AdminSettingController extends Controller
 
         $setting->update($data);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Cập nhật cài đặt thành công!'
-        ]);
+        return back()->with('success', 'Cập nhật thông tin thành công');
+
     }
 }

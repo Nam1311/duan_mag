@@ -93,8 +93,8 @@
                         <div id="box1" class="box-sanpham active-sanpham">
                             <section class="product-thun">
                                 <div class="grid wide container">
-                                    <p class="title-search">
-                                        Hiển thị <span style="font-weight: bold">{{$total}}</span> kết quả cho từ khóa: <span style="color: red">"{{$keyword}}"</span>
+                                    <p class="title-search" style="margin-top: 20px">
+                                        Tìm thấy <span style="font-weight: bold">{{$total}}</span> kết quả cho từ khóa: <span style="color: red">"{{$keyword}}"</span>
                                     </p>
 
 
@@ -220,7 +220,7 @@
                                                         <div class="item-icon">
                                                             <i class="fa-solid fa-cart-shopping"></i>
                                                         </div>
-                                                        <a href="/detail.html">
+                                                        <a href="{{ asset('/detail/' . $productItem->id) }}">
                                                             @if ($productItem->thumbnail && $productItem->thumbnail->path)
                                                                 <img src="{{ asset( $productItem->thumbnail->path) }}" alt="Ảnh" width="150">
                                                             @else

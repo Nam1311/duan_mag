@@ -2454,7 +2454,16 @@ footer {
     /* font-weight: bold; */
 }
 
-
+.post-item>a>button {
+    background-color: #000;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    margin-top: 5px;
+    /* font-weight: bold; */
+}
 
 
 
@@ -3049,6 +3058,24 @@ footer {
     letter-spacing: 1px;
     box-shadow: 0 5px 15px rgba(164, 164, 164, 0.3);
 }
+.about-text>a>button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(164, 164, 164, 0.3);
+}
+
+.about-text>a>button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(176, 174, 174, 0.4);
+}
 
 .about-text>button:hover {
     transform: translateY(-3px);
@@ -3150,28 +3177,43 @@ footer {
 }
 
 .btn-log {
-    width: 70px;
-    height: 40px;
-    background: linear-gradient(155deg, #000000, #000000);
+    width: 170px;
+    height: 45px;
+    background: linear-gradient(135deg, #000000, #1a1a1a);
     color: #ffffff;
-    border: none;
-    padding: 10px 0px;
+    border: 1px solid #333;
+    padding: 10px 0;
     font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    /* text-transform: uppercase; */
+    transition: all 0.35s ease;
+    font-weight: 600;
     letter-spacing: 1px;
-    /* margin: 15px auto 0px; */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
 }
 
+.btn-log::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.15), transparent, rgba(255,255,255,0.15));
+    transform: rotate(25deg);
+    transition: all 0.6s ease;
+}
+
 .btn-log:hover {
-    background: linear-gradient(135deg, #000000, #000000);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #111, #000);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+    border-color: #555;
+}
+
+.btn-log:hover::before {
+    left: 100%;
 }
 
 /* Responsive Design */

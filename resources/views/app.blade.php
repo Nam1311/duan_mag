@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Trang chủ')</title>
 
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/grid.css">
-    <link rel="stylesheet" href="/css/info.css">
-    <link rel="stylesheet" href="/css/info_ctdh.css">
-    <link rel="stylesheet" href="/css/thanhtoan.css">
-    <link rel="stylesheet" href="/css/about.css">
-    <link rel="stylesheet" href="/css/detail.css">
+    <link rel="stylesheet" href="{{ asset('/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/grid.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/info.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/info_ctdh.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/thanhtoan.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/about.css') }}">
+    <link rel="stylesheet" href="{{ asset('/css/detail.css') }}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/css/lightslider.min.css">
@@ -34,7 +34,7 @@
     <div class="avatar" id="avatar">
         <i class="fas fa-robot"></i>
     </div>
-    
+
     <!-- AI Introduction Bubble -->
     <div class="ai-intro-bubble" id="ai-intro-bubble" style="display: none;">
         <div class="bubble-content">
@@ -49,7 +49,7 @@
         </div>
         <div class="bubble-arrow"></div>
     </div>
-    
+
     <div class="box-ai" id="box-ai">
         @include('chat')
     </div>
@@ -61,7 +61,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/js/lightslider.min.js"></script>
-    
+
     <script src="js/slider.js"></script>
     <script src="js/main.js"></script>
     <script src="js/AI.js"></script>
@@ -78,7 +78,7 @@
             // AI Bubble Management
             const aiBubble = document.getElementById('ai-intro-bubble');
             const avatar = document.getElementById('avatar');
-            
+
             // Show bubble immediately when page loads
             if (aiBubble && !localStorage.getItem('ai-bubble-dismissed')) {
                 aiBubble.style.display = 'block';
@@ -118,7 +118,7 @@
         function hideAIBubble() {
             const aiBubble = document.getElementById('ai-intro-bubble');
             const avatar = document.getElementById('avatar');
-            
+
             if (aiBubble) {
                 aiBubble.classList.add('hiding');
                 setTimeout(() => {
@@ -126,7 +126,7 @@
                     localStorage.setItem('ai-bubble-dismissed', 'true');
                 }, 300);
             }
-            
+
             if (avatar) {
                 avatar.classList.remove('has-notification');
             }

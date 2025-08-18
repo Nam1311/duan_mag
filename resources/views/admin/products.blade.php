@@ -88,8 +88,16 @@
                     @foreach($products as $product)
                     <tr>
                         <td>
-                            <img src="{{ asset($product->images->first()->path ?? '/img/default.jpg') }}" alt="Hình ảnh"
-                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+                            <div style="position: relative; display: inline-block; width: 50px; height: 50px;">
+                                <img src="{{ asset($product->images->first()->path ?? '/img/default.jpg') }}"
+                                    alt="Hình ảnh"
+                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+
+                                <a href="/admin/quanlyhinhanh?product_id={{$product->id}}"
+                                style="position: absolute; bottom: -15px; right: -5px; color: #050505; padding: 3px; font-size: 15px;">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                            </div>
                         </td>
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->category->name ?? 'Không có danh mục' }}</td>
