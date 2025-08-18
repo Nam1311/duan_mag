@@ -246,4 +246,65 @@ class NewAdminController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Thêm danh mục tin tức
+     */
+    public function storeCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:new_categories,name',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        NewCategory::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh mục đã được thêm thành công'
+        ]);
+    }
+
+    /**
+     * Cập nhật danh mục tin tức
+     */
+    public function updateCategory(Request $request, $id)
+    {
+        $category = NewCategory::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:new_categories,name,' . $id,
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $category->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh mục đã được cập nhật thành công'
+        ]);
+    }
+
+    /**
+     * Xóa danh mục tin tức
+     */
+    public function destroyCategory($id)
+    {
+        $category = NewCategory::findOrFail($id);
+        
+        // Kiểm tra xem danh mục có tin tức không
+        if ($category->news()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể xóa danh mục này vì đang có tin tức sử dụng'
+            ], 400);
+        }
+
+        $category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Danh mục đã được xóa thành công'
+        ]);
+    }
 }

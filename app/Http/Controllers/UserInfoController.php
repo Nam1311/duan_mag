@@ -16,7 +16,11 @@ class UserInFoController extends Controller
     {
         $user = Auth::user();
         $addresses = addresses::where('user_id', $user->id)->get();
-        $order = Order::where('user_id', $user->id)->get();
+        $order = Order::with([
+            'orderDetails.productVariant.product',
+            'orderDetails.productVariant.size',
+            'orderDetails.productVariant.color'
+        ])->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
         $data = [
             'user' => $user,
@@ -170,11 +174,17 @@ class UserInFoController extends Controller
     {
         $user = Auth::user();
         $addresses = addresses::where('user_id', $user->id)->where('is_default', '=', 1)->get();
-        $order = Order::where('user_id', $user->id)->where('id', $id)->get();
-        $orderdetail = OrderDetail::with('productVariant.product.images')
-            ->whereHas('productVariant.product.images', function ($query) {
-                $query->where('order', 1);
-            })
+        $order = Order::with([
+            'orderDetails.productVariant.product.images',
+            'orderDetails.productVariant.size',
+            'orderDetails.productVariant.color'
+        ])->where('user_id', $user->id)->where('id', $id)->get();
+        
+        $orderdetail = OrderDetail::with([
+            'productVariant.product.images',
+            'productVariant.size',
+            'productVariant.color'
+        ])
             ->where('order_id', $id)
             ->get();
 

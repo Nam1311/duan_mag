@@ -22,6 +22,12 @@
             overflow: hidden;
         }
 
+        .logo {
+            text-align: center;
+            padding: 16px 0;
+            background: #fff;
+        }
+
         .header {
             background: linear-gradient(135deg, #ff8a00, #e52e71);
             color: white;
@@ -73,6 +79,10 @@
 
 <body>
     <div class="container">
+        <div class="logo">
+            <img src="cid:mag-logo" alt="Logo Mail" style="max-height:60px; display:block; margin:0 auto;">
+        </div>
+
         <div class="header">
             <h1>{{ $subjectText }}</h1>
         </div>

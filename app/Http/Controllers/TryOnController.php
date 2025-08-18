@@ -19,8 +19,8 @@ class TryOnController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'person_image' => 'required|image',
-            'cloth_image' => 'required|image',
+            'person_image' => 'required|image|max:10240', // 10MB max
+            'cloth_image' => 'required|image|max:10240',
             'instructions' => 'nullable|string|max:1000',
             'model_type' => 'nullable|string|in:top,bottom,full',
             'gender' => 'nullable|string|in:male,female,unisex',
@@ -28,21 +28,27 @@ class TryOnController extends Controller
             'style' => 'nullable|string|in:casual,formal,streetwear,traditional,sports',
         ]);
 
-        $personPath = $request->file('person_image')->store('uploads', 'public');
-        $clothPath = $request->file('cloth_image')->store('uploads', 'public');
-
-        $personFull = storage_path("app/public/{$personPath}");
-        $clothFull = storage_path("app/public/{$clothPath}");
-
-        $instructions = $request->input('instructions', '');
-        $modelType = $request->input('model_type', '');
-        $gender = $request->input('gender', '');
-        $garmentType = $request->input('garment_type', '');
-        $style = $request->input('style', '');
-
-        // 2. Gọi Python script (folder python/process_image.py)
-        $client = new Client();
         try {
+            // Store uploaded images
+            $personPath = $request->file('person_image')->store('uploads', 'public');
+            $clothPath = $request->file('cloth_image')->store('uploads', 'public');
+
+            $personFull = storage_path("app/public/{$personPath}");
+            $clothFull = storage_path("app/public/{$clothPath}");
+
+            // Prepare parameters
+            $instructions = $request->input('instructions', '');
+            $modelType = $request->input('model_type', '');
+            $gender = $request->input('gender', '');
+            $garmentType = $request->input('garment_type', '');
+            $style = $request->input('style', '');
+
+            // Call Python API
+            $client = new Client([
+                'timeout' => 120, // 2 minutes timeout
+                'connect_timeout' => 30
+            ]);
+
             $response = $client->post('http://localhost:8000/api/try-on', [
                 'multipart' => [
                     [
@@ -55,7 +61,6 @@ class TryOnController extends Controller
                         'contents' => fopen($clothFull, 'r'),
                         'filename' => basename($clothFull),
                     ],
-                    // Các tham số khác nếu cần
                     [
                         'name' => 'instructions',
                         'contents' => $instructions,
@@ -79,25 +84,90 @@ class TryOnController extends Controller
                 ],
             ]);
 
-
             $result = json_decode($response->getBody(), true);
 
             $resultImage = $result['image'] ?? null;
-            $description = $result['text'] ?? 'No description available';
-            return view('tryon.form', [
-                'personImage' => $personPath,
-                'clothImage' => $clothPath,
-                'resultImage' => $resultImage,
-                'description' => $description,
+            $description = $result['text'] ?? 'Kết quả thử đồ ảo thành công';
+
+            // Store result in session for display
+            session([
+                'tryon_result' => [
+                    'person_image' => $personPath,
+                    'cloth_image' => $clothPath,
+                    'result_image' => $resultImage,
+                    'description' => $description,
+                ]
             ]);
 
+            // Handle AJAX request
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Thử đồ ảo thành công',
+                    'data' => [
+                        'result_image' => $resultImage,
+                        'description' => $description,
+                        'person_image' => $personPath,
+                    ],
+                    'redirect' => route('tryon.result')
+                ]);
+            }
 
+            // Regular form submission - redirect to result page
+            return redirect()->route('tryon.result');
 
-
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            $errorMessage = 'Không thể kết nối đến service AI. Vui lòng thử lại sau.';
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 500);
+            }
+            
+            return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
+            
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $errorMessage = 'Service AI đang bận. Vui lòng thử lại sau.';
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 500);
+            }
+            
+            return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
+            
         } catch (\Exception $e) {
-            // Xử lý lỗi nếu có
-            return redirect()->back()->withErrors(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()]);
+            $errorMessage = 'Có lỗi xảy ra: ' . $e->getMessage();
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 500);
+            }
+            
+            return redirect()->back()->withErrors(['error' => $errorMessage])->withInput();
         }
+    }
+
+    public function showResult()
+    {
+        $result = session('tryon_result');
+        
+        if (!$result) {
+            return redirect()->route('tryon.form')->with('error', 'Không tìm thấy kết quả thử đồ.');
+        }
+
+        return view('tryon.form', [
+            'personImage' => $result['person_image'],
+            'clothImage' => $result['cloth_image'],
+            'resultImage' => $result['result_image'],
+            'description' => $result['description'],
+        ]);
     }
 
 

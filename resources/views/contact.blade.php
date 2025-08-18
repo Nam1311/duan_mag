@@ -7,8 +7,16 @@
         <main class="contact-main">
             <div class="contact-container">
                 <div class="contact-section-title contact-animate">
+                    @if (session('success'))
+                        <div id="success-toast"
+                            style="position:fixed;top:20px;right:20px;background-color:#28a745;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.15);font-weight:500;display:flex;align-items:center;z-index:9999;transition:opacity 0.5s ease;">
+                            <span style="margin-right:8px;">✔️</span>
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <h2>Liên Hệ</h2>
-                    <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy điền form bên dưới hoặc liên hệ trực tiếp với chúng tôi qua
+                    <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy điền form bên dưới hoặc liên hệ trực tiếp với chúng tôi
+                        qua
                         thông tin bên dưới.</p>
                 </div>
 
@@ -138,11 +146,11 @@
                     <h3>Gửi Thông Điệp Cho Chúng Tôi</h3>
                     <form id="contactForm" method="POST" action="{{ route('contact.send') }}">
                         @csrf
-                        @if (session('success'))
+                        {{-- @if (session('success'))
                             <div class="alert alert-success" style="margin-bottom: 20px; color: green; font-weight: bold;">
                                 {{ session('success') }}
                             </div>
-                        @endif
+                        @endif --}}
                         <div class="contact-form-row">
                             <div class="contact-form-group">
                                 <label for="name">Họ và Tên <span>*</span></label>
@@ -190,4 +198,19 @@
             </div>
         </main>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('success-toast');
+            if (!toast) return;
+
+            // 2 giây rồi mờ dần
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                // Xoá khỏi DOM sau khi mờ xong
+                toast.addEventListener('transitionend', () => toast.remove(), {
+                    once: true
+                });
+            }, 3000);
+        });
+    </script>
 @endsection
