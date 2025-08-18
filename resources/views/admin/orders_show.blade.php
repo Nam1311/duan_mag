@@ -45,7 +45,7 @@
                 <div class="aorders-profile-avatar">QT</div>
             </div>
         </div>
-        <h1 class="aorders-page-title">Chi tiết đơn hàng: {{ $order->order_code }}</h1>
+        <h1 class="aorders-page-title">Chi tiết đơn hàng {{ $order->order_code }}</h1>
         <p class="aorders-page-subtitle">
             Thông tin chi tiết về đơn hàng và sản phẩm
         </p>
@@ -85,7 +85,7 @@
                            $order->address_details['province_name'] }}
                     </p>
                 @else
-                    <p><strong>Địa chỉ:</strong> {{ $order->address ?? 'Không xác định' }}</p>
+                    <p><strong>Địa chỉ:</strong> {{ $order->address_text ?? 'Không xác định' }}</p>
                 @endif
             </div>
 
@@ -122,8 +122,15 @@
             </div>
 
             <div style="margin-top: 16px; text-align: right;">
-                <div style="display: inline-block; padding: 10px 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; font-weight: bold;">
-                    Tổng tiền đơn hàng: {{ number_format($order->total_price, 0, ',', '.') }}đ
+                <div style="display: inline-block; padding: 10px 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+                    <div style="margin-bottom: 5px;"><strong>Tổng sản phẩm:</strong> {{ number_format($order->orderDetails->sum('total') - $order->orderDetails->sum('ship_price'), 0, ',', '.') }}đ</div>
+                    <div style="margin-bottom: 5px;"><strong>Phí vận chuyển:</strong> {{ number_format($order->orderDetails->sum('ship_price'), 0, ',', '.') }}đ</div>
+                    @if($order->orderDetails->sum('voucher_discount') > 0)
+                        <div style="margin-bottom: 5px; color: #dc3545;"><strong>Giảm giá:</strong> -{{ number_format($order->orderDetails->sum('voucher_discount'), 0, ',', '.') }}đ</div>
+                    @endif
+                    <div style="padding-top: 5px; border-top: 1px solid #ddd; font-weight: bold; font-size: 16px;">
+                        <strong>Tổng tiền đơn hàng:</strong> {{ number_format($order->orderDetails->sum('total_final'), 0, ',', '.') }}đ
+                    </div>
                 </div>
             </div>
 

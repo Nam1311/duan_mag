@@ -406,7 +406,6 @@ Route::prefix('admin')->middleware(CheckProductsManager::class)->group(function 
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 
 
-
     // product admin nam
     Route::get('/products', [ProductAdminController::class, 'index'])->name('admin.products.index');
     Route::get('/products/{id}', [ProductAdminController::class, 'viewDetail']);
@@ -421,7 +420,7 @@ Route::prefix('admin')->middleware(CheckProductsManager::class)->group(function 
     Route::get('/products/category/{id}', [ProductAdminController::class, 'LocDanhMuc'])->name('products.TheoDanhMuc');
     Route::get('/products/status/{status}', [ProductAdminController::class, 'LocTrangThai'])->name('products.TheoTrangThai');
     // tìm
-    Route::get('/products/search', [ProductAdminController::class, 'search'])->name('admin.products.search');
+    Route::get('/search', [ProductAdminController::class, 'search'])->name('admin.products.search');
 });
 
 

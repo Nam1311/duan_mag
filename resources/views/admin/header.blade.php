@@ -15,7 +15,6 @@
     </div>
     <div class="adbl-sidebar-section">
         <h3>Công cụ</h3>
-        <a href="{{ asset('/admin/quanlykho') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlykho*') ? 'adbl-active' : '' }}"><i class="fas fa-warehouse"></i><span>Quản lý kho</span></a>
         <a href="{{ asset('/admin/quanlyhinhanh') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlyhinhanh*') ? 'adbl-active' : '' }}"><i class="fas fa-images"></i><span>Hình ảnh sản phẩm</span></a>
         <a href="{{ asset('/admin/quanlykhachhang') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlykhachhang*') ? 'adbl-active' : '' }}"><i class="fas fa-users"></i><span>Khách hàng</span></a>
         <a href="{{ asset('/admin/quanlybanner') }}" class="adbl-sidebar-item {{ request()->is('admin/quanlybanner*') ? 'adbl-active' : '' }}"><i class="fas fa-user-cog"></i><span>Quản lý Banner</span></a>

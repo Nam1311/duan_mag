@@ -18,7 +18,7 @@
                     <li><a class="mobile_link" href="{{asset('/')}}">Trang chủ</a></li>
                     <li><a class="mobile_link" href="/san-pham">Sản phẩm</a></li>
                     <li><a class="mobile_link" href="/form.html">Bảng size</a></li>
-                    <li><a class="mobile_link" href="/about.html">Về chúng tôi</a></li>
+                    <li><a class="mobile_link" href="/about">Về chúng tôi</a></li>
                     <li><a class="mobile_link" href="/about.html">Yêu thích</a></li>
                     <br><br>
                     <li><a class="mobile_link" href="/info-user.html">Tài khoản</a></li>

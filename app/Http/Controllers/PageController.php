@@ -43,6 +43,7 @@ class PageController extends Controller
             ])
             ->orderBy('sold_count', 'desc')
             ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
+            ->where('is_active', '>', 0)
             ->take(8)
             ->get();
 
