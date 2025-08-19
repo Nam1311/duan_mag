@@ -64,10 +64,6 @@ Route::get('cart', function () {
     return view('cart');
 });
 
-// Route::get('login', function () {
-//     return view('login');
-// });
-
 // login bằng web
 Route::get('/showlogin', [LoginController::class, 'showLogin'])->name('showlogin');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -121,7 +117,7 @@ Route::post('/reviews/reply', [PageController::class, 'reply'])->name('reviews.r
 
 
 
-Route::get('products', function () {
+Route::get('san-pham', function () {
     return view('product');
 });
 Route::get('pagereturn', function () {
@@ -142,15 +138,15 @@ Route::get('favourite_product', function () {
 
 
 // load san pham
-Route::get('/products', [ProductController::class, 'ProductAll'])->name('product.filter');
+Route::get('/san-pham', [ProductController::class, 'ProductAll'])->name('product.filter');
 
 // sx nổi bậtbật
-Route::get('productFeatured', [ProductController::class, 'ProductFeatured']);
+Route::get('san-pham-noi-bat', [ProductController::class, 'ProductFeatured']);
 // sx bán chạy
-Route::get('productBestseller', [ProductController::class, 'ProductBestseller']);
+Route::get('san-pham-ban-chay', [ProductController::class, 'ProductBestseller']);
 // sx gias cao -> thấp
-Route::get('productPriceLowToHight', [ProductController::class, 'ProductPriceLowToHight']);
-Route::get('productPriceHightToLow', [ProductController::class, 'ProductPriceHightToLow']);
+Route::get('gia-thap-den-cao', [ProductController::class, 'ProductPriceLowToHight']);
+Route::get('gia-cao-den-thap', [ProductController::class, 'ProductPriceHightToLow']);
 //tìm kiếm
 Route::get('/search-suggestions', [ProductController::class, 'searchSuggestions']);
 Route::get('/search', [ProductController::class, 'search'])->name('search');

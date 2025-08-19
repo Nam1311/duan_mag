@@ -153,7 +153,7 @@
                         <img class="category-img" src="{{ asset('img/categories/' . $product_categories->image) }}" alt="">
                         <div class="detail-cat">
                             <h2 class="category-name">{{$product_categories->name}}</h2>
-                            <a href="/products?category%5B%5D={{$product_categories->id}}"><button>Xem ngay</button></a>
+                            <a href="/san-pham?category%5B%5D={{$product_categories->id}}"><button>Xem ngay</button></a>
                         </div>
                     </li>
                 @endforeach

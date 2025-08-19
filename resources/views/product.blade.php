@@ -140,20 +140,20 @@
                                         }
                                     </style>
                                     <div class="product-sort-mobile">
-                                        <a href="/products" style="text-decoration: none; color: black;"><h2 class="page-title">Tất cả sản phẩm</h2></a>
+                                        <a href="/san-pham" style="text-decoration: none; color: black;"><h2 class="page-title">Tất cả sản phẩm</h2></a>
                                             <div class="relative">
                                                 <p class="sort-title">Sắp xếp theo: </p>
                                                 <div class="dropdown-container">
                                                     <div class="select-trigger" id="sortButton">
 
                                                         <span class="select-value" id="selectedValue">
-                                                            @if(request()->is('productFeatured'))
+                                                            @if(request()->is('san-pham-noi-bat'))
                                                                 Nổi bật
-                                                            @elseif(request()->is('productBestseller'))
+                                                            @elseif(request()->is('san-pham-ban-chay'))
                                                                 Bán chạy
-                                                            @elseif(request()->is('productPriceLowToHight'))
+                                                            @elseif(request()->is('gia-thap-den-cao'))
                                                                 Giá: Thấp đến Cao
-                                                            @elseif(request()->is('productPriceHightToLow'))
+                                                            @elseif(request()->is('gia-cao-den-thap'))
                                                                 Giá: Cao đến Thấp
                                                             @else
                                                                 Mặc định
@@ -170,19 +170,19 @@
                                                     </style>
                                                     <ul class="dropdown-menu" id="dropdownMenu">
                                                         <li class="dropdown-item {{ request()->is('product') ? 'selected' : '' }}" data-value="Mặc định">
-                                                            <span class="radio"></span><a href="/products">Mặc định</a>
+                                                            <span class="radio"></span><a href="/san-pham">Mặc định</a>
                                                         </li>
-                                                        <li class="dropdown-item {{ request()->is('productFeatured') ? 'selected' : '' }}" data-value="Nổi bật">
-                                                            <span class="radio"></span><a href="/productFeatured">Nổi bật</a>
+                                                        <li class="dropdown-item {{ request()->is('san-pham-noi-bat') ? 'selected' : '' }}" data-value="Nổi bật">
+                                                            <span class="radio"></span><a href="/san-pham-noi-bat">Nổi bật</a>
                                                         </li>
-                                                        <li class="dropdown-item {{ request()->is('productBestseller') ? 'selected' : '' }}" data-value="Bán chạy">
-                                                            <span class="radio"></span><a href="/productBestseller">Bán chạy</a>
+                                                        <li class="dropdown-item {{ request()->is('san-pham-ban-chay') ? 'selected' : '' }}" data-value="Bán chạy">
+                                                            <span class="radio"></span><a href="/san-pham-ban-chay">Bán chạy</a>
                                                         </li>
-                                                        <li class="dropdown-item {{ request()->is('productPriceLowToHight') ? 'selected' : '' }}" data-value="Giá: Thấp đến Cao">
-                                                            <span class="radio"></span><a href="productPriceLowToHight"> Giá: Thấp đến Cao</a>
+                                                        <li class="dropdown-item {{ request()->is('gia-thap-den-cao') ? 'selected' : '' }}" data-value="Giá: Thấp đến Cao">
+                                                            <span class="radio"></span><a href="gia-thap-den-cao"> Giá: Thấp đến Cao</a>
                                                         </li>
-                                                        <li class="dropdown-item {{ request()->is('productPriceHightToLow') ? 'selected' : '' }}" data-value="Giá: Cao đến Thấp">
-                                                            <span class="radio"></span><a href="productPriceHightToLow">Giá: Cao đến Thấp</a>
+                                                        <li class="dropdown-item {{ request()->is('gia-cao-den-thap') ? 'selected' : '' }}" data-value="Giá: Cao đến Thấp">
+                                                            <span class="radio"></span><a href="gia-cao-den-thap">Giá: Cao đến Thấp</a>
                                                         </li>
                                                     </ul>
                                                 </div>

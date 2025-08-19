@@ -74,7 +74,8 @@
                         <th>Tên sản phẩm</th>
                         <th>Danh mục</th>
                         <th>Giá gốc</th>
-                        <th>Giá giảm</th>
+                        <th>Giá bán</th>
+                        {{-- <th>Flsale</th> --}}
                         <th>Sale</th>
                         <th>Kho</th>
                         <th>Trạng thái</th>
@@ -94,7 +95,8 @@
                         <td>{{ $product->category->name ?? 'Không có danh mục' }}</td>
                         <td><del style="text-decoration: line-through">{{ number_format($product->original_price) }}đ</del></td>
                         <td>{{ number_format($product->price) }}đ</td>
-                        <td>{{ $product->sale }}%</td>
+                        {{-- <td>{{ $product->sale }}%</td> --}}
+                        <td>{{ $product->base_sale }}%</td>
                         <td>{{ $product->variants->sum('quantity') }}</td>
                         {{-- <td>
                             @foreach ($product->variants as $variant)
@@ -171,8 +173,8 @@
                     </div>
 
                     <div class="aproducts-form-group">
-                        <label>Sale (%)</label>
-                        <input type="number" name="sale" id="productSale" placeholder="Phần trăm giảm giá" min="0" max="100" />
+                        <label>Base Sale (%)</label>
+                        <input type="number" name="base_sale" id="productBaseSale" placeholder="Giảm giá gốc" min="0" max="100" />
                     </div>
 
                     <div class="aproducts-form-group">
@@ -272,7 +274,7 @@
 
                     <div class="aproducts-form-group">
                         <label>Sale (%)</label>
-                        <input type="number" name="sale" id="editProductSale" min="0" max="100">
+                        <input type="number" name="base_sale" id="editProductSale" min="0" max="100">
                     </div>
 
                     <div class="aproducts-form-group">
@@ -564,7 +566,7 @@
             document.getElementById('editProductId').value = product.id;
             document.getElementById('editProductName').value = product.name;
             document.getElementById('editProductOriginalPrice').value = product.original_price;
-            document.getElementById('editProductSale').value = product.sale;
+            document.getElementById('editProductSale').value = product.base_sale;
             document.getElementById('editProductDescription').value = product.description;
             document.getElementById('editProductCategory').value = product.category_id;
             document.getElementById('editProductStatus').value = product.is_active ? '1' : '0';

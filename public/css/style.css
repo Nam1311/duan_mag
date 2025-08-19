@@ -1823,7 +1823,7 @@ footer {
 .filter-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 15px;
 }
 
 .filter-option {
@@ -1844,7 +1844,7 @@ footer {
 }
 
 .filter-option input {
-    margin-right: 8px;
+    margin-right: 5px;
     cursor: pointer;
     color: #000;
 }
@@ -2047,6 +2047,7 @@ footer {
 
 .box-sanpham.active-sanpham {
     display: block;
+        min-height: 1650px;
 }
 
 .box-sanpham button {
@@ -3469,11 +3470,11 @@ del {
         right: 20px;
         max-width: 250px;
     }
-    
+
     .bubble-content {
         padding: 16px;
     }
-    
+
     .bubble-text {
         font-size: 13px;
     }
