@@ -38,8 +38,18 @@
                     <section class="user-info-profile-section active" id="personal-section">
                         <div class="user-info-section-header">
                             <h2 class="user-info-section-title"><i class="fas fa-user-circle"></i> Thông tin cá nhân</h2>
-                            <button class="user-info-edit-btn" data-modal="personal"><i class="fas fa-edit"></i> Chỉnh
-                                sửa</button>
+                            <div>
+                                @auth
+                                    @if(auth()->user()->role === 'admin')
+                                        <a href="/admin">
+                                            <button class="user-info-edit-btn">
+                                               <i class="fa fa-cogs" aria-hidden="true"></i> Truy cập quản trị
+                                            </button>
+                                        </a>
+                                    @endif
+                                @endauth
+                                <button class="user-info-edit-btn" data-modal="personal"><i class="fas fa-edit"></i> Chỉnh sửa</button>
+                            </div>
                         </div>
                         <div class="user-info-section-content">
                             <div class="user-info-grid">

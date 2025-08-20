@@ -41,7 +41,7 @@
             <i class="fas fa-sparkles bubble-icon"></i>
             <div class="bubble-text">
                 <strong>Xin chào! 👋</strong><br>
-                Tôi có thể giúp bạn tư vấn chọn đồ, tìm kiếm sản phẩm phù hợp và trả lời mọi câu hỏi!
+                Tôi là trợ lý ảo M A G Bot. <br> Tôi có thể giúp gì cho bạn ?
             </div>
             <button class="bubble-close" onclick="hideAIBubble()">
                 <i class="fas fa-times"></i>

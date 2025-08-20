@@ -83,7 +83,7 @@
 
         .user-info-profile-section {
             background: var(--user-info-white);
-            border-radius: var(--user-info-border-radius);
+            /* border-radius: var(--user-info-border-radius); */
             box-shadow: var(--user-info-box-shadow);
             overflow: hidden;
             transition: var(--user-info-transition);

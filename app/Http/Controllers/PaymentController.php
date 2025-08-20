@@ -25,7 +25,7 @@ class PaymentController extends Controller
     protected $vnp_Returnurl;
     protected $vnp_apiUrl;
     protected $apiUrl;
-    
+
     // ZaloPay Configuration
     protected $zp_app_id;
     protected $zp_key1;
@@ -33,11 +33,11 @@ class PaymentController extends Controller
     protected $zp_endpoint;
     protected $zp_callback_url;
     protected $zp_redirect_url;
-    
+
     public function __construct()
     {
         date_default_timezone_set('Asia/Ho_Chi_Minh');
-        
+
         // VNPay Config
         $this->vnp_TmnCode = "AJT0AAYH"; // Mã định danh merchant
         $this->vnp_HashSecret = "50394OTCASPHF09AVM4EDBEQINVFJCDO"; // Secret key
@@ -45,7 +45,7 @@ class PaymentController extends Controller
         $this->vnp_Returnurl = "http://127.0.0.1:8080/payment/result";
         $this->vnp_apiUrl = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
         $this->apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-        
+
         // ZaloPay Config
         $this->zp_app_id = config('zalopay.app_id');
         $this->zp_key1 = config('zalopay.key1');
@@ -88,7 +88,7 @@ class PaymentController extends Controller
 
         if (Auth::check()) {
             $user = Auth::user();
-            $rules['address'] = 'required'; // ID của địa chỉ từ dropdown
+            $rules['address'] = 'required|string'; // ID của địa chỉ từ dropdown
             if (!$user->phone) {
                 $rules['phone'] = 'required|regex:/^0[0-9]{9,10}$/';
             }
@@ -98,9 +98,9 @@ class PaymentController extends Controller
                 'email' => 'required|email',
                 'phone' => 'required',
                 'address' => 'required',
-                'city' => 'required',
-                'district' => 'required',
-                'ward' => 'required',
+                'city' => 'required|string',
+                'district' => 'required|string',
+                'ward' => 'required|string',
             ]);
         }
         $request->validate($rules);
@@ -117,7 +117,7 @@ class PaymentController extends Controller
         $voucherCode = session()->get('applied_voucher');
         $voucherId = session()->get('applied_voucher_id');
         $calculatedVoucherDiscount = 0;
-        
+
         if ($voucherId) {
             $voucher = Voucher::find($voucherId);
             if ($voucher && $voucher->quantity > 0) {
@@ -166,7 +166,7 @@ class PaymentController extends Controller
             $address->ward = $request->ward;
             $address->address = $request->address;
             $address->save();
-            
+
             $order->name = $request->fullname; // Tên người đặt hàng khi chưa đăng nhập
             $order->phone = $request->phone;
             $order->address_text = $request->address . ', ' . $request->ward . ', ' . $request->district . ', ' . $request->city;
@@ -226,12 +226,12 @@ class PaymentController extends Controller
             ksort($inputData);
             $query = "";
             $hashdata = "";
-            
+
             foreach ($inputData as $key => $value) {
                 $hashdata .= urlencode($key) . "=" . urlencode($value) . '&';
                 $query .= urlencode($key) . "=" . urlencode($value) . '&';
             }
-            
+
             $hashdata = rtrim($hashdata, '&');
             $query = rtrim($query, '&');
 
@@ -240,13 +240,13 @@ class PaymentController extends Controller
                 $vnpSecureHash = hash_hmac('sha512', $hashdata, $this->vnp_HashSecret);
                 $vnp_Url .= '&vnp_SecureHash=' . $vnpSecureHash;
             }
-            
+
             \Log::info('VNPay Payment URL Created', [
                 'order_id' => $order->id,
                 'amount' => $vnp_Amount,
                 'url' => $vnp_Url
             ]);
-            
+
             return redirect($vnp_Url);
         } elseif ($request->payment == 'ZaloPay') {
             // Xử lý ZaloPay
@@ -280,7 +280,7 @@ class PaymentController extends Controller
             } elseif ($request->email) {
                 $email = $request->email;
             }
-            
+
             if ($email) {
                 Mail::to($email)->send(new Bill($order));
             }
@@ -294,7 +294,7 @@ class PaymentController extends Controller
         // Lấy tất cả parameters từ request
         $vnp_SecureHash = $request->input('vnp_SecureHash');
         $inputData = [];
-        
+
         foreach ($request->all() as $key => $value) {
             if (substr($key, 0, 4) == "vnp_") {
                 $inputData[$key] = $value;
@@ -316,7 +316,7 @@ class PaymentController extends Controller
                 $i = 1;
             }
         }
-        
+
         $secureHash = hash_hmac('sha512', $hashData, $this->vnp_HashSecret);
 
         // Log để debug
@@ -335,7 +335,7 @@ class PaymentController extends Controller
                 if ($order) {
                     $order->status_payment = 'Đã thanh toán';
                     $order->save();
-                    
+
                     // Cập nhật số lượng sản phẩm
                     foreach ($order->orderDetails as $detail) {
                         $variant = product_variants::find($detail->product_variant_id);
@@ -344,13 +344,13 @@ class PaymentController extends Controller
                             $variant->save();
                         }
                     }
-                    
+
                     // Xóa giỏ hàng và session
                     if (Auth::check()) {
                         Cart::where('user_id', Auth::id())->delete();
                     }
                     session()->forget(['cart', 'checkout_data', 'applied_voucher', 'applied_voucher_id']);
-                    
+
                     // Xử lý email cho cả user đã đăng nhập và chưa đăng nhập
                     $email = null;
                     if (Auth::check() && $order->user && $order->user->email) {
@@ -426,10 +426,10 @@ class PaymentController extends Controller
             $transID = rand(0, 1000000);
             $embeddata = "{}"; // Empty JSON object as string
             $items = "[]"; // Empty array as string
-            
+
             // Tạo app_trans_id theo format chuẩn ZaloPay
             $app_trans_id = date("ymd") . "_" . $transID;
-            
+
             // Xử lý tên người dùng - chỉ dùng ký tự an toàn
             $username = $order->name ? preg_replace('/[^a-zA-Z0-9_]/', '', $order->name) : "user123";
             if (empty($username) || strlen($username) < 3) {
@@ -474,7 +474,7 @@ class PaymentController extends Controller
             ]);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            
+
             $resp = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
@@ -507,15 +507,15 @@ class PaymentController extends Controller
                         -5 => 'Merchant không tồn tại',
                         -6 => 'Đơn hàng đã tồn tại'
                     ];
-                    
+
                     $errorMsg = $errorMessages[$result['return_code']] ?? ($result['return_message'] ?? 'Lỗi không xác định');
-                    
+
                     \Log::error('ZaloPay API Error', [
                         'response' => $result,
                         'order_id' => $order->id,
                         'error_message' => $errorMsg
                     ]);
-                    
+
                     return back()->with('error', 'Lỗi ZaloPay: ' . $errorMsg . ' (Code: ' . $result['return_code'] . ')');
                 }
             } else {
@@ -541,7 +541,7 @@ class PaymentController extends Controller
             $key2 = $this->zp_key2;
             $postdata = $request->getContent();
             $postdatajson = json_decode($postdata, true);
-            
+
             $mac = hash_hmac("sha256", $postdatajson["data"], $key2);
             $requestmac = $postdatajson["mac"];
 
@@ -554,7 +554,7 @@ class PaymentController extends Controller
                 // Thanh toán thành công
                 $dataJson = json_decode($postdatajson["data"], true);
                 $app_trans_id = $dataJson["apptransid"];
-                
+
                 // Tìm order theo app_trans_id
                 $order = Order::where('app_trans_id', $app_trans_id)->first();
                 if ($order) {
@@ -594,7 +594,7 @@ class PaymentController extends Controller
 
         if ($app_trans_id) {
             $order = Order::where('app_trans_id', $app_trans_id)->first();
-            
+
             if ($order) {
                 if ($status == 1) {
                     // Thanh toán thành công
