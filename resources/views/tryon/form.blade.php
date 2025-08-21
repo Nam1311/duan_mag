@@ -398,56 +398,56 @@
         padding: 0 16px;
         margin: 20px auto;
     }
-    
+
     .tryon-header {
         padding: 40px 20px;
     }
-    
+
     .tryon-header h1 {
         font-size: 2rem;
     }
-    
+
     .tryon-form {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .form-card {
         padding: 20px;
     }
-    
+
     .upload-area {
         padding: 30px 15px;
     }
-    
+
     .result-container {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .result-image {
         max-width: 300px;
     }
-    
+
     .result-header {
         flex-direction: column;
         gap: 20px;
         align-items: center;
     }
-    
+
     .close-result-btn {
         position: relative;
         top: 0;
         right: 0;
     }
-    
+
     .submit-section {
         display: flex;
         flex-direction: column;
         gap: 12px;
         align-items: center;
     }
-    
+
     .secondary-btn {
         margin-left: 0 !important;
     }
@@ -526,8 +526,8 @@
 <div class="tryon-container">
     <!-- Header -->
     <div class="tryon-header">
-        <h1><i class="fas fa-magic"></i> Thử Đồ Ảo</h1>
-        <p>Trải nghiệm công nghệ AI tiên tiến để thử đồ ảo trong vài giây</p>
+        <h1><i class="fas fa-magic"></i> Phòng thử đồ online</h1>
+        <p>Trải nghiệm công nghệ AI tiên tiến để thử đồ chỉ có tại M A G Studio</p>
         <a href="{{ route('home') }}" class="back-home-btn">
             <i class="fas fa-home"></i>
             Trở về trang chủ
@@ -537,18 +537,18 @@
     <!-- Form -->
     <form id="tryonForm" class="tryon-form" enctype="multipart/form-data">
         @csrf
-        
+
         <!-- Model Upload Card -->
         <div class="form-card">
-            <h3><i class="fas fa-user"></i> Ảnh Người Mẫu</h3>
-            
+            <h3><i class="fas fa-user"></i> Ảnh của bạn</h3>
+
             <div id="modelUpload" class="upload-area">
                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                 <div class="upload-text">Nhấp hoặc kéo ảnh vào đây</div>
                 <div class="upload-hint">Chỉ ảnh • Tối đa: 10MB</div>
             </div>
             <input type="file" id="modelFileInput" name="person_image" accept="image/*" class="hidden">
-            
+
             <div id="modelPreview" class="preview-container hidden">
                 <img id="modelPreviewImage" src="#" alt="Model Preview" class="preview-image">
                 <span id="removeModel" class="remove-btn"><i class="fas fa-times"></i></span>
@@ -571,14 +571,14 @@
         <!-- Garment Upload Card -->
         <div class="form-card">
             <h3><i class="fas fa-tshirt"></i> Ảnh Trang Phục</h3>
-            
+
             <div id="garmentUpload" class="upload-area">
                 <i class="fas fa-cloud-upload-alt upload-icon"></i>
                 <div class="upload-text">Nhấp hoặc kéo ảnh vào đây</div>
                 <div class="upload-hint">Chỉ ảnh • Tối đa: 10MB</div>
             </div>
             <input type="file" id="garmentFileInput" name="cloth_image" accept="image/*" class="hidden">
-            
+
             <div id="garmentPreview" class="preview-container hidden">
                 <img id="garmentPreviewImage" src="#" alt="Garment Preview" class="preview-image">
                 <span id="removeGarment" class="remove-btn"><i class="fas fa-times"></i></span>
@@ -613,7 +613,7 @@
         <div class="form-card instructions-card">
             <h3><i class="fas fa-comment-dots"></i> Hướng Dẫn Đặc Biệt</h3>
             <div class="form-group">
-                <textarea id="instructions" name="instructions" 
+                <textarea id="instructions" name="instructions"
                     placeholder="Nhập các yêu cầu đặc biệt (ví dụ: độ vừa vặn, điều chỉnh màu sắc, v.v.)"></textarea>
             </div>
         </div>
@@ -631,22 +631,22 @@
     @if(!empty($resultImage))
     <div class="result-section">
         <div class="result-header">
-            <h2><i class="fas fa-sparkles"></i> Kết Quả Thử Đồ Ảo</h2>
+            <h2><i class="fas fa-sparkles"></i> Kết Quả</h2>
             <button class="close-result-btn" onclick="closeResult()">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        
+
         <div class="result-container">
             <div class="result-image-container">
                 <img src="{{ $resultImage }}" alt="Virtual Try-On Result" class="result-image">
             </div>
         </div>
-        
+
         @if(!empty($description))
         <p class="result-text">{{ $description }}</p>
         @endif
-        
+
         <div class="submit-section">
             <a href="{{ route('tryon.form') }}" class="submit-btn">
                 <i class="fas fa-redo"></i>
@@ -664,7 +664,7 @@
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <div class="loading-text">Đang xử lý thử đồ ảo...</div>
+            <div class="loading-text">Đang xử lý...</div>
             <div class="loading-subtext">Quá trình này có thể mất 30-60 giây</div>
         </div>
     </div>
@@ -675,7 +675,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-load product image if available
     function loadProductImage() {
         let productData = null;
-        
+
         // First, try to get from server-side data (if passed via URL)
         @if(isset($productData) && $productData)
             productData = @json($productData);
@@ -692,16 +692,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('No product data found in localStorage');
             }
         @endif
-        
+
         if (productData && productData.image) {
             console.log('Loading product for try-on:', productData);
-            
+
             // Auto-fill the garment image using the correct IDs
             const garmentPreview = document.getElementById('garmentPreview');
             const garmentPreviewImage = document.getElementById('garmentPreviewImage');
             const garmentUploadArea = document.getElementById('garmentUpload');
             const garmentFileInput = document.getElementById('garmentFileInput');
-            
+
             if (garmentPreview && garmentPreviewImage && garmentUploadArea) {
                 // Load image from URL and convert to file
                 fetch(productData.image)
@@ -710,23 +710,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Create file from blob
                         const fileName = `product-${productData.id}.jpg`;
                         const file = new File([blob], fileName, { type: blob.type });
-                        
+
                         // Update file input
                         const dt = new DataTransfer();
                         dt.items.add(file);
                         garmentFileInput.files = dt.files;
-                        
+
                         // Show preview
                         garmentPreviewImage.src = productData.image;
                         garmentUploadArea.classList.add('hidden');
                         garmentPreview.classList.remove('hidden');
-                        
+
                         console.log('✅ Đã tải ảnh sản phẩm thành công');
                     })
                     .catch(error => {
                         console.error('❌ Lỗi khi tải ảnh sản phẩm:', error);
                     });
-                
+
                 // Auto-fill garment type based on category
                 const garmentSelect = document.getElementById('garmentType');
                 if (garmentSelect && productData.category) {
@@ -746,7 +746,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     // Helper function to show notifications
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
@@ -764,15 +764,15 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: slideIn 0.3s ease;
         `;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
-    
+
     // Load product image on page load
     setTimeout(loadProductImage, 500);
 
@@ -785,16 +785,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const removeBtn = document.getElementById(removeBtnId);
 
         uploadArea.addEventListener('click', () => fileInput.click());
-        
+
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('drag-over');
         });
-        
+
         uploadArea.addEventListener('dragleave', () => {
             uploadArea.classList.remove('drag-over');
         });
-        
+
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('drag-over');
@@ -842,12 +842,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const tryOnData = localStorage.getItem('tryOnProductData');
             if (tryOnData) {
                 const data = JSON.parse(tryOnData);
-                
+
                 // Auto-populate garment image with product image
                 if (data.currentImage) {
                     populateGarmentImage(data.currentImage);
                 }
-                
+
                 // Clear the data after use
                 localStorage.removeItem('tryOnProductData');
             }
@@ -864,21 +864,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Create a file from the blob
                 const fileName = 'product-image.jpg';
                 const file = new File([blob], fileName, { type: blob.type });
-                
+
                 // Create a new FileList with the file
                 const dt = new DataTransfer();
                 dt.items.add(file);
                 document.getElementById('garmentFileInput').files = dt.files;
-                
+
                 // Show preview
                 const garmentPreviewImage = document.getElementById('garmentPreviewImage');
                 const garmentUpload = document.getElementById('garmentUpload');
                 const garmentPreview = document.getElementById('garmentPreview');
-                
+
                 garmentPreviewImage.src = imageUrl;
                 garmentUpload.classList.add('hidden');
                 garmentPreview.classList.remove('hidden');
-                
+
                 console.log('Auto-populated garment image from product detail');
             })
             .catch(error => {
@@ -893,11 +893,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     submitBtn.addEventListener('click', async function(e) {
         e.preventDefault();
-        
+
         // Validation
         const personImage = document.getElementById('modelFileInput').files[0];
         const clothImage = document.getElementById('garmentFileInput').files[0];
-        
+
         if (!personImage || !clothImage) {
             alert('Vui lòng tải lên cả ảnh người mẫu và ảnh trang phục');
             return;
@@ -930,7 +930,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok) {
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Redirect to show result
                     window.location.href = result.redirect || window.location.href;

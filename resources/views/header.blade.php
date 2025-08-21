@@ -17,13 +17,40 @@
                 <ul class="list">
                     <li><a class="mobile_link" href="{{asset('/')}}">Trang chủ</a></li>
                     <li><a class="mobile_link" href="/san-pham">Sản phẩm</a></li>
-                    <li><a class="mobile_link" href="/form.html">Bảng size</a></li>
+                    <li><a class="mobile_link" href="/contact">Liên hệ</a></li>
                     <li><a class="mobile_link" href="/about">Về chúng tôi</a></li>
-                    <li><a class="mobile_link" href="/about.html">Yêu thích</a></li>
+                    <li><a class="mobile_link" href="/wishlist">Yêu thích</a></li>
                     <br><br>
-                    <li><a class="mobile_link" href="/info-user.html">Tài khoản</a></li>
-                    <li><a class="mobile_link" href="/dangnhap.html">Đăng nhập</a></li>
-                    <li><a class="mobile_link" href="/dangky.html">Đăng ký</a></li>
+                    <li class="mobile_link">
+                        {{-- <a href="{{asset('/check-login')}}">Tài khoản</a> --}}
+                        <ul>
+                            @guest
+                                {{-- Chưa đăng nhập --}}
+                                <li><a href="{{ route('showlogin') }}">Đăng nhập</a></li>
+                                <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                            @endguest
+
+                            @auth
+                                {{-- Đã đăng nhập --}}
+                                <li><a href="/infouser">Trang cá nhân</a></li>
+                                <li>
+                                    <style>
+                                        .form-logout>.btn-logout{
+                                            border: none;
+                                            background-color: white;
+                                            cursor: pointer;
+                                            font-size: 15px
+                                        }
+                                    </style>
+                                    <form class="form-logout" method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button class="btn-logout" type="submit">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            @endauth
+                        </ul>
+                    </li>
+
                 </ul>
             </nav>
 
@@ -306,7 +333,11 @@
                                 @auth
                                     {{-- Đã đăng nhập --}}
                                     <li><a href="/infouser">Trang cá nhân</a></li>
-                                    <li><a href="/wishlist">Yêu thích</a></li>
+                                    @auth
+                                        @if(auth()->user()->role === 'admin')
+                                            <li><a href="/admin">Trang quản trị</a></li>
+                                        @endif
+                                    @endauth
                                     <li>
                                         <style>
                                             .form-logout>.btn-logout{

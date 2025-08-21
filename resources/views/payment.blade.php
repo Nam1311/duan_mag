@@ -62,18 +62,23 @@
                                 <select id="city" class="tt-select" required>
                                     <option value="">Chọn thành phố</option>
                                 </select>
+                                <input type="hidden" name="city" id="city_name">
                             </div>
+
                             <div class="tt-form-group">
                                 <label for="district" class="tt-label">Quận/Huyện</label>
                                 <select id="district" class="tt-select" required>
                                     <option value="">Chọn quận/huyện</option>
                                 </select>
+                                <input type="hidden" name="district" id="district_name">
                             </div>
+
                             <div class="tt-form-group">
                                 <label for="ward" class="tt-label">Phường/Xã</label>
                                 <select id="ward" class="tt-select" required>
                                     <option value="">Chọn phường/xã</option>
                                 </select>
+                                <input type="hidden" name="ward" id="ward_name">
                             </div>
                         </div>
                     @else
@@ -148,7 +153,7 @@
                                 <div class="tt-product-title">{{ $item->productVariant->product->name ?? 'Sản phẩm không xác định' }}</div>
                                 <div class="tt-product-variant">
                                     @if($item->productVariant->size)
-                                        Size: {{ $item->productVariant->size->name }} | 
+                                        Size: {{ $item->productVariant->size->name }} |
                                     @endif
                                     @if($item->productVariant->color)
                                         Màu: {{ $item->productVariant->color->name }}
@@ -195,94 +200,98 @@
             </div>
         </form>
 
+        {{-- code mới --}}
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const citySelect = document.getElementById('city');
-                const districtSelect = document.getElementById('district');
-                const wardSelect = document.getElementById('ward');
+        document.addEventListener('DOMContentLoaded', function () {
+            const citySelect = document.getElementById('city');
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
 
-                citySelect.name = 'city';
-                districtSelect.name = 'district';
-                wardSelect.name = 'ward';
+            const cityNameInput = document.getElementById('city_name');
+            const districtNameInput = document.getElementById('district_name');
+            const wardNameInput = document.getElementById('ward_name');
 
-                fetch('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1')
-                    .then(response => response.json())
-                    .then(data => {
-                        const provinces = data.data.data;
-                        if (Array.isArray(provinces)) {
-                            provinces.forEach(province => {
+            // Load Tỉnh
+            fetch('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1')
+                .then(response => response.json())
+                .then(data => {
+                    const provinces = data.data.data;
+                    provinces.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.code;
+                        option.text = province.name_with_type;
+                        option.setAttribute("data-name", province.name_with_type);
+                        citySelect.appendChild(option);
+                    });
+                });
+
+            // Khi chọn Tỉnh
+            citySelect.addEventListener('change', function () {
+                const selected = this.selectedOptions[0];
+                if (!selected) return;
+
+                cityNameInput.value = selected.getAttribute("data-name");
+                const provinceCode = selected.value;
+
+                // Reset huyện + xã
+                districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+                wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+                districtNameInput.value = '';
+                wardNameInput.value = '';
+
+                if (provinceCode) {
+                    fetch(`https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceCode}&limit=-1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const districts = data.data.data;
+                            districts.forEach(district => {
                                 const option = document.createElement('option');
-                                option.value = province.code;
-                                option.text = province.name_with_type;
-                                citySelect.appendChild(option);
+                                option.value = district.code;
+                                option.text = district.name;
+                                option.setAttribute("data-name", district.name);
+                                districtSelect.appendChild(option);
                             });
-
-                            @if (!Auth::check() && isset($address) && $address->isNotEmpty())  
-                                @php
-                                    $defaultAddress = $address->firstWhere('is_default', true) ?? $address->first();
-                                @endphp
-                                citySelect.value = '{{ $address->province }}';
-                                districtSelect.value = '{{ $address->district }}';
-                                wardSelect.value = '{{ $address->ward }}';
-
-                                citySelect.dispatchEvent(new Event('change'));
-                                setTimeout(() => {
-                                    districtSelect.value = '{{ $address->district }}';
-                                    districtSelect.dispatchEvent(new Event('change'));
-                                    setTimeout(() => {
-                                        wardSelect.value = '{{ $address->ward }}';
-                                    }, 500);
-                                }, 500);
-                            @else
-                                console.warn("Không có địa chỉ hợp lệ hoặc người dùng chưa đăng nhập.");
-                            @endif
-                                                        } else {
-                            console.error('Expected an array but got:', provinces);
-                        }
-                    })
-                    .catch(error => console.error('Lỗi khi lấy tỉnh:', error));
-                // Sự kiện khi chọn tỉnh
-                citySelect.addEventListener('change', function () {
-                    const provinceCode = this.value;
-                    districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
-                    if (provinceCode) {
-                        fetch(`https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceCode}&limit=-1`)
-                            .then(response => response.json())
-                            .then(data => {
-                                const district = data.data.data;
-
-                                district.forEach(district => {
-                                    const option = document.createElement('option');
-                                    option.value = district.code;
-                                    option.text = district.name;
-                                    districtSelect.add(option);
-                                });
-                            })
-                            .catch(error => console.error('Lỗi khi lấy huyện:', error));
-                    }
-                });
-
-                // Sự kiện khi chọn huyện
-                districtSelect.addEventListener('change', function () {
-                    const districtCode = this.value;
-                    if (districtCode) {
-                        fetch(`https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtCode}&limit=-1`)
-                            .then(response => response.json())
-                            .then(data => {
-                                const ward = data.data.data;
-
-                                ward.forEach(ward => {
-                                    const option = document.createElement('option');
-                                    option.value = ward.code;
-                                    option.text = ward.name;
-                                    wardSelect.add(option);
-                                });
-                            })
-                            .catch(error => console.error('Lỗi khi lấy xã:', error));
-                    }
-                });
+                        });
+                }
             });
 
+            // Khi chọn Huyện
+            districtSelect.addEventListener('change', function () {
+                const selected = this.selectedOptions[0];
+                if (!selected) return;
+
+                districtNameInput.value = selected.getAttribute("data-name"); // ✅ lưu tên
+                const districtCode = selected.value;
+
+                // Reset xã
+                wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+                wardNameInput.value = '';
+
+                if (districtCode) {
+                    fetch(`https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtCode}&limit=-1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const wards = data.data.data;
+                            wards.forEach(ward => {
+                                const option = document.createElement('option');
+                                option.value = ward.code;
+                                option.text = ward.name;
+                                option.setAttribute("data-name", ward.name);
+                                wardSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+
+            // Khi chọn Xã
+            wardSelect.addEventListener('change', function () {
+                const selected = this.selectedOptions[0];
+                if (!selected) return;
+
+                wardNameInput.value = selected.getAttribute("data-name"); // ✅ lưu tên
+            });
+        });
         </script>
+        {{-- hết code mới --}}
 
 @endsection

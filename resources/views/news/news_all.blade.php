@@ -4,123 +4,95 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/tintuc.css') }}">
     <style>
-        /* Category Filter Dropdown Styles - Phiên bản căn giữa tiêu đề */
-.news-header-container {
-    display: flex;
-    justify-content: center; /* Căn giữa chính */
-    align-items: center;
-    margin-bottom: 30px;
-    position: relative; /* Tạo context cho absolute của nút lọc */
-}
+        /* CSS chung cho header */
+        .news-header-container {
+            display: flex;
+            justify-content: center;
+            /* Căn giữa chính */
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            /* Để dropdown có thể absolute theo */
+        }
 
-.news-section-title {
-    margin: 0;
-    font-size: 28px;
-    color: #333;
-    text-align: center; /* Đảm bảo văn bản căn giữa */
-}
+        /* Tiêu đề ở giữa */
+        .news-section-title {
+            text-align: center;
+            flex-grow: 1;
+            /* Chiếm không gian còn lại */
+        }
 
-.news-category-filter {
-    position: absolute;
-    right: 0; /* Đặt nút lọc sang bên phải */
-    top: 50%;
-    transform: translateY(-50%);
-    min-width: 200px;
-}
+        /* Dropdown ở bên phải */
+        .news-filter-dropdown {
+            position: absolute;
+            right: 0;
+            /* Đẩy sang hết bên phải */
+        }
 
-.news-filter-button {
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px 15px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    transition: all 0.3s ease;
-}
+        /* CSS cho dropdown */
+        .filter-dropdown-btn {
+            background-color: #f8f8f8;
+            color: #333;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
 
-.news-filter-button:hover {
-    background-color: #e9ecef;
-}
+        .filter-dropdown-btn:hover {
+            background-color: #e7e7e7;
+        }
 
-.news-filter-button i {
-    margin-left: 10px;
-    transition: transform 0.3s ease;
-}
+        .dropdown-arrow {
+            font-size: 10px;
+            margin-left: 5px;
+        }
 
-.news-filter-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0; /* Căn phải dropdown */
-    width: 100%;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 10;
-    max-height: 300px;
-    overflow-y: auto;
-    display: none;
-}
+        .filter-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-.news-filter-dropdown.show {
-    display: block;
-}
+        .filter-dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
 
-.news-filter-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+        .filter-dropdown-content a:hover {
+            background-color: #e7e7e7;
+        }
 
-.news-filter-item:hover {
-    background-color: #f8f9fa;
-}
-
-.news-filter-item.active {
-    background-color: #e9ecef;
-    font-weight: bold;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .news-header-container {
-        flex-direction: column;
-        padding-top: 40px; /* Tạo khoảng trống cho nút lọc */
-    }
-
-    .news-category-filter {
-        position: static;
-        transform: none;
-        width: 100%;
-        margin-top: 15px;
-    }
-
-    .news-filter-dropdown {
-        right: auto;
-        left: 0;
-    }
-}
+        .news-filter-dropdown:hover .filter-dropdown-content {
+            display: block;
+            z-index: 3;
+        }
     </style>
-
     <!-- Stores Section -->
     <section class="news-stores-section">
         <div class="news-container">
             <div class="news-header-container">
                 <h2 class="news-section-title">Tất cả bài viết</h2>
-                <div class="news-category-filter">
-                    <button class="news-filter-button">
-                        Lọc danh mục
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="news-filter-dropdown">
-                        <div class="news-filter-item active" data-category="all">Tất cả</div>
-                        @foreach ($categories as $category)
-                            <div class="news-filter-item" data-category="{{ $category->id }}">
-                                {{ $category->name }}
-                            </div>
+                <div class="news-filter-dropdown">
+                    <button class="filter-dropdown-btn">Lọc bài viết <span class="dropdown-arrow">▼</span></button>
+                    <div class="filter-dropdown-content">
+                        @foreach ($news_category as $cate)
+                            <a href="#">{{ $cate->name }}</a>
+                            {{-- <a href="#">Xem nhiều nhất</a>
+                            <a href="#">Theo chủ đề</a>
+                            <a href="#">Theo tác giả</a> --}}
                         @endforeach
                     </div>
                 </div>
@@ -146,7 +118,7 @@
                                 </div>
                                 <div class="news-meta-item">
                                     <i class="far fa-calendar"></i>
-                                    <span>{{ $item->posted_date }}</span>
+                                    <span>{{ $item->posted_date->format('d/m/Y') }}</span>
                                 </div>
                                 <div class="news-meta-item">
                                     {{-- <i class="fa-solid fa-eye"></i> --}}
@@ -165,4 +137,21 @@
             </div>
         </div>
     </section>
+    <script>
+        document.querySelector('.filter-dropdown-btn').addEventListener('click', function() {
+            document.querySelector('.filter-dropdown-content').classList.toggle('show');
+        });
+
+        // Đóng dropdown khi click bên ngoài
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.filter-dropdown-btn')) {
+                var dropdowns = document.querySelectorAll('.filter-dropdown-content');
+                dropdowns.forEach(function(dropdown) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

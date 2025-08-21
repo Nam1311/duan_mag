@@ -18,16 +18,12 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <div class="avatar">
-                <i class="fas fa-robot"></i>
-            </div>
             <div class="ai-info">
                 <h3>M A G Bot <span class="ai-badge">AI</span></h3>
-                <p>Trợ lý ảo thời trang thông minh</p>
+                <p>Trợ lý thời trang thông minh</p>
             </div>
-            <div class="close-chat" style="cursor: pointer">x</div>
-            <div class="clear-chat" style="cursor: pointer; margin-left: 10px; font-size: 14px; opacity: 0.8;" title="Xóa lịch sử chat">🗑️</div>
 
+            <div class="close-chat" style="cursor: pointer">X</div>
         </div>
 
         <div class="chat-messages" id="chat-messages">
@@ -47,7 +43,6 @@
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
-
 
         <div id="suggestion-list" class="suggestion-list">
             <!-- JS sẽ inject HTML gợi ý tại đây -->
@@ -73,12 +68,12 @@
             function scrollToBottom() {
                 // Multiple methods to ensure scrolling works
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                
+
                 // Fallback method
                 setTimeout(() => {
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }, 50);
-                
+
                 // Force scroll with smooth behavior
                 setTimeout(() => {
                     chatMessages.scrollTo({
@@ -114,7 +109,7 @@
                     const savedHistory = localStorage.getItem('chatHistory');
                     if (savedHistory) {
                         const messages = JSON.parse(savedHistory);
-                        
+
                         // Clear current messages except welcome message
                         const welcomeMessage = chatMessages.querySelector('.message.received.ai-response');
                         chatMessages.innerHTML = '';
@@ -166,7 +161,7 @@
                 }
                 chatMessages.appendChild(messageDiv);
                 scrollToBottom();
-                
+
                 // Save chat history after adding message
                 saveChatHistory();
             }
@@ -211,12 +206,12 @@
                                 block.classList.add('suggestion-section');
                                 block.innerHTML = data.suggestions;
                                 chatMessages.appendChild(block);
-                                
+
                                 // Auto scroll after adding suggestions
                                 setTimeout(() => {
                                     scrollToBottom();
                                 }, 100);
-                                
+
                                 // Save chat history after adding suggestions
                                 saveChatHistory();
                             }
@@ -271,7 +266,7 @@
                 clearChatBtn.addEventListener('click', function() {
                     if (confirm('Bạn có muốn xóa toàn bộ lịch sử chat không?')) {
                         localStorage.removeItem('chatHistory');
-                        
+
                         // Reset to welcome message only
                         chatMessages.innerHTML = `
                             <div class="message received ai-response">
@@ -284,7 +279,7 @@
                                 </div>
                             </div>
                         `;
-                        
+
                         // Re-bind suggestion chips
                         const newSuggestionChips = document.querySelectorAll('.suggestion-chip');
                         newSuggestionChips.forEach(chip => {
@@ -293,7 +288,7 @@
                                 sendMessage();
                             });
                         });
-                        
+
                         scrollToBottom();
                     }
                 });
