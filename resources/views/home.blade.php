@@ -232,7 +232,7 @@
                         <div class="breard"
                             style="display: flex; justify-content:space-between; align-item: center; padding: 20px 0;">
                             <h3 style="text-align: center;">Các thiết kế mới được M A G cập nhật liên tục và đa dạng mẫu mã</h3>
-                            <a class="see-all" href="/products?category[]={{ $category->id }}"
+                            <a class="see-all" href="/san-pham?category[]={{ $category->id }}"
                                 style="color: black; text-decoration: none;">
                                 Xem tất cả <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             </a>
@@ -417,7 +417,7 @@
                             <p>Đội ngũ nhân viên chuyên nghiệp, tận tâm luôn sẵn sàng hỗ trợ khách hàng 24/7. Chúng tôi cam
                                 kết chỉ bán những sản phẩm chính hãng, có nguồn gốc xuất xứ rõ ràng.</p>
                             <p>Hãy đến với chúng tôi để trải nghiệm dịch vụ tốt nhất và những ưu đãi hấp dẫn!</p>
-                            <button>Xem thêm</button>
+                            <a href="/about"><button>Xem thêm</button></a>
                         </div>
                     </div>
                 </div>
@@ -431,15 +431,13 @@
                 <div>
                     <h2 class="section-title-ab" style="margin-top: 30px">Đăng ký nhận ưu đãi</h2>
                 </div>
-                <div class="about-us" style="background-image: url('{{asset('img/slider_2.webp')}}');">
+                <div class="about-us" style="background-image: url('{{ asset('img/slider_2.webp') }}');">
                     <div class="box-log">
                         <div class="text-content">
                             <h3 class="text">Trở thành thành viên của M A G ngay hôm nay !!</h3>
                             <h2 class="text">Tận hưởng ưu đãi mua sắm hằng ngày</h2>
                             <div style="display: flex; align-item:center; justify-content: center; gap: 10px  ">
-                                <input class="input-email" style="width: 300px; height: 41px; padding: 10px; border: none;"
-                                    type="text" placeholder="Nhập email nhận ưu đãi ">
-                                <button class="btn-log">Gửi</button>
+                                <a href="{{ asset('/contact') }}"><button class="btn-log">Truy cập ngay </button></a>
                             </div>
                         </div>
                     </div>
@@ -454,27 +452,28 @@
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%">
             <h2 style="font-size: 35px; font-weight: normal; padding: 20px 0px;">Tin tức</h2>
             <div style="display: flex;align-items: center;gap: 5px; margin-top: 18px;">
-                <a class="see-all" href="" style="color: black; text-decoration: none;">Xem tất cả</a><i
+                <a class="see-all" href="/news" style="color: black; text-decoration: none;">Xem tất cả</a><i
                     class="fa fa-arrow-right" aria-hidden="true"></i>
             </div>
         </div>
         <div class="row">
-            @foreach ($news as $news)
+            @foreach ($newhome as $newhome)
                 <div class="col l-4 m-6 c-12">
                     <div class="post-item">
                         <div class="post-img">
-                            <img src="{{asset('/img/' . $news->image)}}" alt="">
+                            <img src="{{asset('/img/' . $newhome->image)}}" alt="">
                         </div>
                         <div class="post-time">
-                            {{ \Carbon\Carbon::parse($news->posted_date)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($newhome->posted_date)->format('d/m/Y') }}
                         </div>
                         <div class="post-name">
-                            <h2>{{$news->title}}</h2>
+                            <h2>{{$newhome->title}}</h2>
                         </div>
                         <div class="post-content">
-                            <p>{{$news->description}}</p>
+                            <p>{{$newhome->description}}</p>
                         </div>
-                        <button>Đọc tiếp <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                        <a href="new_detail/{{ $newhome->id }}"><button>Đọc tiếp <i class="fa fa-arrow-right" aria-hidden="true"></i></button></a>
+
                     </div>
                 </div>
             @endforeach

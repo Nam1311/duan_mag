@@ -71,6 +71,7 @@ class ProductAdminController extends Controller
             'images' => 'required|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+        // dd($request);
 
         $originalPrice = $request->original_price;
         $baseSale = $request->base_sale ?? 0;   // 👈 lấy base_sale
@@ -138,7 +139,8 @@ class ProductAdminController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Sản phẩm đã được tạo thành công!']);
+        $product->save();
+        return back()->with('success', 'Thêm sản phẩm thành công');
     }
 
     public function destroy($id)

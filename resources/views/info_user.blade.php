@@ -30,8 +30,7 @@
                 <ul>
                     <li class="active" data-section="personal"><i class="fas fa-user-circle"></i> Thông tin cá nhân</li>
                     <li data-section="address"><i class="fas fa-map-marker-alt"></i> Địa chỉ</li>
-                    <li data-section="orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</li>
-                    <li data-section="favorites"><i class="fas fa-heart"></i> Sản phẩm yêu thích</li>
+                    <li data-section="orders"><i class="fas fa-shopping-bag"></i>Lịch sử đơn hàng</li>
                 </ul>
             </div>
             <div class="user-info-content">

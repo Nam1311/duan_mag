@@ -881,6 +881,347 @@
                     opacity: 0;
                 }
             }
+
+            /* Loading Animation - đơn giản hóa */
+            .loading {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 30px 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                margin: 20px 0;
+                border: 1px solid #ddd;
+            }
+
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #e3e3e3;
+                border-top: 3px solid #007bff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+            }
+
+            .loading-text {
+                color: #007bff;
+                font-weight: 500;
+                font-size: 16px;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+
+            .loading-subtitle {
+                color: #6c757d;
+                font-size: 14px;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .ai-progress {
+                width: 100%;
+                max-width: 300px;
+                height: 4px;
+                background-color: #e9ecef;
+                border-radius: 2px;
+                overflow: hidden;
+                margin: 10px 0;
+            }
+
+            .ai-progress-bar {
+                height: 100%;
+                background: #007bff;
+                border-radius: 2px;
+                transition: width 0.3s ease;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            /* Button loading state - đơn giản */
+            #generateBtn.loading {
+                opacity: 0.7;
+                pointer-events: none;
+            }
+
+            #generateBtn.loading::before {
+                content: '⏳ ';
+            }
+
+            /* Result container - đơn giản hóa */
+            .ai-result-container {
+                background: #fff;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Button hover effects - đơn giản */
+            .copy-btn:hover {
+                background: #218838 !important;
+            }
+
+            .copy-title-btn:hover {
+                background: #138496 !important;
+            }
+
+            .fill-form-btn:hover {
+                background: #0056b3 !important;
+            }
+
+            /* Enhanced loading states */
+            .loading {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .loading::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                animation: shimmer 2s infinite;
+            }
+
+            @keyframes shimmer {
+                0% { left: -100%; }
+                100% { left: 100%; }
+            }
+
+            .loading-text {
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+
+            /* Additional animations */
+            @keyframes slideInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes zoomIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            /* Mobile responsiveness */
+            @media (max-width: 768px) {
+                .loading {
+                    padding: 20px 15px;
+                }
+                
+                .ai-result-container {
+                    margin: 10px 0;
+                    padding: 15px;
+                }
+                
+                .result-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .result-actions .adnews-btn {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+
+            /* Enhanced form styling for AI chat */
+            .form-section {
+                animation: fadeInUp 0.6s ease;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+                transition: all 0.3s ease;
+            }
+
+            .form-group:hover {
+                transform: translateX(2px);
+            }
+
+            .form-group label {
+                font-weight: 600;
+                color: #495057;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background-color: #fff;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #007bff;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+                transform: translateY(-1px);
+            }
+
+            .checkbox-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-top: 10px;
+            }
+
+            .checkbox-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+            .checkbox-item:hover {
+                background: #e9ecef;
+                transform: translateY(-1px);
+            }
+
+            .checkbox-item input[type="checkbox"] {
+                width: auto;
+                margin: 0;
+                accent-color: #007bff;
+            }
+
+            .checkbox-item label {
+                margin: 0;
+                font-weight: normal;
+                cursor: pointer;
+            }
+
+            .char-count {
+                font-size: 12px;
+                color: #6c757d;
+                text-align: right;
+                margin-top: 5px;
+                transition: color 0.3s ease;
+            }
+
+            .char-count.warning {
+                color: #ffc107;
+            }
+
+            .char-count.danger {
+                color: #dc3545;
+            }
+
+            #basicIdea {
+                min-height: 120px;
+                resize: vertical;
+            }
+
+            #generateBtn {
+                width: 100%;
+                padding: 15px 20px;
+                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            #generateBtn:hover:not(.loading) {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+                background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            }
+
+            #generateBtn:active:not(.loading) {
+                transform: translateY(0);
+            }
+
+            .ai-indicator {
+                background: linear-gradient(135deg, #e8f4fd 0%, #d4edda 100%);
+                border: 1px solid #b8daff;
+                border-radius: 8px;
+                padding: 12px 15px;
+                margin-top: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                color: #155724;
+                animation: pulse 2s ease-in-out infinite alternate;
+            }
+
+            .ai-indicator i {
+                color: #007bff;
+                animation: bounce 2s ease-in-out infinite;
+            }
+
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-3px);
+                }
+                60% {
+                    transform: translateY(-1px);
+                }
+            }
         </style>
 
 
@@ -1525,11 +1866,109 @@
             const notificationArea = document.getElementById('notificationArea');
             const ideaCount = document.getElementById('ideaCount');
             const storyImg = document.getElementById('story_img');
-            // Cập nhật số ký tự
+            // Cập nhật số ký tự với hiệu ứng
             basicIdea.addEventListener('input', function () {
-                ideaCount.textContent = `${basicIdea.value.length}/500 ký tự`;
+                const length = basicIdea.value.length;
+                const maxLength = 500;
+                const percentage = (length / maxLength) * 100;
+                
+                ideaCount.textContent = `${length}/${maxLength} ký tự`;
+                
+                // Thay đổi màu dựa trên độ dài
+                ideaCount.className = 'char-count';
+                if (percentage > 90) {
+                    ideaCount.classList.add('danger');
+                } else if (percentage > 75) {
+                    ideaCount.classList.add('warning');
+                }
+                
+                // Disable/enable button based on content
+                if (length === 0 || length > maxLength) {
+                    generateBtn.disabled = true;
+                    generateBtn.style.opacity = '0.6';
+                } else {
+                    generateBtn.disabled = false;
+                    generateBtn.style.opacity = '1';
+                }
             });
-            ideaCount.textContent = `${basicIdea.value.length}/500 ký tự`;
+            
+            // Initialize character count
+            const initialLength = basicIdea.value.length;
+            ideaCount.textContent = `${initialLength}/500 ký tự`;
+            
+            // Add form validation enhancement
+            document.addEventListener('DOMContentLoaded', function() {
+                // Add real-time validation feedback
+                const formInputs = document.querySelectorAll('#basicIdea, #genre, #length, #ageGroup');
+                
+                formInputs.forEach(input => {
+                    input.addEventListener('blur', function() {
+                        validateInput(this);
+                    });
+                    
+                    input.addEventListener('focus', function() {
+                        this.parentNode.classList.remove('error');
+                    });
+                });
+                
+                function validateInput(input) {
+                    const formGroup = input.parentNode;
+                    let isValid = true;
+                    
+                    if (input.id === 'basicIdea') {
+                        if (input.value.trim().length === 0) {
+                            isValid = false;
+                            showInputError(formGroup, 'Vui lòng nhập ý tưởng cho bài viết');
+                        } else if (input.value.length > 500) {
+                            isValid = false;
+                            showInputError(formGroup, 'Ý tưởng không được vượt quá 500 ký tự');
+                        }
+                    }
+                    
+                    if (input.id === 'length') {
+                        const value = parseInt(input.value);
+                        if (value < 1000 || value > 10000) {
+                            isValid = false;
+                            showInputError(formGroup, 'Độ dài phải từ 1000 đến 10000 ký tự');
+                        }
+                    }
+                    
+                    if (isValid) {
+                        formGroup.classList.remove('error');
+                        const errorMsg = formGroup.querySelector('.error-message');
+                        if (errorMsg) errorMsg.remove();
+                    }
+                }
+                
+                function showInputError(formGroup, message) {
+                    formGroup.classList.add('error');
+                    
+                    let errorMsg = formGroup.querySelector('.error-message');
+                    if (!errorMsg) {
+                        errorMsg = document.createElement('div');
+                        errorMsg.className = 'error-message';
+                        errorMsg.style.cssText = 'color: #dc3545; font-size: 12px; margin-top: 5px; animation: fadeInUp 0.3s ease;';
+                        formGroup.appendChild(errorMsg);
+                    }
+                    errorMsg.textContent = message;
+                }
+                
+                // Add CSS for error state
+                const style = document.createElement('style');
+                style.textContent = `
+                    .form-group.error input,
+                    .form-group.error select,
+                    .form-group.error textarea {
+                        border-color: #dc3545 !important;
+                        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+                    }
+                    
+                    .error-message {
+                        animation: fadeInUp 0.3s ease;
+                    }
+                `;
+                document.head.appendChild(style);
+            });
 
             // Xử lý sự kiện khi nhấn nút "Tạo truyện với AI"
             generateBtn.addEventListener('click', async function () {
@@ -1554,8 +1993,8 @@
                     return;
                 }
 
-                // Hiển thị loading
-                storyOutput.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                // Bắt đầu loading state
+                startLoadingAnimation();
 
                 try {
                     // Gửi yêu cầu đến backend
@@ -1577,35 +2016,525 @@
                     const data = await response.json();
 
                     if (data.error) {
+                        endLoadingAnimation();
                         showNotification(data.error, 'error');
                         storyOutput.innerHTML = '';
                     } else {
-                        const story = data.story;
-                        const imageUrl = data.image_url; // Lấy URL của ảnh từ backend
-
-
-
-                        const titleMatch = story.match(/<TIEUDE>(.*?)<\/TIEUDE>/);
-                        const contentMatch = story.match(/<NOIDUNG>(.*?)<\/NOIDUNG>/s);
-                        const title = titleMatch ? titleMatch[1] : "Câu chuyện của bạn";
-                        const content = contentMatch ? contentMatch[1] : story;
-
-
-                        const Output = `
-                                                                        <div class="story-title">${title}</div>
-                                                                         <img src="${imageUrl}" alt="Hình ảnh" style="max-width: 100%; height: auto; margin-bottom: 20px;">
-                                                                         >${content}
-                                                                    `;
-
-                        // storyImg.innerHTML = imgOutput
-                        storyOutput.innerHTML = Output;
+                        // Hiển thị kết quả với animation
+                        displayResultWithAnimation(data);
                         showNotification('Câu chuyện đã được tạo thành công!', 'success');
                     }
                 } catch (error) {
+                    endLoadingAnimation();
                     showNotification('Đã xảy ra lỗi khi kết nối đến server!', 'error');
                     storyOutput.innerHTML = '';
                 }
             });
+
+            // Hàm bắt đầu animation loading - đơn giản hóa
+            function startLoadingAnimation() {
+                // Disable button và thêm loading state
+                generateBtn.classList.add('loading');
+                generateBtn.disabled = true;
+                
+                // Hiển thị loading đơn giản
+                storyOutput.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">AI đang tạo nội dung tin tức...</div>
+                        <div class="loading-subtitle">Vui lòng chờ trong giây lát</div>
+                        <div class="ai-progress">
+                            <div class="ai-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                `;
+
+                // Animate progress bar
+                animateProgressBar();
+                
+                // Show loading notification
+                showNotification('🔄 Đang xử lý yêu cầu tạo tin tức...', 'info');
+            }
+
+            // Hàm animate progress bar - đơn giản hóa
+            function animateProgressBar() {
+                const progressBar = document.querySelector('.ai-progress-bar');
+                if (!progressBar) return;
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10 + 5; // Random increment between 5-15%
+                    if (progress > 85) progress = 85; // Don't go to 100% until actually complete
+                    
+                    progressBar.style.width = progress + '%';
+                    
+                    // Update loading text occasionally
+                    if (progress > 30 && progress < 35) {
+                        const loadingText = document.querySelector('.loading-text');
+                        if (loadingText) {
+                            loadingText.textContent = 'AI đang tạo nội dung...';
+                        }
+                    } else if (progress > 60 && progress < 65) {
+                        const loadingText = document.querySelector('.loading-text');
+                        if (loadingText) {
+                            loadingText.textContent = 'AI đang hoàn thiện bài viết...';
+                        }
+                    }
+                }, 800);
+                
+                // Store interval to clear later
+                window.progressInterval = interval;
+            }
+
+            // Hàm kết thúc animation loading
+            function endLoadingAnimation() {
+                // Enable button và remove loading state
+                generateBtn.classList.remove('loading');
+                generateBtn.disabled = false;
+                
+                // Clear progress animation
+                if (window.progressInterval) {
+                    clearInterval(window.progressInterval);
+                    window.progressInterval = null;
+                }
+                
+                // Complete progress bar
+                const progressBar = document.querySelector('.ai-progress-bar');
+                if (progressBar) {
+                    progressBar.style.width = '100%';
+                    setTimeout(() => {
+                        // Progress bar completed, will be replaced by result
+                    }, 500);
+                }
+            }
+
+            // Hàm hiển thị kết quả với animation
+            function displayResultWithAnimation(data) {
+                endLoadingAnimation();
+                
+                const story = data.story;
+                const imageUrl = data.image_url;
+
+                const titleMatch = story.match(/<TIEUDE>(.*?)<\/TIEUDE>/);
+                const contentMatch = story.match(/<NOIDUNG>(.*?)<\/NOIDUNG>/s);
+                const title = titleMatch ? titleMatch[1] : "Câu chuyện của bạn";
+                const content = contentMatch ? contentMatch[1] : story;
+                
+                // Create result HTML với thiết kế đơn giản hơn
+                let resultHTML = `
+                    <div class="ai-result-container">
+                        <div class="result-header">
+                            <h3 style="color: #28a745; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-check-circle"></i> Tin tức đã được tạo thành công!
+                            </h3>
+                        </div>
+                `;
+                
+                if (title && title !== "Câu chuyện của bạn") {
+                    resultHTML += `
+                        <div class="story-title-section" style="margin-bottom: 20px;">
+                            <h4 style="color: #007bff; margin-bottom: 10px;">Tiêu đề:</h4>
+                            <div class="story-title" style="
+                                font-size: 1.3rem; 
+                                font-weight: 600; 
+                                color: #333; 
+                                background: #f8f9fa; 
+                                padding: 15px; 
+                                border-radius: 8px;
+                                border-left: 4px solid #007bff;
+                            ">${title}</div>
+                        </div>
+                    `;
+                }
+                
+                if (imageUrl) {
+                    resultHTML += `
+                        <div class="result-image" style="margin-bottom: 20px; text-align: center;">
+                            <h4 style="color: #007bff; margin-bottom: 10px;">Hình ảnh:</h4>
+                            <img src="${imageUrl}" alt="Generated Image" 
+                                 style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #ddd;">
+                        </div>
+                    `;
+                }
+                
+                resultHTML += `
+                        <div class="result-content" style="margin-bottom: 20px;">
+                            <h4 style="color: #007bff; margin-bottom: 10px;">Nội dung bài viết:</h4>
+                            <div class="content-text" style="
+                                background: #fff; 
+                                padding: 20px; 
+                                border: 1px solid #ddd;
+                                border-radius: 8px; 
+                                line-height: 1.6;
+                                color: #333;
+                                white-space: pre-wrap;
+                            ">${content}</div>
+                        </div>
+                        <div class="result-actions" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="copy-btn" data-text="${content.replace(/"/g, '&quot;')}" 
+                                    style="
+                                        background: #28a745; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 10px 20px; 
+                                        border-radius: 6px; 
+                                        cursor: pointer;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        font-size: 14px;
+                                        transition: background 0.3s ease;
+                                    ">
+                                <i class="fas fa-copy"></i> Sao chép nội dung
+                            </button>
+                            <button class="copy-title-btn" data-text="${title.replace(/"/g, '&quot;')}" 
+                                    style="
+                                        background: #17a2b8; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 10px 20px; 
+                                        border-radius: 6px; 
+                                        cursor: pointer;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        font-size: 14px;
+                                        transition: background 0.3s ease;
+                                    ">
+                                <i class="fas fa-copy"></i> Sao chép tiêu đề
+                            </button>
+                            <button class="fill-form-btn" data-title="${title.replace(/"/g, '&quot;')}" data-content="${content.replace(/"/g, '&quot;')}" 
+                                    style="
+                                        background: #007bff; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 10px 20px; 
+                                        border-radius: 6px; 
+                                        cursor: pointer;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                        font-size: 14px;
+                                        transition: background 0.3s ease;
+                                    ">
+                                <i class="fas fa-edit"></i> Đưa vào form thêm tin
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                storyOutput.innerHTML = resultHTML;
+                
+                // Simple fade in animation
+                const resultContainer = document.querySelector('.ai-result-container');
+                if (resultContainer) {
+                    resultContainer.style.opacity = '0';
+                    resultContainer.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        resultContainer.style.transition = 'all 0.3s ease';
+                        resultContainer.style.opacity = '1';
+                        resultContainer.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+                
+                // Add hover effects for buttons
+                document.querySelectorAll('.copy-btn, .copy-title-btn, .fill-form-btn').forEach(btn => {
+                    btn.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-1px)';
+                        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                    });
+                    btn.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = 'none';
+                    });
+                });
+                
+                // Add click event listeners
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const text = this.getAttribute('data-text');
+                        copyToClipboard(text, this);
+                    });
+                });
+                
+                document.querySelectorAll('.copy-title-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const text = this.getAttribute('data-text');
+                        copyToClipboard(text, this);
+                    });
+                });
+                
+                document.querySelectorAll('.fill-form-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const title = this.getAttribute('data-title');
+                        const content = this.getAttribute('data-content');
+                        fillNewsForm(title, content, this);
+                    });
+                });
+            }
+
+            // Hàm copy to clipboard cải thiện
+            window.copyToClipboard = function(text, buttonElement) {
+                console.log('Copy function called with text:', text);
+                
+                // Remove HTML tags for plain text copy
+                const plainText = text.replace(/<[^>]*>/g, '').trim();
+                console.log('Plain text to copy:', plainText);
+                
+                // Get button element if not provided
+                if (!buttonElement) {
+                    buttonElement = document.activeElement || event?.target?.closest('button');
+                }
+                
+                // Fallback method for older browsers
+                if (!navigator.clipboard) {
+                    console.log('Using fallback copy method');
+                    // Create temporary textarea
+                    const textArea = document.createElement('textarea');
+                    textArea.value = plainText;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    try {
+                        const successful = document.execCommand('copy');
+                        textArea.remove();
+                        if (successful) {
+                            showCopySuccess(buttonElement);
+                        } else {
+                            showCopyError();
+                        }
+                    } catch (err) {
+                        console.error('Copy failed:', err);
+                        textArea.remove();
+                        showCopyError();
+                    }
+                } else {
+                    console.log('Using modern clipboard API');
+                    // Modern clipboard API
+                    navigator.clipboard.writeText(plainText).then(function() {
+                        console.log('Copy successful');
+                        showCopySuccess(buttonElement);
+                    }, function(err) {
+                        console.error('Copy failed:', err);
+                        showCopyError();
+                    });
+                }
+                
+                function showCopySuccess(btn) {
+                    showNotification('✅ Đã sao chép vào clipboard!', 'success');
+                    // Visual feedback on button
+                    if (btn) {
+                        const originalBg = btn.style.background;
+                        const originalText = btn.innerHTML;
+                        btn.style.background = '#28a745';
+                        btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!';
+                        setTimeout(() => {
+                            btn.style.background = originalBg;
+                            btn.innerHTML = originalText;
+                        }, 2000);
+                    }
+                }
+                
+                function showCopyError() {
+                    showNotification('❌ Không thể sao chép. Vui lòng thử lại!', 'error');
+                }
+            };
+
+            // Hàm fill vào form thêm tin cải thiện
+            window.fillNewsForm = function(title, content, buttonElement) {
+                console.log('Fill form function called with:', { title, content });
+                
+                // Clean text from HTML tags
+                const cleanTitle = title.replace(/<[^>]*>/g, '').trim();
+                const cleanContent = content.replace(/<[^>]*>/g, '').trim();
+                
+                console.log('Cleaned data:', { cleanTitle, cleanContent });
+                
+                // Get button element if not provided
+                if (!buttonElement) {
+                    buttonElement = document.activeElement || event?.target?.closest('button');
+                }
+                
+                // Show loading state
+                if (buttonElement) {
+                    const originalText = buttonElement.innerHTML;
+                    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                    buttonElement.disabled = true;
+                    
+                    // Restore button after process
+                    setTimeout(() => {
+                        buttonElement.innerHTML = originalText;
+                        buttonElement.disabled = false;
+                    }, 3000);
+                }
+                
+                // Switch to news list tab first
+                const listTab = document.querySelector('[data-tab="adnews-list"]');
+                if (listTab) {
+                    console.log('Switching to list tab');
+                    listTab.click();
+                    showNotification('🔄 Đang chuyển đến form thêm tin tức...', 'info');
+                } else {
+                    console.error('List tab not found');
+                }
+                
+                // Open add modal after tab switch
+                setTimeout(() => {
+                    try {
+                        console.log('Attempting to open add modal');
+                        
+                        // Check if openAddModal function exists
+                        if (typeof openAddModal === 'function') {
+                            openAddModal();
+                            showNotification('📝 Đã mở form thêm tin tức!', 'info');
+                        } else {
+                            console.error('openAddModal function not found');
+                            // Try alternative method
+                            const addBtn = document.querySelector('.adnews-btn.adnews-btn-primary[onclick="openAddModal(\'\')"]');
+                            if (addBtn) {
+                                addBtn.click();
+                            } else {
+                                showNotification('❌ Không thể mở form thêm tin!', 'error');
+                                return;
+                            }
+                        }
+                        
+                        // Fill form fields after modal opens
+                        setTimeout(() => {
+                            console.log('Attempting to fill form fields');
+                            let fieldsUpdated = 0;
+                            
+                            // Check if modal is open
+                            const modal = document.querySelector('#addModal');
+                            if (!modal || modal.style.display === 'none') {
+                                console.error('Modal is not open');
+                                showNotification('❌ Form chưa được mở!', 'error');
+                                return;
+                            }
+                            
+                            // Fill title
+                            const titleField = document.querySelector('#addModal input[name="title"]');
+                            if (titleField) {
+                                titleField.value = cleanTitle;
+                                titleField.style.background = '#e8f5e8';
+                                setTimeout(() => titleField.style.background = '', 2000);
+                                fieldsUpdated++;
+                                console.log('Title field updated');
+                            } else {
+                                console.error('Title field not found');
+                            }
+                            
+                            // Fill content
+                            const contentField = document.querySelector('#addModal textarea[name="content"]');
+                            if (contentField) {
+                                contentField.value = cleanContent;
+                                contentField.style.background = '#e8f5e8';
+                                setTimeout(() => contentField.style.background = '', 2000);
+                                fieldsUpdated++;
+                                console.log('Content field updated');
+                            } else {
+                                console.error('Content field not found');
+                            }
+                            
+                            // Fill author (optional)
+                            const authorField = document.querySelector('#addModal input[name="author"]');
+                            if (authorField && !authorField.value) {
+                                authorField.value = 'AI Generator';
+                                fieldsUpdated++;
+                                console.log('Author field updated');
+                            }
+                            
+                            // Set current date
+                            const dateField = document.querySelector('#addModal input[name="posted_date"]');
+                            if (dateField && !dateField.value) {
+                                const now = new Date();
+                                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                                    .toISOString().slice(0, 16);
+                                dateField.value = localDateTime;
+                                fieldsUpdated++;
+                                console.log('Date field updated');
+                            }
+                            
+                            if (fieldsUpdated > 0) {
+                                showNotification(`✅ Đã điền ${fieldsUpdated} trường vào form!`, 'success');
+                                console.log(`Successfully updated ${fieldsUpdated} fields`);
+                                
+                                // Scroll to top of modal to show filled content
+                                const modal = document.querySelector('#addModal');
+                                if (modal) {
+                                    modal.scrollTop = 0;
+                                }
+                                
+                                // Focus on title field
+                                if (titleField) {
+                                    titleField.focus();
+                                    titleField.select();
+                                }
+                            } else {
+                                showNotification('⚠️ Không tìm thấy form để điền!', 'warning');
+                                console.error('No fields were updated');
+                            }
+                        }, 1000); // Increased timeout to 1 second
+                        
+                    } catch (error) {
+                        console.error('Error opening add modal:', error);
+                        showNotification('❌ Có lỗi khi mở form thêm tin!', 'error');
+                    }
+                }, 500); // Increased timeout for tab switch
+            };
+
+            // Debug function to check form elements
+            window.debugFormElements = function() {
+                console.log('=== DEBUG FORM ELEMENTS ===');
+                
+                const modal = document.querySelector('#addModal');
+                console.log('Modal element:', modal);
+                console.log('Modal display style:', modal ? modal.style.display : 'Modal not found');
+                
+                const titleField = document.querySelector('#addModal input[name="title"]');
+                console.log('Title field:', titleField);
+                
+                const contentField = document.querySelector('#addModal textarea[name="content"]');
+                console.log('Content field:', contentField);
+                
+                const authorField = document.querySelector('#addModal input[name="author"]');
+                console.log('Author field:', authorField);
+                
+                const dateField = document.querySelector('#addModal input[name="posted_date"]');
+                console.log('Date field:', dateField);
+                
+                const listTab = document.querySelector('[data-tab="adnews-list"]');
+                console.log('List tab:', listTab);
+                
+                console.log('openAddModal function:', typeof openAddModal);
+                
+                console.log('=== END DEBUG ===');
+            };
+
+            // Test functions for debugging
+            window.testCopy = function() {
+                console.log('Testing copy function...');
+                copyToClipboard('Test copy content from console');
+            };
+
+            window.testFillForm = function() {
+                console.log('Testing fill form function...');
+                fillNewsForm('Test Title from Console', 'Test Content for the form from console');
+            };
+
+            // Console instructions
+            console.log(`
+=== DEBUG INSTRUCTIONS ===
+Để debug các chức năng, bạn có thể chạy trong console:
+1. debugFormElements() - Kiểm tra các phần tử form
+2. testCopy() - Test chức năng sao chép
+3. testFillForm() - Test chức năng điền form
+===========================
+            `);
 
             // Hàm hiển thị thông báo sử dụng toast system của web
             function showNotification(message, type = 'info') {

@@ -156,24 +156,15 @@ class ProductController extends Controller
         }
 
         $productAll = Products::with('thumbnail')
-            ->where('name', 'like', '%' . $keyword . '%')
-            ->select('id', 'name', 'sale', 'price', 'original_price')
-            ->paginate(12)
-            ->appends(['keyword' => $keyword]);
+        ->where('name', 'like', '%' . $keyword . '%')
+        ->select('id', 'name', 'base_sale', 'sale', 'price', 'original_price') // 👈 thêm base_sale
+        ->where('is_active', '>', 0)
+        ->paginate(12)
+        ->appends(['keyword' => $keyword]);
+
 
         $total = $productAll->total();
 
         return view('searchpage', compact('productAll', 'total', 'keyword'));
     }
-
-    // tăng lượt xem
-    // public function detail($id)
-    // {
-    //     $product = Products::findOrFail($id);
-
-    //     $product->increment('views');
-
-    //     return view('product');
-    // }
-
 }

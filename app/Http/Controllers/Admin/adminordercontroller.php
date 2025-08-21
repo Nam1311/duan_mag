@@ -7,6 +7,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use App\Mail\OrderStatusChanged;
+use Illuminate\Support\Facades\Mail;
 
 class AdminOrderController extends Controller
 {
@@ -68,12 +70,12 @@ class AdminOrderController extends Controller
         try {
             $order = Order::findOrFail($id);
             if ($order->status !== 'Đã hủy') {
-                return redirect()->route('admin.orders.index');
+                return redirect()->route('admin.orders.index')->with('error', 'Chỉ có thể xóa đơn hàng có trạng thái "Đã hủy"!');
             }
             $order->delete();
-            return redirect()->route('admin.orders.index');
+            return redirect()->route('admin.orders.index')->with('success', 'Xóa mềm đơn hàng thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.orders.index');
+            return redirect()->route('admin.orders.index')->with('error', 'Không tìm thấy đơn hàng hoặc lỗi khi xóa!');
         }
     }
 
@@ -82,46 +84,42 @@ class AdminOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'status' => 'required|in:Chờ xác nhận,Đã xác nhận,Đang giao hàng,Thành công,Đã hủy,Hoàn hàng',
+        ]);
+
         try {
-            $order = Order::findOrFail($id);
+            $order = Order::with('user')->findOrFail($id);
+            $oldStatus = $order->status;
 
-            $progressOrder = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao hàng', 'Thành công'];
-            $currentStatus = $order->status;
-            $currentIndex = array_search($currentStatus, $progressOrder);
+            // Định nghĩa thứ tự trạng thái hợp lệ
+            $statusOrder = [
+                'Chờ xác nhận' => 1,
+                'Đã xác nhận' => 2,
+                'Đang giao hàng' => 3,
+                'Thành công' => 4,
+                'Đã hủy' => 4,
+                'Hoàn hàng' => 4,
+            ];
 
-            if ($request->has('progress')) {
-                // Xử lý tiến trạng thái khi checkbox được tích
-                if ($currentIndex !== false && $currentIndex < 3) {
-                    $newStatus = $progressOrder[$currentIndex + 1];
-                    $order->status = $newStatus;
-                    $order->save();
-                    return redirect()->route('admin.orders.index');
-                } else {
-                    return redirect()->route('admin.orders.index');
-                }
-            } else {
-                // Xử lý cập nhật trạng thái thông thường từ select
-                $request->validate([
-                    'status' => 'required|in:Chờ xác nhận,Đã xác nhận,Đang giao hàng,Thành công,Đã hủy,Hoàn hàng',
-                ]);
-
-                $newStatus = $request->status;
-                $newIndex = array_search($newStatus, $progressOrder);
-
-                if (in_array($order->status, ['Thành công', 'Đang giao hàng']) && $newStatus === 'Đã hủy') {
-                    return redirect()->route('admin.orders.index')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
-                }
-
-                // Ngăn chặn quay ngược trạng thái tiến bộ
-                if ($currentIndex !== false && $newIndex !== false && $newIndex < $currentIndex) {
-                    return redirect()->route('admin.orders.index')->with('error', 'Không thể quay ngược trạng thái đơn hàng!');
-                }
-
-                $order->status = $newStatus;
-                $order->save();
-
-                return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
+            // Kiểm tra nếu trạng thái mới nhỏ hơn trạng thái hiện tại
+            if ($statusOrder[$request->status] < $statusOrder[$oldStatus]) {
+                return redirect()->route('admin.orders.index')->with('error', 'Không thể thay đổi trạng thái ngược về trước!');
             }
+
+            if (in_array($order->status, ['Thành công', 'Đang giao hàng']) && $request->status === 'Đã hủy') {
+                return redirect()->route('admin.orders.index')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
+            }
+
+            $order->status = $request->status;
+            $order->save();
+
+            // Gửi mail nếu có user và email
+            if ($order->user && $order->user->email) {
+                Mail::to($order->user->email)->send(new OrderStatusChanged($order, $oldStatus, $order->status));
+            }
+
+            return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công và đã gửi email!');
         } catch (\Exception $e) {
             return redirect()->route('admin.orders.index')->with('error', 'Lỗi khi cập nhật trạng thái đơn hàng!');
         }
@@ -141,8 +139,8 @@ class AdminOrderController extends Controller
                 'orderDetails.productVariant.color'
             ])->findOrFail($id);
 
-            // Lấy cột orders.address (string)
-            $orderAddressString = $order->getAttribute('address') ?? 'Không xác định';
+            // Lấy cột orders.address_text (string)
+            $orderAddressString = $order->getAttribute('address_text') ?? 'Không xác định';
 
             // Lấy quan hệ addresses
             $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);
@@ -174,7 +172,7 @@ class AdminOrderController extends Controller
                 'orderDetails.productVariant.color'
             ])->findOrFail($id);
 
-            $orderAddressString = $order->getAttribute('address') ?? 'Không xác định';
+            $orderAddressString = $order->getAttribute('address_text') ?? 'Không xác định';
             $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);
             $order->address_details = $this->fetchAddressDetails($order);
 
@@ -196,7 +194,7 @@ class AdminOrderController extends Controller
         // Khởi tạo giá trị mặc định
         $receiver_name = 'Không xác định';
         $phone = 'Không xác định';
-        $address = $order->address ?? 'Không xác định';
+        $address = $order->address_text ?? 'Không xác định';
 
         // Lấy quan hệ address
         $addressRelation = $order->getRelation('address') ?? ($order->address_id ? $order->load('address')->getRelation('address') : null);
