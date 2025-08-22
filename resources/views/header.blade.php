@@ -145,17 +145,13 @@
                                         @endif
                                     @endauth
                                     <li>
-                                        <style>
-                                            .form-logout>.btn-logout{
-                                                border: none;
-                                                background-color: white;
-                                                cursor: pointer;
-                                                font-size: 15px
-                                            }
-                                        </style>
-                                        <form class="form-logout" method="POST" action="{{ route('logout') }}">
+                                        <a href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            <i class="fa fa-sign-out" aria-hidden="true"></i>    Đăng xuất
+                                        </a>
+
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                             @csrf
-                                            <button class="btn-logout" type="submit">Đăng xuất</button>
                                         </form>
                                     </li>
                                 @endauth

@@ -264,6 +264,9 @@
                                                                     <img src="{{ asset('img/kocoanh.png') }}" alt="no ảnh ok like" width="150">
                                                                 @endif
                                                             </a>
+                                                            @if($productItem->sale > $productItem->base_sale)
+                                                                <span class="item-flash-sale">Flash sale!!</span>
+                                                            @endif
                                                             <div class="item-select-variant">
                                                                 <a class="a-buy-now"
                                                                 data-id="{{ $productItem->id }}"
