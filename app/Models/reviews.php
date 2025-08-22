@@ -46,4 +46,5 @@ public function replies()
     {
         return $this->replies()->with('nestedReplies', 'user');
     }
+    
 }

@@ -51,7 +51,9 @@ use App\Http\Middleware\CheckNewsManager;
 use App\Http\Middleware\CheckProductsManager;
 use App\Models\Products;
 use App\Models\product_variants;
-
+// thông báo
+use App\Http\Controllers\NotificationController;
+// 
 Route::get('about', function () {
     return view('about');
 });
@@ -88,6 +90,7 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 
 // kiểm trạng thái đăng nhập
 Route::middleware('auth')->group(function () {
+    // mạnh thông báo
 
     // mạnh trang info {
     Route::get('infouser', [UserInFoController::class, 'ShowInFo'])->middleware('auth')->name('infouser');

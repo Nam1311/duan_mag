@@ -6,32 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class VoucherAdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $vouchers = Voucher::paginate(5);
-        return view(
-            'admin.khuyenmai',['vouchers' => $vouchers,]);
-        }
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('admin.khuyenmai', ['vouchers' => $vouchers]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,86 +27,61 @@ class VoucherAdminController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $exists = Voucher::where('code', $validated['code'])
-            ->exists();
-
         if (Voucher::where('code', $validated['code'])->exists()) {
             return redirect()->back()->with('error', 'Voucher bạn tạo đã tồn tại!');
         }
 
+        $voucher = Voucher::create($validated);
 
-        $voucher = new Voucher();
-        $voucher->code = $validated['code'];
-        $voucher->discount_amount = $validated['discount_amount'];
-        $voucher->start_date = $validated['start_date'];
-        $voucher->expiration_date = $validated['expiration_date'];
-        $voucher->quantity = $validated['quantity'] ?? 0; // nếu null thì gán 0
-        $voucher->value_type = $validated['value_type'];
-        $voucher->save();
+        // 🔔 Thêm notification mới khi tạo voucher
+        DB::table('notifications')->insert([
+            'type'       => 'voucher',
+            'title'      => 'Voucher mới',
+            'message'    => "Voucher {$voucher->code} đã được tạo thành công!",
+            'voucher_id' => $voucher->id,
+            'is_read'    => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return redirect()->back()->with('success', 'Thêm voucher thành công!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-
-        $exists = Voucher::where('code', $request->code)
-            ->where('id', '!=', $id) // khác code
-            ->exists();
-
-        if ($exists) {
-            return back()
-                ->with('error', 'Mã voucher đã tồn tại.')
-                ->withInput();
+        if (Voucher::where('code', $request->code)->where('id', '!=', $id)->exists()) {
+            return back()->with('error', 'Mã voucher đã tồn tại.')->withInput();
         }
-        $validated = $request->validate(
-            [
-                'code' => [
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('vouchers')->ignore($id), // bỏ qua voucher trùng id
-                ],
-                'discount_amount' => 'required|numeric|min:0',
-                'value_type' => 'required|in:percent,fixed',
-                'start_date' => 'required|date',
-                'expiration_date' => 'required|date|after_or_equal:start_date',
-                'quantity' => 'required|integer|min:1',
-            ]
-        );
 
+        $validated = $request->validate([
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('vouchers')->ignore($id),
+            ],
+            'discount_amount' => 'required|numeric|min:0',
+            'value_type' => 'required|in:percent,fixed',
+            'start_date' => 'required|date',
+            'expiration_date' => 'required|date|after_or_equal:start_date',
+            'quantity' => 'required|integer|min:1',
+        ]);
 
         $voucher = Voucher::findOrFail($id);
-
         $voucher->update($validated);
 
-        return redirect()->route('admin.vouchers.index')
-            ->with('success', 'Cập nhật khuyến mãi thành công!');
+        // 🔔 Cập nhật notification có sẵn thay vì tạo mới
+        DB::table('notifications')
+            ->where('voucher_id', $voucher->id)
+            ->update([
+                'title'      => 'Cập nhật voucher',
+                'message'    => "Voucher {$voucher->code} đã được cập nhật!",
+                'updated_at' => now(),
+            ]);
+
+        return redirect()->route('admin.vouchers.index')->with('success', 'Cập nhật khuyến mãi thành công!');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $voucher = Voucher::find($id);
@@ -131,10 +90,20 @@ class VoucherAdminController extends Controller
             return redirect()->back()->with('error', 'Voucher không tồn tại.');
         }
 
+        $code = $voucher->code;
         $voucher->delete();
+
+        // 🔔 Thay vì xóa notification -> cập nhật thành “Voucher hết hạn”
+        DB::table('notifications')
+            ->where('voucher_id', $id)
+            ->update([
+                'title'      => 'Voucher hết hạn',
+                'message'    => "Voucher {$code} đã hết hạn hoặc bị xóa!",
+                'updated_at' => now(),
+            ]);
+
         return redirect()->back()->with('success', 'Xóa voucher thành công.');
     }
-
 
     public function search(Request $request)
     {
@@ -145,11 +114,9 @@ class VoucherAdminController extends Controller
             ->orWhere('discount_amount', 'like', '%' . $keyword . '%')
             ->paginate(5);
 
-        $data = [
+        return view('admin.khuyenmai', [
             'vouchers' => $vouchers,
-            'keyword' => $keyword
-        ];
-
-        return view('admin.khuyenmai', $data);
+            'keyword'  => $keyword
+        ]);
     }
 }

@@ -14,7 +14,6 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable,SoftDeletes;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -67,4 +66,5 @@ protected $fillable = [
         // return $this->role === UserRole::ADMIN->value;
         return $this->hasOne(addresses::class); // nếu mỗi user chỉ có 1 địa chỉ
     }
+    
 }

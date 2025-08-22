@@ -125,6 +125,11 @@
 
                 <div class="favourite-container">
                     <a href="{{asset('/wishlist')}}"><i class="fa fa-heart" style="color: red; font-size: 26px;"></i></a>
+
+
+
+
+
                     <div id="thongbaou-notification-system">
                         <!-- Notification bell -->
                         <button id="thongbaou-notificationBell" aria-label="Thông báo">
@@ -309,6 +314,10 @@
                         </div>
                     </div>
                 
+
+
+
+                    
                 </div>
 
 
@@ -582,3 +591,4 @@
             }
         });
     </script>
+  

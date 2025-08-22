@@ -229,32 +229,45 @@ $reviewDetail = reviews::with([
         return view('detail', $data);
     }
 // ReviewController.php
- public function reply(Request $request)
-    {
-        $request->validate([
-            'parent_id' => 'required|exists:reviews,id',
-            'comment' => 'required|string|max:1000',
-        ]);
+public function reply(Request $request)
+{
+    $request->validate([
+        'parent_id' => 'required|exists:reviews,id',
+        'comment' => 'required|string|max:1000',
+    ]);
 
-        $userId = Auth::id();
-        if (!$userId) {
-            return redirect()->back()->withErrors('Bạn cần đăng nhập để gửi phản hồi.');
-        }
-
-        $parentReview = reviews::findOrFail($request->parent_id);
-
-        reviews::create([
-            'product_id' => $parentReview->product_id,
-            'parent_id' => $request->parent_id,
-            'user_id' => $userId,
-            'comment' => $request->comment,
-            'rating' => null,
-        ]);
-
-        return redirect()->back()->with('success', 'Phản hồi của bạn đã được gửi thành công!');
+    $userId = Auth::id();
+    if (!$userId) {
+        return redirect()->back()->withErrors('Bạn cần đăng nhập để gửi phản hồi.');
     }
 
+    $parentReview = reviews::findOrFail($request->parent_id);
 
+    // Tạo phản hồi
+    $reply = reviews::create([
+        'product_id' => $parentReview->product_id,
+        'parent_id' => $request->parent_id,
+        'user_id' => $userId,
+        'comment' => $request->comment,
+        'rating' => null,
+    ]);
+
+    // Lưu notification nếu người trả lời khác người tạo review gốc
+    if ($parentReview->user_id != $userId) {
+        DB::table('notifications')->insert([
+            'user_id'    => $parentReview->user_id, // người nhận thông báo
+            'review_id'  => $parentReview->id,     // review gốc
+            'type'       => 'reply_review',
+            'title'      => 'Có phản hồi mới',
+            'message'    => "User " . Auth::user()->name . " đã trả lời bình luận của bạn: '{$request->comment}'",
+            'is_read'    => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Phản hồi của bạn đã được gửi thành công!');
+}
 
     public function getVariantQuantity(Request $request)
     {
