@@ -24,10 +24,15 @@ class PageController extends Controller
 {
     public function home()
     {
-        $products_sale = Products::with(['images', 'variants'])->where('products.sale', '>', 15)->take(8)->get();
+        $products_sale = Products::with(['images', 'variants'])
+            ->where('is_active', '>', 0)
+            ->where('products.sale', '>', 15)
+            ->take(8)
+            ->get();
         $products_is_featured = Products::with(['images', 'variants'])
+            ->where('is_active', '>', 0)
             ->orderBy('views', 'desc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'views')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'views', 'base_sale')
             ->take(8)->get();
         $product_categories = Product_categories::all();
         $newhome = News::where('status', '=', 'Đã xuất bản')->orderBy('posted_date', 'desc')->take(6)->get();
@@ -43,7 +48,7 @@ class PageController extends Controller
                 'variants'
             ])
             ->orderBy('sold_count', 'desc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'base_sale')
             ->where('is_active', '>', 0)
             ->take(8)
             ->get();

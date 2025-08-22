@@ -49,6 +49,15 @@
                                     @endif
                                 @endauth
                                 <button class="user-info-edit-btn" data-modal="personal"><i class="fas fa-edit"></i> Chỉnh sửa</button>
+                                <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                     <button class="user-info-edit-btn">
+                                        <i class="fa fa-sign-out" aria-hidden="true"></i>   Đăng xuất
+                                     </button>
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
                             </div>
                         </div>
                         <div class="user-info-section-content">

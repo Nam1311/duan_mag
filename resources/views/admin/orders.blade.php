@@ -9,7 +9,7 @@
                 <form action="{{ route('admin.orders.index') }}" method="GET" id="search-form">
                     <i class="fas fa-search"></i>
                     <input type="text" name="search" id="order-search"
-                        placeholder="Tìm kiếm tên khách hàng, số điện thoại..." value="{{ request('search') }}" />
+                           placeholder="Tìm kiếm tên khách hàng, số điện thoại..." value="{{ request('search') }}" />
                     <button type="submit" style="display: none;">Tìm kiếm</button>
                 </form>
             </div>
@@ -28,14 +28,10 @@
             <form action="{{ route('admin.orders.index') }}" method="GET" id="status-filter-form">
                 <label for="status-filter">Lọc theo trạng thái:</label>
                 <select name="status" id="status-filter" class="aorders-form-control" onchange="this.form.submit()">
-                    <option value="all" {{ request('status') == 'all' || !request('status') ? 'selected' : '' }}>Tất cả
-                        trạng thái</option>
-                    <option value="Chờ xác nhận" {{ request('status') == 'Chờ xác nhận' ? 'selected' : '' }}>Chờ xác nhận
-                    </option>
-                    <option value="Đã xác nhận" {{ request('status') == 'Đã xác nhận' ? 'selected' : '' }}>Đã xác nhận
-                    </option>
-                    <option value="Đang giao hàng" {{ request('status') == 'Đang giao hàng' ? 'selected' : '' }}>Đang giao
-                        hàng</option>
+                    <option value="all" {{ request('status') == 'all' || !request('status') ? 'selected' : '' }}>Tất cả trạng thái</option>
+                    <option value="Chờ xác nhận" {{ request('status') == 'Chờ xác nhận' ? 'selected' : '' }}>Chờ xác nhận</option>
+                    <option value="Đã xác nhận" {{ request('status') == 'Đã xác nhận' ? 'selected' : '' }}>Đã xác nhận</option>
+                    <option value="Đang giao hàng" {{ request('status') == 'Đang giao hàng' ? 'selected' : '' }}>Đang giao hàng</option>
                     <option value="Thành công" {{ request('status') == 'Thành công' ? 'selected' : '' }}>Thành công</option>
                     <option value="Đã hủy" {{ request('status') == 'Đã hủy' ? 'selected' : '' }}>Đã hủy</option>
                     <option value="Hoàn hàng" {{ request('status') == 'Hoàn hàng' ? 'selected' : '' }}>Hoàn hàng</option>
@@ -43,31 +39,17 @@
 
                 <label for="start_date">Từ ngày:</label>
                 <input type="date" name="start_date" id="start_date" class="aorders-form-control"
-                    value="{{ request('start_date') }}" onchange="this.form.submit()" />
+                       value="{{ request('start_date') }}" onchange="this.form.submit()" />
 
                 <label for="end_date">Đến ngày:</label>
                 <input type="date" name="end_date" id="end_date" class="aorders-form-control"
-                    value="{{ request('end_date') }}" onchange="this.form.submit()" />
+                       value="{{ request('end_date') }}" onchange="this.form.submit()" />
 
                 <button type="submit" style="display: none;">Lọc</button>
             </form>
         </div>
 
         <div class="aorders-data-card">
-            {{-- @if (session('success'))
-            <div class="aorders-toast aorders-toast-success show">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="aorders-toast aorders-toast-error show">
-                <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-            </div>
-        @endif --}}
-
-            <!-- Debug: Kiểm tra dữ liệu orders (bỏ chú thích nếu cần) -->
-            {{-- <pre>{{ print_r($orders->toArray(), true) }}</pre> --}}
-
             <table class="aorders-data-table">
                 <thead>
                     <tr>
@@ -92,11 +74,8 @@
                                 'Hoàn hàng' => 'purple',
                             ];
                             $color = $statusColors[$order->status] ?? 'dark';
-                            // Lấy tên khách hàng
-                            $customerName = !empty($order->address_details['receiver_name']) ? $order->address_details['receiver_name'] : 'Không xác định';
-                            // Lấy số điện thoại
-                            $phone = !empty($order->address_details['phone']) ? $order->address_details['phone'] : 'Không xác định';
-                            // Định nghĩa trạng thái tiếp theo
+                            $customerName = !empty($order->name) ? $order->name : 'Không xác định';
+                            $phone = !empty($order->phone) ? $order->phone : 'Không xác định';
                             $nextStatus = null;
                             if ($order->status == 'Chờ xác nhận') {
                                 $nextStatus = 'Đã xác nhận';
@@ -133,7 +112,6 @@
                                 @endif
                             </td>
                             <td>
-
                                 <form action="{{ route('admin.orders.softDelete', $order->id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
@@ -142,7 +120,7 @@
                                     </button>
                                 </form>
                                 <a href="{{ route('admin.orders.show', $order->id) }}" class="aorders-btn aorders-btn-primary">Xem</a>
-                              @if ($nextStatus)
+                                @if ($nextStatus)
                                     <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('PUT')
@@ -203,8 +181,7 @@
                     btn.addEventListener("click", () => {
                         currentPage = i;
                         renderPage();
-                        document.querySelectorAll(".aorders-pagination-btn").forEach((b) => b.classList
-                            .remove("active"));
+                        document.querySelectorAll(".aorders-pagination-btn").forEach((b) => b.classList.remove("active"));
                         btn.classList.add("active");
                     });
                     pagination.appendChild(btn);

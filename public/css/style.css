@@ -292,19 +292,25 @@ header>.nav-top>.nav-pc>ul>li>a {
 }
 
 /*  */
-.user-all>ul>li {
-    display: inline-block;
-    position: relative;
+.user-all {
+    width: auto;
 }
 
-.user-all>ul>li>a {
+.user-all > ul > li {
+    display: inline-block;
+    position: relative;
+    width: auto;
+}
+
+.user-all > ul > li > a {
     transition: color 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
 }
 
-.user-all>ul>li>a:hover {
+.user-all > ul > li > a:hover {
     transform: scale(1.1);
 }
 
+/* Ẩn menu dropdown mặc định */
 .user-all ul ul {
     display: none;
     position: absolute;
@@ -312,41 +318,70 @@ header>.nav-top>.nav-pc>ul>li>a {
     left: 50%;
     transform: translateX(-50%);
     background-color: #ffffff;
-    border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     list-style: none;
+    padding: 0;
+    margin: 0;
     z-index: 1000;
+    min-width: 130px;
+    /* border-radius: 4px; */
     overflow: hidden;
+}
+
+/* Hiển thị menu dropdown khi hover */
+.user-all > ul > li:hover > ul {
+    display: block;
 }
 
 .user-all ul ul li {
     text-align: center;
-    width: 90px;
-    margin: 3px 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.user-all ul ul a {
+.user-all ul ul li:last-child {
+    border-bottom: none;
+}
+
+.user-all ul ul a,
+.user-all ul ul .form-logout {
     display: block;
-    padding: 5px 5px;
-    font-size: 16px;
-    color: black;
+    padding: 10px 0px;
+    font-size: 14px;
+    color: #333;
     text-decoration: none;
-    border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.user-all ul ul a:hover {
+.user-all ul ul a:hover,
+.user-all ul ul .form-logout:hover {
     background-color: rgb(189, 189, 189);
     color: #ffffff;
-
+}
+.user-all ul ul .form-logout .btn-logout{
+  width: 100%;
 }
 
-.user-all>ul>li:hover>ul{
-    display: block;
-    width: 130px !important;
+/* Style cho nút đăng xuất */
+.form-logout > .btn-logout {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    text-align: center;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.3s ease;
 }
-.user-all>ul>li:hover>ul>li{
-    width: auto;
+
+.user-all ul ul .form-logout:hover .btn-logout {
+    /* color: #ffffff; */
 }
 
 /*  */

@@ -53,7 +53,7 @@ class ProductController extends Controller
         }
 
 
-        $productAll = $productAll->select('id', 'name', 'sale', 'price', 'original_price')
+        $productAll = $productAll->select('id', 'name', 'sale', 'base_sale' , 'price', 'original_price')
                                 ->paginate(12)
                                 ->appends($request->query());
 
@@ -70,7 +70,7 @@ class ProductController extends Controller
         $productAll = Products::with('thumbnail')
             ->where('is_featured', 1)
             ->where('is_active', '>', 0)
-            ->select('id', 'name', 'sale', 'price', 'original_price')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'base_sale')
             ->paginate(12);
 
         $total = $productAll->total();
@@ -83,8 +83,9 @@ class ProductController extends Controller
     public function ProductBestseller()
     {
         $productAll = Products::with('thumbnail')
+            ->where('is_active', '>', 0)
             ->orderBy('sold_count', 'desc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'base_sale')
             ->paginate(12);
 
         $total = $productAll->total();
@@ -97,8 +98,9 @@ class ProductController extends Controller
     public function ProductPriceLowToHight()
     {
         $productAll = Products::with('thumbnail')
+            ->where('is_active', '>', 0)
             ->orderBy('price', 'asc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'base_sale')
             ->paginate(12);
 
         $total = $productAll->total();
@@ -111,8 +113,9 @@ class ProductController extends Controller
     public function ProductPriceHightToLow()
     {
         $productAll = Products::with('thumbnail')
+            ->where('is_active', '>', 0)
             ->orderBy('price', 'desc')
-            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count')
+            ->select('id', 'name', 'sale', 'price', 'original_price', 'sold_count', 'base_sale')
             ->paginate(12);
 
         $total = $productAll->total();
@@ -129,6 +132,7 @@ class ProductController extends Controller
 
         $products = Products::with('thumbnail')
             ->where('name', 'like', '%' . $keyword . '%')
+            ->where('is_active', '>', 0)
             ->take(5)
             ->get();
 
@@ -157,7 +161,7 @@ class ProductController extends Controller
 
         $productAll = Products::with('thumbnail')
         ->where('name', 'like', '%' . $keyword . '%')
-        ->select('id', 'name', 'base_sale', 'sale', 'price', 'original_price') // 👈 thêm base_sale
+        ->select('id', 'name', 'base_sale', 'sale', 'price', 'original_price')
         ->where('is_active', '>', 0)
         ->paginate(12)
         ->appends(['keyword' => $keyword]);
