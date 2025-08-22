@@ -25,7 +25,7 @@
                                 </div>
                                 <div class="news-meta-item">
                                     <i class="far fa-calendar"></i>
-                                    <span>{{ $newListView->posted_date }}</span>
+                                    <span>{{ $newListView->posted_date->format('d/m/Y') }}</span>
                                 </div>
                                 <div class="news-meta-item">
                                     {{-- <i class="fa-solid fa-eye"></i> --}}
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="news-meta-item">
                                     <i class="far fa-calendar"></i>
-                                    <span>{{ $item->posted_date }}</span>
+                                    <span>{{ $item->posted_date->format('d/m/Y') }}</span>
                                 </div>
                                 <div class="news-meta-item">
                                     {{-- <i class="fa-solid fa-eye"></i> --}}
@@ -166,7 +166,7 @@
                                 </div>
                                 <div class="news-meta-item">
                                     <i class="far fa-calendar"></i>
-                                    <span>{{ $newestNew->posted_date }}</span>
+                                    <span>{{ $newestNew->posted_date->format('d/m/Y') }}</span>
                                 </div>
                                 <div class="news-meta-item">
                                     {{-- <i class="fa-solid fa-eye"></i> --}}

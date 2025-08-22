@@ -7,7 +7,7 @@
         <article>
             <div class="newdetail-article-header">
                 <h1 class="newdetail-article-title">{{ $new_detail->title }}</h1>
-                <div class="newdetail-article-meta">Đăng bởi: {{ $new_detail->author }} | Ngày: {{ $new_detail->posted_date }}</div>
+                <div class="newdetail-article-meta">Đăng bởi: {{ $new_detail->author }} | Ngày: {{ $new_detail->posted_date->format('d/m/Y') }}</div>
                 {{-- <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Thời trang 2023" class="newdetail-article-image"> --}}
             </div>
 

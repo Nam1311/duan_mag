@@ -1,6 +1,7 @@
 @extends('admin.app')
 
 @section('admin.body')
+<link rel="stylesheet" href="{{ asset('/css/admin/products.css') }}">
     <style>
         /* CSS cho các trạng thái */
         .status-badge {
