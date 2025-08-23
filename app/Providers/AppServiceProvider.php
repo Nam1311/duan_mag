@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Cart;
 use App\Models\Setting;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,30 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $view->with('settings', Setting::all());
         });
+
+    //    manh
+    View::composer('*', function ($view) {
+    if (Auth::check()) {
+        // Lấy thông báo của user + thông báo chung (user_id = null)
+        $notifications = Notification::where(function($query) {
+                $query->where('user_id', Auth::id())
+                      ->orWhereNull('user_id'); // cho tất cả user
+            })
+            ->latest()
+            ->take(10) // chỉ lấy 10 cái mới nhất
+            ->get();
+
+        $view->with('notifications', $notifications);
+    } else {
+        // Nếu chưa đăng nhập thì chỉ lấy thông báo chung
+        $notifications = Notification::whereNull('user_id')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        $view->with('notifications', $notifications);
+    }
+});
     }
 
 }

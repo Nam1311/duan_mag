@@ -151,9 +151,10 @@
                                 </div>
                             </div>
                             
-                            <div id="thongbaou-notificationContent">
+                            {{-- <div id="thongbaou-notificationContent"> --}}
+                                
                                 <!-- Comment notification -->
-                                <div class="thongbaou-notificationItem unread thongbaou-new-notification" data-comment-id="1" data-type="comment">
+                                {{-- <div class="thongbaou-notificationItem unread thongbaou-new-notification" data-comment-id="1" data-type="comment">
                                     <div class="thongbaou-notificationBody">
                                         <img src="https://randomuser.me/api/portraits/women/44.jpg" class="thongbaou-userAvatar" alt="Nguyễn Thị A">
                                         <div class="thongbaou-notificationText">
@@ -184,10 +185,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
+                                </div> --}}
                                 <!-- Shipping notification -->
-                                <div class="thongbaou-notificationItem unread thongbaou-new-notification" data-type="shipping">
+                                {{-- <div class="thongbaou-notificationItem unread thongbaou-new-notification" data-type="shipping">
                                     <div class="thongbaou-notificationBody">
                                         <div class="thongbaou-userAvatar" style="background: var(--purple); color: white; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-truck"></i>
@@ -206,10 +206,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                                 
-                                <!-- Sale notification -->
-                                <div class="thongbaou-notificationItem" data-type="sale">
+                                {{-- <div class="thongbaou-notificationItem" data-type="sale">
                                     <div class="thongbaou-notificationBody">
                                         <div class="thongbaou-userAvatar" style="background: var(--pink); color: white; display: flex; align-items: center; justify-content: center;">
                                             <i class="fas fa-percent"></i>
@@ -228,7 +227,160 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
+                                  {{-- </div>
+                        </div>
+                    </div> --}}
+                            <div id="thongbaou-notificationContent">
+
+  @foreach ($notifications as $notification)
+    @switch($notification->type)
+
+        {{-- Thông báo bình luận --}}
+        @case('review_reply')
+            <div class="thongbaou-notificationItem {{ $notification->is_read ? '' : 'unread thongbaou-new-notification' }}" 
+                data-comment-id="{{ $notification->review_id }}" 
+                data-type="comment">
+                <div class="thongbaou-notificationBody">
+                    <img src="{{ $notification->user->avatar ?? 'https://via.placeholder.com/40' }}" 
+                        class="thongbaou-userAvatar" 
+                        alt="{{ $notification->user->name ?? 'Người dùng' }}">
+
+                    <div class="thongbaou-notificationText">
+                        <p class="thongbaou-notificationMessage">
+                            <strong>{{ $notification->user->name ?? 'Người dùng' }}</strong> 
+                            đã bình luận về sản phẩm của bạn
+                        </p>
+
+                        <div class="thongbaou-notificationComment">
+                            "{{ $notification->message }}"
+                        </div>
+
+                        <div class="thongbaou-notificationMeta">
+                            <span class="thongbaou-notificationTime">
+                                {{ $notification->created_at->diffForHumans() }}
+                            </span>
+                            <span class="thongbaou-notificationType comment">Bình luận</span>
+                        </div>
+
+                        <div class="thongbaou-notificationActions">
+                            <button class="thongbaou-notificationBtn primary" data-action="view-comment">
+                                <i class="fas fa-comment-alt"></i> Xem chi tiết
+                            </button>
+                            <button class="thongbaou-notificationBtn secondary" data-action="reply">
+                                <i class="fas fa-reply"></i> Trả lời
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @break
+
+
+        {{-- Thông báo đơn hàng --}}
+        @case('order_status')
+            <div class="thongbaou-notificationItem {{ $notification->is_read ? '' : 'unread thongbaou-new-notification' }}" 
+                data-type="shipping">
+                <div class="thongbaou-notificationBody">
+                    <div class="thongbaou-userAvatar" 
+                        style="background: var(--purple); color: white; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-truck"></i>
+                    </div>
+
+                    <div class="thongbaou-notificationText">
+                        <p class="thongbaou-notificationMessage">
+                            <strong>{{ $notification->title }}</strong>
+                        </p>
+                        <div class="thongbaou-notificationComment">
+                            {{ $notification->message }}
+                        </div>
+                        <div class="thongbaou-notificationMeta">
+                            <span class="thongbaou-notificationTime">
+                                {{ $notification->created_at->diffForHumans() }}
+                            </span>
+                            <span class="thongbaou-notificationType shipping">Vận chuyển</span>
+                        </div>
+                        <div class="thongbaou-notificationActions">
+                            <button class="thongbaou-notificationBtn primary" data-action="track-order">
+                                <i class="fas fa-map-marker-alt"></i> Theo dõi đơn hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @break
+
+
+        {{-- Thông báo Flash Sale --}}
+        @case('flash_sale')
+            <div class="thongbaou-notificationItem" data-type="flash_sale">
+                <div class="thongbaou-notificationBody">
+                    <div class="thongbaou-userAvatar" 
+                        style="background: var(--pink); color: white; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-percent"></i>
+                    </div>
+                    <div class="thongbaou-notificationText">
+                        <p class="thongbaou-notificationMessage">
+                            <strong>{{ $notification->title }}</strong>
+                        </p>
+                        <div class="thongbaou-notificationComment">
+                            {{ $notification->message }}
+                        </div>
+                        <div class="thongbaou-notificationMeta">
+                            <span class="thongbaou-notificationTime">
+                                {{ $notification->created_at->diffForHumans() }}
+                            </span>
+                            <span class="thongbaou-notificationType flash_sale">Flash Sale</span>
+                        </div>
+                        <div class="thongbaou-notificationActions">
+                            <a href="/" class="thongbaou-notificationBtn primary" data-action="view-sale">
+                                <i class="fas fa-shopping-bag"></i> Xem ưu đãi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @break
+
+
+        {{-- Thông báo Voucher --}}
+        @case('voucher')
+            <div class="thongbaou-notificationItem" data-type="voucher">
+                <div class="thongbaou-notificationBody">
+                    <div class="thongbaou-userAvatar" 
+                        style="background: var(--green); color: white; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="thongbaou-notificationText">
+                        <p class="thongbaou-notificationMessage">
+                            <strong>{{ $notification->title }}</strong>
+                        </p>
+                        <div class="thongbaou-notificationComment">
+                            {{ $notification->message }}
+                        </div>
+                        <div class="thongbaou-notificationMeta">
+                            <span class="thongbaou-notificationTime">
+                                {{ $notification->created_at->diffForHumans() }}
+                            </span>
+                            <span class="thongbaou-notificationType voucher">Voucher</span>
+                        </div>
+                        <div class="thongbaou-notificationActions">
+                            <a href="/voucher/{{ $notification->voucher_id }}" class="thongbaou-notificationBtn primary" data-action="use-voucher">
+                                <i class="fas fa-ticket-alt"></i> Dùng ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @break
+
+    @endswitch
+@endforeach
+
+
+
+
+                                
                             </div>
                         </div>
                     </div>
@@ -314,8 +466,6 @@
                         </div>
                     </div>
                 
-
-
 
                     
                 </div>

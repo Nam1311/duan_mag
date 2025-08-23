@@ -11,6 +11,7 @@ use App\Models\reviews;
 use App\Models\Product_categories;
 use App\Models\ProductCountDown;
 use App\Models\Banners;
+use App\Models\Notification;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -142,6 +143,13 @@ class PageController extends Controller
         }
         $dataSetting = Setting::all();
 
+        // thông báo {
+        // $notifications = Notification::where('user_id', Auth::id())->get();
+        // dd($notifications);
+    
+    
+        // }
+
         $data = [
             'products_sale' => $products_sale,
             'product_categories' => $product_categories,
@@ -155,7 +163,10 @@ class PageController extends Controller
             'recommendedProducts' => $recommendedProducts,
             'allColors' => $allColors,
             'allSizes' => $allSizes,
-            'dataSetting' => $dataSetting
+            'dataSetting' => $dataSetting,
+            // manh
+            // 'notifications' => $notifications,
+
         ];
 
         return view('home', $data);
