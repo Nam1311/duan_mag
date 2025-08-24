@@ -90,12 +90,14 @@
             <div class="Search" style="position: relative;">
                 <form id="search-form" action="{{ route('search') }}" method="GET" autocomplete="off">
                     <input type="text" id="search-input" name="keyword" placeholder="Tìm kiếm sản phẩm...">
-
+                    <i id="voiceBtn" class="fa fa-microphone" aria-hidden="true"></i>
                     <button class="icon-search icon-search-pc" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                     <ul id="suggestion-box" class="suggestion-list"></ul>
                 </form>
+
                     <button class="icon-search-mobile" type="" style="display: none"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
+
 
             {{-- menu pc --}}
             <div class="nav-pc">
@@ -170,3 +172,43 @@
             </form>
         </div>
 </header>
+
+<script>
+    const searchInput = document.getElementById("search-input");
+const voiceBtn = document.getElementById("voiceBtn");
+const searchForm = document.getElementById("search-form");
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = "vi-VN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    voiceBtn.addEventListener("click", () => {
+        recognition.start();
+        voiceBtn.innerText = "🎙️ Đang nghe...";
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        searchInput.value = transcript;
+        voiceBtn.innerText = "🎤";
+
+        // 🚀 Submit form để tìm kiếm trong DB Laravel
+        searchForm.submit();
+    };
+
+    recognition.onerror = () => {
+        voiceBtn.innerText = "🎤";
+    };
+
+    recognition.onend = () => {
+        voiceBtn.innerText = "🎤";
+    };
+} else {
+    alert("Trình duyệt của bạn không hỗ trợ Voice Search.");
+}
+
+    </script>
