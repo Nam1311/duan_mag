@@ -110,6 +110,31 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   }
 
+  .detail-try-on {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            height: 50.4px;
+                            background-color: black;
+                            box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
+                            cursor: pointer;
+                            margin-bottom: 5px;
+                        }
+
+                        .detail-try-on>a {
+                            color: white;
+                        }
+
+                        .detail-try-on>a>i {
+                            color: white;
+                            font-size: 16px;
+                        }
+
+                        .detail-try-on>p {
+                            color: white;
+                            font-size: 12px;
+                        }
   .detail-imgall button:hover {
       background: #fff;
       color: #e53935;
@@ -130,7 +155,7 @@
   }
 
   .detail-textall>h2 {
-      font-size: 28px;
+      font-size: 23px;
       font-weight: 700;
       margin-bottom: 15px;
       color: #222;
@@ -138,7 +163,7 @@
   }
 
   .detail-textall>hr {
-      margin: 15px 0;
+      /* margin: 15px 0; */
       border: none;
       border-top: 1px solid #eee;
   }
@@ -181,7 +206,7 @@
       display: flex;
       align-items: center;
       gap: 15px;
-      margin: 15px 0;
+      /* margin: 15px 0; */
       padding: 12px 0;
       border-top: 1px dashed #eee;
       border-bottom: 1px dashed #eee;
@@ -237,7 +262,7 @@
   .option-title {
       font-size: 17px;
       font-weight: 500;
-      margin: 25px 0 12px;
+      margin: 0px 0 12px;
       color: #222;
   }
 
@@ -327,6 +352,8 @@
 
   .quantity-section {
       margin: 25px 0;
+      display: flex;
+      gap: 20px;
   }
 
   .quantity-label {
@@ -829,7 +856,7 @@
 
 
 
-  
+
 
 
 
@@ -1141,35 +1168,35 @@
             .detaill-review-card {
                 padding: 15px;
             }
-            
+
             .detaill-review-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .detaill-user-avatar {
                 margin-bottom: 10px;
             }
-            
+
             .detaill-review-meta {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 5px;
             }
-            
+
             .detaill-review-actions {
                 gap: 8px;
             }
-            
+
             .detaill-review-replies {
                 padding-left: 10px;
             }
-            
+
             .detaill-reply-form textarea {
                 min-height: 60px;
                 padding: 10px;
             }
-            
+
             .detaill-cancel-btn, .detaill-submit-btn {
                 padding: 6px 12px;
                 font-size: 13px;
@@ -1180,26 +1207,26 @@
             .detaill-review-card {
                 padding: 12px;
             }
-            
+
             .detaill-user-avatar {
                 width: 35px;
                 height: 35px;
                 font-size: 16px;
             }
-            
+
             .detaill-username {
                 font-size: 15px;
             }
-            
+
             .detaill-review-text {
                 font-size: 14px;
             }
-            
+
             .detaill-action-btn {
                 font-size: 12px;
                 padding: 4px 8px;
             }
-            
+
             .detaill-reply-form textarea {
                 min-height: 50px;
                 font-size: 14px;
@@ -1207,7 +1234,7 @@
         }
 
 
-        /* 
+        /*
          */
 .alert {
   padding: 12px 20px;
@@ -1281,15 +1308,15 @@
     .detail-try-on {
         height: 45px;
     }
-    
+
     .detail-try-on > a {
         font-size: 13px;
     }
-    
+
     .detail-try-on > a > i {
         font-size: 14px;
     }
-    
+
     .detail-try-on > p {
         font-size: 11px;
     }

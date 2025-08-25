@@ -534,6 +534,39 @@
         </a>
     </div>
 
+    <!-- Result Section -->
+    @if(!empty($resultImage))
+    <div class="result-section">
+        <div class="result-header">
+            <h2><i class="fas fa-sparkles"></i> Kết Quả</h2>
+            <button class="close-result-btn" onclick="closeResult()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="result-container">
+            <div class="result-image-container">
+                <img src="{{ $resultImage }}" alt="Virtual Try-On Result" class="result-image">
+            </div>
+        </div>
+
+        {{-- @if(!empty($description))
+        <p class="result-text">{{ $description }}</p>
+        @endif --}}
+
+        <div class="submit-section">
+            <a href="{{ route('tryon.form') }}" class="submit-btn">
+                <i class="fas fa-redo"></i>
+                Thử Trang Phục Khác
+            </a>
+            <a href="{{ route('home') }}" class="submit-btn secondary-btn">
+                <i class="fas fa-home"></i>
+                Về Trang Chủ
+            </a>
+        </div>
+    </div>
+    @endif
+
     <!-- Form -->
     <form id="tryonForm" class="tryon-form" enctype="multipart/form-data">
         @csrf
@@ -627,38 +660,6 @@
         </button>
     </div>
 
-    <!-- Result Section -->
-    @if(!empty($resultImage))
-    <div class="result-section">
-        <div class="result-header">
-            <h2><i class="fas fa-sparkles"></i> Kết Quả</h2>
-            <button class="close-result-btn" onclick="closeResult()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <div class="result-container">
-            <div class="result-image-container">
-                <img src="{{ $resultImage }}" alt="Virtual Try-On Result" class="result-image">
-            </div>
-        </div>
-
-        @if(!empty($description))
-        <p class="result-text">{{ $description }}</p>
-        @endif
-
-        <div class="submit-section">
-            <a href="{{ route('tryon.form') }}" class="submit-btn">
-                <i class="fas fa-redo"></i>
-                Thử Trang Phục Khác
-            </a>
-            <a href="{{ route('home') }}" class="submit-btn secondary-btn">
-                <i class="fas fa-home"></i>
-                Về Trang Chủ
-            </a>
-        </div>
-    </div>
-    @endif
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden">

@@ -53,7 +53,7 @@ use App\Models\Products;
 use App\Models\product_variants;
 // thông báo
 use App\Http\Controllers\NotificationController;
-// 
+//
 Route::get('about', function () {
     return view('about');
 });

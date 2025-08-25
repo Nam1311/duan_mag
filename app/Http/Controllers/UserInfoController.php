@@ -103,14 +103,25 @@ class UserInFoController extends Controller
 
         $address->save();
 
-        $hasDefault = addresses::where('user_id', $userId)->where('is_default', 1)->exists();
+        $hasDefault = addresses::where('user_id', $userId)
+            ->where('is_default', 1)
+            ->exists();
+
         if (!$hasDefault) {
             $address->is_default = 1;
             $address->save();
         }
 
+        // ✅ Điều hướng theo redirect param
+        $redirect = $request->input('redirect');
+
+        if ($redirect === 'showpayment') {
+            return redirect('/showpayment');
+        }
+
         return redirect()->route('infouser', ['tab' => 'address']);
     }
+
 
     public function xoaaddress($id)
     {
@@ -179,7 +190,7 @@ class UserInFoController extends Controller
             'orderDetails.productVariant.size',
             'orderDetails.productVariant.color'
         ])->where('user_id', $user->id)->where('id', $id)->get();
-        
+
         $orderdetail = OrderDetail::with([
             'productVariant.product.images',
             'productVariant.size',

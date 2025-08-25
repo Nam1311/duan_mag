@@ -84,7 +84,7 @@ class CartController extends Controller
                 session()->forget('applied_voucher');
             }
         }
-        
+
         $shippingFee = Setting::where('id', 1)->value('ship_price') ?? 40000;
         $total = $subtotal - $voucherDiscount + $shippingFee;
         $data = $this->getCartData();
@@ -128,29 +128,29 @@ class CartController extends Controller
 
         if (!$productVariantId) {
             $productId = $validated['product_id'] ?? null;
-            
+
             if (!$productId) {
                 return response()->json([
                     'message' => 'Cần cung cấp product_id hoặc product_variant_id'
                 ], 422);
             }
-            
+
             $product = Products::with('category')->find($productId);
-            
+
             if (!$product) {
                 return response()->json([
                     'message' => 'Sản phẩm không tồn tại'
                 ], 422);
             }
-            
+
             // Kiểm tra category để quyết định logic variant
             $categoryName = strtolower($product->category->name ?? '');
-            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') ||
                                    str_contains($categoryName, 'quần') ||
                                    str_contains($categoryName, 'accessories') ||
                                    str_contains($categoryName, 'pants') ||
                                    str_contains($categoryName, 'trousers');
-            
+
             if ($isAccessoryOrTrousers) {
                 // Với phụ kiện/quần: chỉ cần màu, không cần size
                 $variant = product_variants::where('product_id', $productId)
@@ -167,7 +167,7 @@ class CartController extends Controller
                     ->orderBy('id')
                     ->first();
             }
-            
+
             if ($variant) {
                 $productVariantId = $variant->id;
             } else {
@@ -234,21 +234,21 @@ class CartController extends Controller
         if (!$productVariantId) {
             $productId = $validated['product_id'];
             $product = Products::with('category')->find($productId);
-            
+
             if (!$product) {
                 return response()->json([
                     'message' => 'Sản phẩm không tồn tại'
                 ], 422);
             }
-            
+
             // Kiểm tra category để quyết định logic variant
             $categoryName = strtolower($product->category->name ?? '');
-            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') || 
+            $isAccessoryOrTrousers = str_contains($categoryName, 'phụ kiện') ||
                                    str_contains($categoryName, 'quần') ||
                                    str_contains($categoryName, 'accessories') ||
                                    str_contains($categoryName, 'pants') ||
                                    str_contains($categoryName, 'trousers');
-            
+
             if ($isAccessoryOrTrousers) {
                 // Với phụ kiện/quần: chỉ cần màu, không cần size
                 $variant = product_variants::where('product_id', $productId)
@@ -331,7 +331,7 @@ class CartController extends Controller
         $this->createDirectCheckoutData($variant, $quantity);
 
         return response()->json([
-            'redirect' => route('payment.show')
+            'redirect' => route('cart.view')
         ]);
     }
 
@@ -368,7 +368,7 @@ class CartController extends Controller
 
         $vouCherCode = $request->input('voucher_code');
         $selectedVariants = $request->input('selected_variants', []); // Mảng variant IDs được chọn
-        
+
         if (empty($vouCherCode)) {
             session()->forget('applied_voucher');
             session()->forget('voucher_selected_variants'); // Xóa thông tin sản phẩm đã chọn cho voucher
@@ -409,14 +409,14 @@ class CartController extends Controller
 
         session()->put('applied_voucher', $vouCherCode);
         session()->put('applied_voucher_id', $voucher->id);
-        
+
         // Lưu thông tin sản phẩm được chọn cho voucher (nếu có)
         if (!empty($selectedVariants)) {
             session()->put('voucher_selected_variants', $selectedVariants);
         } else {
             session()->forget('voucher_selected_variants');
         }
-        
+
         $data = $this->getCartData();
         if ($request->ajax()) {
             return response()->json([
@@ -514,7 +514,7 @@ class CartController extends Controller
                         'size',
                         'color'
                     ])->find($item['product_variant_id']);
-                    
+
                     if ($variant && $variant->product) {
                         return (object) [
                             'productVariant' => $variant,
@@ -545,7 +545,7 @@ class CartController extends Controller
         })->filter()->toArray();
 
         $subtotal = collect($cartDetails)->sum('subtotal');
-        
+
         // Tính voucher discount
         $appliedVoucherCode = session()->get('applied_voucher');
         $voucherDiscount = 0;
@@ -555,7 +555,7 @@ class CartController extends Controller
                 ->where('start_date', '<=', now())
                 ->where('quantity', '>', 0)
                 ->first();
-            
+
             if ($voucher) {
                 if ($voucher->value_type == 'fixed') {
                     $voucherDiscount = $voucher->discount_amount;
@@ -628,15 +628,15 @@ class CartController extends Controller
             \Log::info('Raw request data:', ['data' => $request->all()]);
             \Log::info('Request headers:', ['headers' => $request->headers->all()]);
             \Log::info('Variant ID from URL:', ['variantId' => $variantId]);
-            
+
             $validated = $request->validate([
                 'color_id' => 'required|integer|exists:colors,id',
                 'size_id' => 'required|integer|exists:sizes,id',
                 'quantity' => 'required|integer|min:1',
             ]);
-            
+
             \Log::info('Validated data:', ['validated' => $validated]);
-            
+
             $oldVariant = product_variants::find($variantId);
             if (!$oldVariant) {
                 if ($request->ajax()) {
@@ -667,13 +667,13 @@ class CartController extends Controller
             if (Auth::check()) {
                 // Lấy cart item cũ để giữ nguyên vị trí
                 $oldCartItem = Cart::where('user_id', Auth::id())->where('product_variant_id', $variantId)->first();
-                
+
                 if ($oldCartItem) {
                     // Kiểm tra xem variant mới đã tồn tại trong cart chưa
                     $existingNewCartItem = Cart::where('user_id', Auth::id())
                         ->where('product_variant_id', $newVariant->id)
                         ->first();
-                    
+
                     if ($existingNewCartItem && $existingNewCartItem->id !== $oldCartItem->id) {
                         // Nếu variant mới đã tồn tại, cộng dồn số lượng và xóa item cũ
                         $existingNewCartItem->quantity += $validated['quantity'];
@@ -689,7 +689,7 @@ class CartController extends Controller
             } else {
                 $cart = Session::get('cart', []);
                 $oldItemIndex = null;
-                
+
                 // Tìm vị trí của item cũ
                 foreach ($cart as $index => $item) {
                     if ($item['product_variant_id'] == $variantId) {
@@ -697,7 +697,7 @@ class CartController extends Controller
                         break;
                     }
                 }
-                
+
                 if ($oldItemIndex !== null) {
                     // Kiểm tra xem variant mới đã tồn tại chưa
                     $existingNewItemIndex = null;
@@ -707,7 +707,7 @@ class CartController extends Controller
                             break;
                         }
                     }
-                    
+
                     if ($existingNewItemIndex !== null) {
                         // Nếu variant mới đã tồn tại, cộng dồn số lượng và xóa item cũ
                         $cart[$existingNewItemIndex]['quantity'] += $validated['quantity'];
@@ -718,7 +718,7 @@ class CartController extends Controller
                         $cart[$oldItemIndex]['product_variant_id'] = $newVariant->id;
                         $cart[$oldItemIndex]['quantity'] = $validated['quantity'];
                     }
-                    
+
                     Session::put('cart', $cart);
                 }
             }
@@ -732,7 +732,7 @@ class CartController extends Controller
                 ]);
             }
             return redirect()->route('cart.view')->with('success', 'Đã cập nhật biến thể sản phẩm');
-            
+
         } catch (\Exception $e) {
             \Log::error('Cart update variant error: ' . $e->getMessage());
             if ($request->ajax()) {
@@ -918,7 +918,7 @@ class CartController extends Controller
                         'size',
                         'color'
                     ])->find($item['product_variant_id']);
-                    
+
                     if ($variant && $variant->product) {
                         return (object) [
                             'productVariant' => $variant,
@@ -943,14 +943,14 @@ class CartController extends Controller
         $appliedVoucherCode = session()->get('applied_voucher');
         $voucherSelectedVariants = session()->get('voucher_selected_variants', []);
         $voucherDiscount = 0;
-        
+
         if ($appliedVoucherCode && Auth::check()) {
             $voucher = Voucher::where('code', $appliedVoucherCode)
                 ->where('expiration_date', '>=', now())
                 ->where('start_date', '<=', now())
                 ->where('quantity', '>', 0)
                 ->first();
-            
+
             if ($voucher) {
                 if (!empty($voucherSelectedVariants)) {
                     $voucherApplicableVariants = array_intersect($variantIds, $voucherSelectedVariants);
@@ -963,7 +963,7 @@ class CartController extends Controller
                             ->sum(function ($item) {
                                 return $item->productVariant->product->price * $item->quantity;
                             });
-                        
+
                         if ($voucher->value_type == 'fixed') {
                             $voucherDiscount = $voucher->discount_amount;
                         } elseif ($voucher->value_type == 'percent') {
@@ -1003,7 +1003,7 @@ class CartController extends Controller
     public function getSummaryForAll()
     {
         $data = $this->getCartData();
-        
+
         return response()->json([
             'summary_html' => view('cart._summary', $data)->render(),
         ]);
@@ -1012,7 +1012,7 @@ class CartController extends Controller
     public function clearViewedHistory()
     {
         session()->forget('viewed_products');
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Đã xóa lịch sử đã xem'
@@ -1129,7 +1129,7 @@ class CartController extends Controller
 
         // Lấy sản phẩm gợi ý
         $suggestedProducts = $this->getSuggestedProducts($cartItems);
-        
+
         // Lấy lịch sử sản phẩm đã xem từ session
         $viewedProducts = $this->getViewedProducts();
 
@@ -1148,16 +1148,16 @@ class CartController extends Controller
         }
 
         $cartCategoryIds = $cartItems->pluck('productVariant.product.category_id')->unique();
-        
+
         // Logic gợi ý sản phẩm
         $suggestedCategoryIds = collect();
-        
+
         foreach ($cartCategoryIds as $categoryId) {
             // Lấy thông tin category để xác định loại sản phẩm
             $category = \App\Models\Product_categories::find($categoryId);
             if ($category) {
                 $categoryName = strtolower($category->name);
-                
+
                 // Logic gợi ý dựa trên tên danh mục
                 if (str_contains($categoryName, 'áo') || str_contains($categoryName, 'shirt') || str_contains($categoryName, 'top')) {
                     // Nếu có áo, gợi ý quần và phụ kiện
@@ -1169,7 +1169,7 @@ class CartController extends Controller
                               ->orWhere('name', 'like', '%accessory%');
                     })->pluck('id');
                     $suggestedCategoryIds = $suggestedCategoryIds->merge($suggested);
-                    
+
                 } elseif (str_contains($categoryName, 'quần') || str_contains($categoryName, 'pant') || str_contains($categoryName, 'jean')) {
                     // Nếu có quần, gợi ý áo và phụ kiện
                     $suggested = \App\Models\Product_categories::where(function($query) {
@@ -1180,7 +1180,7 @@ class CartController extends Controller
                               ->orWhere('name', 'like', '%accessory%');
                     })->pluck('id');
                     $suggestedCategoryIds = $suggestedCategoryIds->merge($suggested);
-                    
+
                 } elseif (str_contains($categoryName, 'phụ kiện') || str_contains($categoryName, 'accessory')) {
                     // Nếu có phụ kiện, gợi ý áo khoác và áo
                     $suggested = \App\Models\Product_categories::where(function($query) {
@@ -1220,14 +1220,14 @@ class CartController extends Controller
     private function getViewedProducts()
     {
         $viewedProductIds = session()->get('viewed_products', []);
-        
+
         if (empty($viewedProductIds)) {
             return collect();
         }
 
         // Lấy tối đa 6 sản phẩm đã xem gần nhất
         $recentViewedIds = array_slice(array_reverse($viewedProductIds), 0, 6);
-        
+
         return \App\Models\Products::with('thumbnail')
             ->active()
             ->whereIn('id', $recentViewedIds)

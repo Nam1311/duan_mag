@@ -17,21 +17,22 @@ class LoginController extends Controller
     {
         return view('login');
     }
-    public function login(Request $request)
+   public function login(Request $request)
     {
-        // Đánh dấu đây là form login
         session(['form_type' => 'login']);
 
         $request->validate([
             'email' => 'required',
             'password' => 'required|string|min:8',
         ], [
-            'email.required' => 'Vui lòng nhập tên đăng nhập hoặt email.',
+            'email.required' => 'Vui lòng nhập tên đăng nhập hoặc email.',
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
         ]);
+
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $request->email)->first();
+
         if ($user && $user->is_active == 0) {
             return back()->withErrors([
                 'email' => 'Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt.',
@@ -47,32 +48,37 @@ class LoginController extends Controller
                     'email' => 'Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt.',
                 ])->withInput();
             }
+
             if (Auth::user()->is_locked == 1) {
                 Auth::logout();
-
                 return back()->withErrors([
                     'email' => 'Tài khoản của bạn đã bị khóa.',
                 ])->withInput();
             }
 
-            switch ($user->role) {
+            // ✅ Đồng bộ giỏ hàng
+            \Log::info('Starting cart sync after login for user: ' . Auth::id());
+            $this->syncCartFromSession();
+
+            // ✅ Nếu là admin/manager → ép về trang quản trị
+            switch (Auth::user()->role) {
                 case 'admin':
                     return redirect('/admin');
                 case 'news_manager':
                     return redirect('/admin/quanlytintuc');
                 case 'products_manager':
                     return redirect('/admin/products');
-                    // sửa vào trang của chăm sóc khách hàng
                 case 'customer_service':
                     return redirect('/admin/quanlylienhe');
-                default:
-                    return redirect()->route('home');
             }
 
-            // Đồng bộ giỏ hàng từ session vào database ngay sau khi đăng nhập
-            \Log::info('Starting cart sync after login for user: ' . Auth::id());
-            $this->syncCartFromSession();
+            $redirect = $request->input('redirect');
+            // Nếu redirect chứa '/cart' thì đưa về /cart
+            if ($redirect && str_contains($redirect, '/cart')) {
+                return redirect('/cart');
+            }
 
+            // fallback
             return redirect()->route('home');
         }
 
@@ -80,6 +86,7 @@ class LoginController extends Controller
             'email' => 'Email hoặc mật khẩu không chính xác.',
         ])->withInput();
     }
+
 
 
     public function register(Request $request)

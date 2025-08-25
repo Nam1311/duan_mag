@@ -99,7 +99,7 @@
                                     <option value="">Chưa có địa chỉ, vui lòng thêm mới</option>
                                 @endforelse
                             </select>
-                            <a href="{{route('infouser')}}">Thêm địa chỉ mới</a>
+                            <a href="{{route('infouser', ['redirect' => url()->current()])}}">Thêm địa chỉ mới</a>
                                 <div class="alert alert-warning">
                                     <strong>Lưu ý:</strong>Vui lòng cập nhật địa chỉ chính xác để thanh toán!
                                     để thanh toán.

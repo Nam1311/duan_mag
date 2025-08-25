@@ -311,6 +311,7 @@
                     <h2 class="user-info-modal-title">Thêm địa chỉ</h2>
                     <form action="{{ '/themaddress/' }}" method="POST" id="add-address-form">
                         @csrf
+                        <input type="hidden" name="redirect" value="showpayment">
                         <div class="user-info-form-group">
                             <div class="user-info-input-group">
                                 <label for="add-address-street" class="user-info-input-label">Địa chỉ:</label>

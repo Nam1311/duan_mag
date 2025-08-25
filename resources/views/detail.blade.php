@@ -86,32 +86,32 @@
                     <h2>{{ $product_detail->name }}</h2>
                     {{-- --}}
                     {{-- sku variants --}}
-                    <div id="sku-info"></div>
-                    {{-- --}}
-                    <hr>
-                    <p class="deital-star">
-                        @php
-                            $totalRating = $reviewDetail->sum('rating'); // Tổng số sao
-                            $totalReview = $reviewDetail->count(); // Tổng số lượt đánh giá
-                            $averageRating = $totalReview > 0 ? round($totalRating / $totalReview, 1) : 0; // Trung bình (làm tròn 1 số thập phân)
-                            $starsToShow = floor($averageRating); // Số sao nguyên để hiển thị
-                        @endphp
+                    <div style="display: flex; gap: 25px">
+                        <div id="sku-info"></div> |
+                        <p class="deital-star">
+                            @php
+                                $totalRating = $reviewDetail->sum('rating'); // Tổng số sao
+                                $totalReview = $reviewDetail->count(); // Tổng số lượt đánh giá
+                                $averageRating = $totalReview > 0 ? round($totalRating / $totalReview, 1) : 0; // Trung bình (làm tròn 1 số thập phân)
+                                $starsToShow = floor($averageRating); // Số sao nguyên để hiển thị
+                            @endphp
 
-                        {{-- Hiển thị số sao --}}
-                        @for ($i = 0; $i < $starsToShow; $i++)
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-                        @endfor
+                            {{-- Hiển thị số sao --}}
+                            @for ($i = 0; $i < $starsToShow; $i++)
+                                <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            @endfor
 
-                        {{-- Nếu muốn nửa sao cho đẹp: --}}
-                        @if ($averageRating - $starsToShow >= 0.5)
-                            <i class="fa-solid fa-star-half-stroke" style="color: #FFD43B;"></i>
-                        @endif
+                            {{-- Nếu muốn nửa sao cho đẹp: --}}
+                            @if ($averageRating - $starsToShow >= 0.5)
+                                <i class="fa-solid fa-star-half-stroke" style="color: #FFD43B;"></i>
+                            @endif
 
-                        {{-- Text thống kê --}}
-                        <span>{{ $averageRating }} ({{ $totalReview }} đánh giá)</span>
+                            {{-- Text thống kê --}}
+                            <span>{{ $averageRating }} ({{ $totalReview }} đánh giá)</span>
 
-                    </p>
-
+                        </p>
+                    </div>
+                    {{-- giá --}}
                     <div class="price-container">
                         <div class="current-price">
                             {{ number_format($product_detail->original_price * (1 - $product_detail->sale / 100), 0, ',', '.') }}đ
@@ -119,59 +119,7 @@
                         <div class="original-price">{{ number_format($product_detail->original_price) }}đ</div>
                         <div class="discount-badge">{{ $product_detail->sale }}%</div>
                     </div>
-                    <style>
-                        .detail-try-on {
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: center;
-                            align-items: center;
-                            height: 50.4px;
-                            background-color: black;
-                            box-shadow: 0 2px 8px rgba(188, 19, 188, 0.6);
-                            cursor: pointer;
-                            margin-bottom: 5px;
-                        }
 
-                        .detail-try-on>a {
-                            color: white;
-                        }
-
-                        .detail-try-on>a>i {
-                            color: white;
-                            font-size: 16px;
-                        }
-
-                        .detail-try-on>p {
-                            color: white;
-                            font-size: 12px;
-                        }
-                    </style>
-                    <div class="detail-button-mua" style="margin-bottom: 15px">
-                        <button class="add-button-detail" id="btnAddCart">
-                            <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
-                        </button>
-                        <button class="buy-button-detail" id="btnAddCheckout">
-                            <i class="fas fa-bolt"></i> MUA
-                        </button>
-
-                        {{-- Place to store variant id --}}
-                        <input type="hidden" id="product_variant_id" name="product_variant_id" value="">
-                        <input type="hidden" id="product-id" name="product_id" value="{{ $product_detail->id }}">
-                        <input type="hidden" id="product-category" name="product_category"
-                            value="{{ strtolower($product_detail->category->name ?? '') }}">
-                        {{-- quantity input exists --}}
-                        <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
-                    </div>
-    <div class="detail-try-on" id="tryOnBtn" onclick="goToTryOn()">
-        <a href="#" onclick="return false;">
-            <i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay
-        </a>
-        <p>Phòng thử đồ online</p>
-    </div>
-
-                    {{-- giới thiệu sản phẩm --}}
-                    {!! $product_detail->short_description !!}
-                    {{-- --}}
                     <div class="option-title" id="selected-iconhinhanh">Màu sắc: Chọn màu</div>
                     {{-- color --}}
                     <div class="option-container">
@@ -194,15 +142,46 @@
                         {{-- --}}
                     </div>
 
-                    <!-- Nơi hiển thị số lượng còn hàng -->
-                    <div id="stock-info" style="margin-top: 15px; font-weight: bold; color: #333;">
-                        Vui lòng chọn màu và kích thước
-                    </div>
-
                     <!-- input product id ẩn -->
                     <input type="hidden" id="product-id" value="{{ $product_detail->id }}">
 
+                    <div class="quantity-section">
+                        <div class="quantity-control">
+                            <div class="quantity-buttons">
+                                <button type="button" id="decrease">-</button>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" />
+                                <button type="button" id="increase">+</button>
 
+                            </div>
+                        </div>
+                        <!-- Nơi hiển thị số lượng còn hàng -->
+                        <div id="stock-info" style="margin-top: 15px; font-weight: bold; color: #333;">
+                            Vui lòng chọn màu và kích thước
+                        </div>
+                    </div>
+
+                    <div class="detail-button-mua" style="margin-bottom: 15px">
+                        <button class="add-button-detail" id="btnAddCart">
+                            <i class="fas fa-shopping-cart"></i> THÊM GIỎ HÀNG
+                        </button>
+                        <button class="buy-button-detail" id="btnAddCheckout">
+                            <i class="fas fa-bolt"></i> MUA NGAY
+                        </button>
+
+                        {{-- Place to store variant id --}}
+                        <input type="hidden" id="product_variant_id" name="product_variant_id" value="">
+                        <input type="hidden" id="product-id" name="product_id" value="{{ $product_detail->id }}">
+                        <input type="hidden" id="product-category" name="product_category"
+                            value="{{ strtolower($product_detail->category->name ?? '') }}">
+                        {{-- quantity input exists --}}
+                        <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
+                    </div>
+                    <div class="detail-try-on" id="tryOnBtn" onclick="goToTryOn()">
+                        <a href="#" onclick="return false;">
+                            <i class="fa fa-asterisk" aria-hidden="true"></i> Thử ngay
+                        </a>
+                        <p>Phòng thử đồ online</p>
+                    </div>
 
                     <a class="size-guide-link" href="#" id="openBox">
                         <i class="fas fa-ruler"></i> Hướng dẫn chọn size
@@ -214,20 +193,6 @@
                         <img src="{{ asset('img/sidetun.jpg') }}" alt="Hướng dẫn chọn size">
                         <button class="close-btn-size" id="closeBox">Đóng</button>
                     </div>
-
-                    <div class="quantity-section">
-                        <label class="quantity-label">Số lượng</label>
-                        <div class="quantity-control">
-                            <div class="quantity-buttons">
-                                <button type="button" id="decrease">-</button>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" />
-                                <button type="button" id="increase">+</button>
-
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
             </div>
         </div>
@@ -596,10 +561,10 @@
             try {
                 localStorage.setItem('tryOnProduct', JSON.stringify(productData));
                 console.log('Đã lưu thông tin sản phẩm để thử đồ:', productData);
-                
+
                 // Chuyển đến trang thử đồ với product_id
                 window.location.href = `/try-on?product_id=${productData.id}`;
-                
+
             } catch (e) {
                 console.error('Không thể lưu thông tin sản phẩm:', e);
                 // Fallback: chuyển đến trang thử đồ thông thường
@@ -615,7 +580,7 @@
                     this.style.transform = 'translateY(-2px)';
                     this.style.boxShadow = '0 4px 12px rgba(188, 19, 188, 0.8)';
                 });
-                
+
                 tryOnBtn.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                     this.style.boxShadow = '0 2px 8px rgba(188, 19, 188, 0.6)';

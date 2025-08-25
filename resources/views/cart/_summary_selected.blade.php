@@ -33,10 +33,10 @@
                             <option value="">-- Chọn mã giảm giá --</option>
                             @foreach ($availableVouchers as $voucher)
                                 <option value="{{ $voucher->code }}" {{ $appliedVoucherCode == $voucher->code ? 'selected' : '' }}>
-                                    {{ $voucher->code }} - 
+                                    {{ $voucher->code }} -
                                     @if($voucher->value_type == 'percent')
                                         Giảm {{ $voucher->discount_amount }}%
-                                    @else 
+                                    @else
                                         Giảm {{ number_format($voucher->discount_amount, 0, ',', '.') }}đ
                                     @endif
                                 </option>
@@ -65,7 +65,7 @@
             <i class="fas fa-user-lock" style="font-size: 24px; color: #856404; margin-bottom: 10px;"></i>
             <h4 style="margin: 0 0 5px 0; color: #856404; font-weight: 600; font-size: 16px;">Đăng nhập để sử dụng Voucher</h4>
             <p style="margin: 0; color: #856404; font-size: 14px;">
-                <a href="{{ route('showlogin') }}" style="color: #856404; text-decoration: underline; font-weight: 600;">Nhấn vào đây để đăng nhập</a>
+                <a href="{{ route('showlogin', ['redirect' => url()->current()]) }}" style="color: #856404; text-decoration: underline; font-weight: 600;">Nhấn vào đây để đăng nhập</a>
             </p>
         </div>
     @endif
@@ -94,12 +94,12 @@ $(document).ready(function() {
         e.preventDefault();
         var form = $(this);
         var voucherCode = form.find('select[name="voucher_code"]').val();
-        
+
         // Lấy danh sách variant IDs đã chọn
         var selectedVariantIds = $('.gh-cart-item-checkbox:checked').map(function () {
             return $(this).data('variant-id');
         }).get();
-        
+
         if (selectedVariantIds.length === 0) {
             const toast = Toastify({
                 text: `
@@ -118,7 +118,7 @@ $(document).ready(function() {
             toast.showToast();
             return;
         }
-        
+
         var scrollPosition = $(window).scrollTop();
         $.ajax({
             url: '{{ route("cart.applyVoucher") }}',
@@ -146,7 +146,7 @@ $(document).ready(function() {
                     });
                     toast.showToast();
                 }
-                
+
                 // Cập nhật lại summary cho sản phẩm đã chọn
                 updateSummaryForSelected();
                 $(window).scrollTop(scrollPosition);

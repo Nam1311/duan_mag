@@ -67,6 +67,7 @@
                             <form action="{{ route('login') }}" method="POST" class="logins-login-form">
                                 @csrf
 
+                                <input type="hidden" name="redirect" value="{{ request('redirect') }}">
                                 <div class="logins-input-group">
                                     <label for="email">TÊN TÀI KHOẢN</label>
                                     <input type="text" value="{{ old('email') }}" name="email" id="login-username"
@@ -84,9 +85,9 @@
                                     <div class="logins-password-container">
                                         <input type="password" name="password" id="login-password"
                                             placeholder="Mật khẩu của bạn">
-                                        <button type="button" class="logins-toggle-password"  
+                                        <button type="button" class="logins-toggle-password"
                                             onclick="togglePassword('login-password')">
-                                        
+
                                             <i class="far fa-eye"></i>
                                         </button>
                                     </div>
@@ -248,11 +249,11 @@
         @if($errors->any())
             console.log('Errors detected:', {!! json_encode($errors->all()) !!});
             console.log('Session form_type:', @json(session('form_type')));
-            
+
             @php
                 $formType = session('form_type', 'login');
             @endphp
-            
+
             @if($formType === 'register')
                 // Nếu có lỗi đăng ký, chuyển về tab đăng ký
                 console.log('Switching to register tab');
@@ -282,24 +283,24 @@
             document.querySelectorAll('.logins-nav-item').forEach(nav => {
                 nav.classList.remove('logins-active');
             });
-            
+
             // Kích hoạt tab được chọn
             const targetNav = document.querySelector(`.logins-nav-item[data-target="${target}"]`);
             if (targetNav) {
                 targetNav.classList.add('logins-active');
             }
-            
+
             // Ẩn tất cả form content
             document.querySelectorAll('.logins-form-content').forEach(form => {
                 form.classList.remove('logins-active');
             });
-            
+
             // Hiện form được chọn
             const targetForm = document.getElementById(target);
             if (targetForm) {
                 targetForm.classList.add('logins-active');
             }
-            
+
             // Update form header
             const header = document.querySelector('.logins-form-header');
             if (header) {
@@ -353,7 +354,7 @@
                 }
             });
         });
-        
+
         // Toggle password visibility
         function togglePassword(fieldId) {
             const passwordField = document.getElementById(fieldId);
