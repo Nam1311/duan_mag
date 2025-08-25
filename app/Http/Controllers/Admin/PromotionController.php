@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Products;
+use App\Models\User;
 use App\Models\ProductCountDown;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PromotionController extends Controller
 {
@@ -43,6 +44,9 @@ class PromotionController extends Controller
             }
         }
 
+        // Gửi notification cho tất cả user
+        $this->sendOrUpdateFlashSaleNotification($promotion);
+
         return redirect()->route('admin.countdown.index')->with('success', 'Khuyến mãi đã được tạo!');
     }
 
@@ -58,18 +62,8 @@ class PromotionController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        // Nếu status chuyển từ active -> inactive thì trừ discount cũ
-        if ($promotion->status === 'active' && $validated['status'] === 'inactive') {
-            foreach ($promotion->products as $oldProduct) {
-                $oldProduct->sale -= $promotion->percent_discount;
-                if ($oldProduct->sale < 0) $oldProduct->sale = 0;
-                $oldProduct->price = $oldProduct->original_price * (100 - $oldProduct->sale) / 100;
-                $oldProduct->save();
-            }
-        }
-
-        // Nếu status vẫn là active → cập nhật sản phẩm (trừ cũ, cộng mới)
-        if ($promotion->status === 'active' && $validated['status'] === 'active') {
+        // Trừ discount cũ nếu sale đang active
+        if ($promotion->status === 'active') {
             foreach ($promotion->products as $oldProduct) {
                 $oldProduct->sale -= $promotion->percent_discount;
                 if ($oldProduct->sale < 0) $oldProduct->sale = 0;
@@ -81,7 +75,7 @@ class PromotionController extends Controller
         $promotion->update($validated);
         $promotion->products()->sync($request->product_ids);
 
-        // Nếu status là active → cộng discount mới cho sản phẩm mới
+        // Cộng discount mới nếu active
         if ($validated['status'] === 'active') {
             foreach ($request->product_ids as $productId) {
                 $product = Products::find($productId);
@@ -92,6 +86,10 @@ class PromotionController extends Controller
                     $product->save();
                 }
             }
+            $this->sendOrUpdateFlashSaleNotification($promotion);
+        } else {
+            // Nếu inactive → xóa notification
+            DB::table('notifications')->where('promotion_id', $promotion->id)->delete();
         }
 
         return redirect()->route('admin.countdown.index')->with('success', 'Khuyến mãi đã được cập nhật!');
@@ -101,7 +99,7 @@ class PromotionController extends Controller
     {
         $countDown = ProductCountDown::with('products')->findOrFail($id);
 
-        // Trừ phần trăm giảm giá của countdown ra khỏi các sản phẩm
+        // Trừ discount khỏi sản phẩm
         foreach ($countDown->products as $product) {
             $product->sale -= $countDown->percent_discount;
             if ($product->sale < 0) $product->sale = 0;
@@ -112,6 +110,47 @@ class PromotionController extends Controller
         $countDown->products()->detach();
         $countDown->delete();
 
+        // Xóa tất cả notification liên quan
+        DB::table('notifications')->where('promotion_id', $id)->delete();
+
         return redirect()->route('admin.countdown.index')->with('success', 'Đã xóa chương trình khuyến mãi và cập nhật lại sản phẩm!');
+    }
+
+    /**
+     * Tạo hoặc cập nhật notification Flash Sale cho tất cả user
+     */
+    private function sendOrUpdateFlashSaleNotification($promotion)
+    {
+        $users = User::all();
+
+        foreach ($users as $user) {
+            $message = 'Giảm '.$promotion->percent_discount.'% từ '.$promotion->start_hour.' đến '.$promotion->end_hour;
+
+            $existing = DB::table('notifications')
+                ->where('user_id', $user->id)
+                ->where('promotion_id', $promotion->id)
+                ->first();
+
+            if ($existing) {
+                // Update nếu đã tồn tại
+                DB::table('notifications')
+                    ->where('id', $existing->id)
+                    ->update([
+                        'title' => 'Flash Sale hôm nay',
+                        'message' => $message,
+                    ]);
+            } else {
+                // Tạo mới nếu chưa có
+                DB::table('notifications')->insert([
+                    'user_id' => $user->id,
+                    'promotion_id' => $promotion->id,
+                    'type' => 'flash_sale',
+                    'title' => 'Flash Sale hôm nay',
+                    'message' => $message,
+                    'is_read' => 0,
+                    'created_at' => now(),
+                ]);
+            }
+        }
     }
 }

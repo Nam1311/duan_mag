@@ -695,6 +695,7 @@
             .user-info-edit-btn {
                 width: 100%;
                 justify-content: center;
+                        margin-top: 5px;
             }
 
             .user-info-address-actions {

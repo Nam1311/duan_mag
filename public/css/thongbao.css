@@ -1,0 +1,669 @@
+:root {
+    --ttt-primary: #000000ff;
+    --ttt-primary-hover: #9a9a9bff;
+    --ttt-danger: #ef4444;
+    --ttt-danger-hover: #dc2626;
+    --ttt-success: #10b981;
+    --ttt-success-hover: #059669;
+    --ttt-warning: #f59e0b;
+    --ttt-warning-hover: #d97706;
+    --ttt-purple: #8b5cf6;
+    --ttt-pink: #ec4899;
+    --ttt-gray-100: #f3f4f6;
+    --ttt-gray-200: #e5e7eb;
+    --ttt-gray-300: #d1d5db;
+    --ttt-gray-400: #9ca3af;
+    --ttt-gray-500: #6b7280;
+    --ttt-gray-600: #4b5563;
+    --ttt-gray-700: #374151;
+    --ttt-gray-800: #1f2937;
+    --ttt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --ttt-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --ttt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --ttt-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --ttt-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --ttt-transition: all 0.2s ease-in-out;
+    --ttt-border-radius: 12px;
+}
+
+/* Notification system */
+#thongbaou-notification-system {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Notification bell */
+#thongbaou-notificationBell {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: var(--ttt-shadow-md);
+    cursor: pointer;
+    transition: var(--ttt-transition);
+    border: none;
+    outline: none;
+}
+
+#thongbaou-notificationBell:hover {
+    transform: scale(1.05);
+    box-shadow: var(--ttt-shadow-lg);
+    background-color: var(--ttt-gray-100);
+}
+
+#thongbaou-notificationBell i {
+    font-size: 22px;
+    color: var(--ttt-gray-700);
+}
+
+#thongbaou-notificationBell.active {
+    animation: bellRing 0.5s ease-in-out;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(15deg); }
+    50% { transform: rotate(-15deg); }
+    75% { transform: rotate(5deg); }
+}
+
+#thongbaou-notificationBadge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--ttt-danger);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+/* Notification panel */
+#thongbaou-notificationPanel {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    width: 420px;
+    max-height: 80vh;
+    background: white;
+    border-radius: var(--ttt-border-radius);
+    box-shadow: var(--ttt-shadow-xl);
+    overflow: hidden;
+    display: none;
+    transform-origin: top right;
+    animation: slideDown 0.3s ease-out;
+    z-index: 1001;
+}
+
+#thongbaou-notificationPanel.show {
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#thongbaou-notificationHeader {
+    padding: 18px 22px;
+    background: linear-gradient(135deg, var(--ttt-primary) 0%, var(--ttt-primary-hover) 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#thongbaou-notificationActions {
+    display: flex;
+    gap: 12px;
+}
+
+#thongbaou-markAllAsRead, #thongbaou-refreshNotifications {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--ttt-transition);
+}
+
+#thongbaou-markAllAsRead:hover, #thongbaou-refreshNotifications:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+#thongbaou-notificationContent {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+}
+
+#thongbaou-notificationEmpty {
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--ttt-gray-500);
+    font-size: 15px;
+}
+
+#thongbaou-notificationEmpty i {
+    font-size: 56px;
+    margin-bottom: 20px;
+    color: var(--ttt-gray-300);
+    opacity: 0.6;
+}
+
+.thongbaou-notificationItem {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--ttt-gray-200);
+    transition: var(--ttt-transition);
+    cursor: pointer;
+    background: white;
+    position: relative;
+}
+
+.thongbaou-notificationItem.unread {
+    background: rgba(59, 130, 246, 0.04);
+}
+
+.thongbaou-notificationItem.unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--ttt-primary);
+    border-radius: 0 4px 4px 0;
+}
+
+.thongbaou-notificationItem:hover {
+    background: var(--ttt-gray-100);
+    transform: translateY(-1px);
+}
+
+.thongbaou-notificationBody {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.thongbaou-userAvatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid #bfbfbf;
+    box-shadow: var(--ttt-shadow-sm);
+}
+
+.thongbaou-notificationText {
+    flex: 1;
+    min-width: 0;
+}
+
+.thongbaou-notificationMessage {
+    font-weight: 500;
+    color: var(--ttt-gray-800);
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.thongbaou-notificationComment {
+    background: var(--ttt-gray-100);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    border-left: 3px solid var(--ttt-gray-300);
+    color: var(--ttt-gray-700);
+}
+
+.thongbaou-notificationMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.thongbaou-notificationTime {
+    font-size: 13px;
+    color: var(--ttt-gray-500);
+}
+
+.thongbaou-notificationType {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--ttt-gray-200);
+    color: var(--ttt-gray-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.thongbaou-notificationActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.thongbaou-notificationBtn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: var(--ttt-transition);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.thongbaou-notificationBtn i {
+    font-size: 14px;
+}
+
+.thongbaou-notificationBtn.primary {
+    background: var(--ttt-primary);
+    color: white;
+}
+
+.thongbaou-notificationBtn.primary:hover {
+    background: var(--ttt-primary-hover);
+    transform: translateY(-1px);
+}
+
+.thongbaou-notificationBtn.secondary {
+    background: var(--ttt-gray-100);
+    color: var(--ttt-gray-700);
+}
+
+.thongbaou-notificationBtn.secondary:hover {
+    background: var(--ttt-gray-200);
+    transform: translateY(-1px);
+}
+
+/* Reply form in notification */
+.thongbaou-reply-form {
+    display: none;
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--ttt-gray-100);
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.thongbaou-reply-form.show {
+    display: block;
+}
+
+.thongbaou-reply-textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid var(--ttt-gray-200);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    resize: none;
+    margin-bottom: 12px;
+    font-family: inherit;
+    transition: var(--ttt-transition);
+}
+
+.thongbaou-reply-textarea:focus {
+    outline: none;
+    border-color: var(--ttt-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Notification types */
+.thongbaou-notificationType.comment {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--ttt-primary);
+}
+
+.thongbaou-notificationType.reply {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--ttt-success);
+}
+
+.thongbaou-notificationType.mention {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--ttt-warning);
+}
+
+.thongbaou-notificationType.sale {
+    background: rgba(236, 72, 153, 0.1);
+    color: var(--ttt-pink);
+}
+
+.thongbaou-notificationType.shipping {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--ttt-purple);
+}
+
+/* Overlay */
+#thongbaou-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    display: none;
+    backdrop-filter: blur(4px);
+}
+
+#thongbaou-overlay.show {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Comment detail box */
+#thongbaou-commentDetailBox {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 640px;
+    background: white;
+    border-radius: var(--ttt-border-radius);
+    box-shadow: var(--ttt-shadow-xl);
+    z-index: 1051;
+    display: none;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#thongbaou-commentDetailBox.show {
+    display: flex;
+    flex-direction: column;
+}
+
+#thongbaou-commentDetailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--ttt-gray-200);
+    background: white;
+    z-index: 1;
+}
+
+#thongbaou-commentDetailTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ttt-gray-800);
+}
+
+#thongbaou-closeCommentBox {
+    font-size: 26px;
+    cursor: pointer;
+    color: var(--ttt-gray-500);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--ttt-transition);
+}
+
+#thongbaou-closeCommentBox:hover {
+    background: var(--ttt-gray-100);
+    color: var(--ttt-gray-700);
+}
+
+#thongbaou-commentDetailContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px;
+}
+
+#thongbaou-productInfo {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ttt-gray-200);
+}
+
+#thongbaou-productImage {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    max-height: 260px;
+    object-fit: cover;
+    box-shadow: var(--ttt-shadow);
+}
+
+#thongbaou-productTitle {
+    margin: 0 0 12px 0;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+#thongbaou-commentThread {
+    margin-top: 20px;
+}
+
+.thongbaou-commentItem {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ttt-gray-200);
+}
+
+.thongbaou-commentItem:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.thongbaou-commentHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.thongbaou-commentUserAvatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 14px;
+    border: 2px solid white;
+    box-shadow: var(--ttt-shadow-sm);
+}
+
+.thongbaou-commentUserInfo {
+    flex: 1;
+}
+
+.thongbaou-commentUserName {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ttt-gray-800);
+}
+
+.thongbaou-commentTime {
+    font-size: 13px;
+    color: var(--ttt-gray-500);
+    margin-top: 4px;
+}
+
+.thongbaou-commentText {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-left: 58px;
+    color: var(--ttt-gray-700);
+}
+
+.thongbaou-commentActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+    gap: 12px;
+}
+
+.thongbaou-commentLike {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ttt-gray-500);
+    cursor: pointer;
+    transition: var(--ttt-transition);
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.thongbaou-commentLike:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--ttt-danger);
+}
+
+.thongbaou-commentLike.active {
+    color: var(--ttt-danger);
+}
+
+.thongbaou-commentLike i {
+    font-size: 15px;
+}
+
+.thongbaou-commentLikeCount {
+    font-size: 14px;
+}
+
+/* Reply form in detail box */
+#thongbaou-detail-reply-form {
+    display: none;
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--ttt-gray-100);
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#thongbaou-detail-reply-form.show {
+    display: block;
+}
+
+#thongbaou-detail-reply-textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid var(--ttt-gray-200);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    resize: none;
+    margin-bottom: 12px;
+    font-family: inherit;
+    transition: var(--ttt-transition);
+}
+
+#thongbaou-detail-reply-textarea:focus {
+    outline: none;
+    border-color: var(--ttt-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.thongbaou-reply-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Loading indicator */
+#thongbaou-loading {
+    padding: 32px 20px;
+    text-align: center;
+    color: var(--ttt-gray-500);
+}
+
+#thongbaou-loading i {
+    animation: spin 1s linear infinite;
+    font-size: 26px;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    #thongbaou-notification-system {
+        right: 12px;
+        top: 12px;
+    }
+    
+    #thongbaou-notificationPanel {
+        width: calc(100vw - 24px);
+        right: 12px;
+        top: 60px;
+        max-height: calc(100vh - 72px);
+    }
+    
+    #thongbaou-commentDetailBox {
+        width: calc(100vw - 24px);
+        max-height: calc(100vh - 32px);
+    }
+    
+    #thongbaou-commentDetailContent {
+        padding: 16px;
+    }
+    
+    .thongbaou-notificationBtn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .thongbaou-userAvatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .thongbaou-notificationBody {
+        gap: 12px;
+    }
+}
+
+/* Animation for new notifications */
+@keyframes slideIn {
+    from { transform: translateX(30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.thongbaou-new-notification {
+    animation: slideIn 0.4s ease-out;
+}

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use App\Mail\OrderStatusChanged;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\DB;
 class AdminOrderController extends Controller
 {
     /**
@@ -82,48 +82,68 @@ class AdminOrderController extends Controller
     /**
      * Cập nhật trạng thái đơn hàng.
      */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:Chờ xác nhận,Đã xác nhận,Đang giao hàng,Thành công,Đã hủy,Hoàn hàng',
-        ]);
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:Chờ xác nhận,Đã xác nhận,Đang giao hàng,Thành công,Đã hủy,Hoàn hàng',
+    ]);
 
-        try {
-            $order = Order::with('user')->findOrFail($id);
-            $oldStatus = $order->status;
+    try {
+        $order = Order::with('user')->findOrFail($id);
+        $oldStatus = $order->status;
 
-            // Định nghĩa thứ tự trạng thái hợp lệ
-            $statusOrder = [
-                'Chờ xác nhận' => 1,
-                'Đã xác nhận' => 2,
-                'Đang giao hàng' => 3,
-                'Thành công' => 4,
-                'Đã hủy' => 4,
-                'Hoàn hàng' => 4,
-            ];
+        // Kiểm tra trạng thái hợp lệ
+        $statusOrder = [
+            'Chờ xác nhận' => 1,
+            'Đã xác nhận' => 2,
+            'Đang giao hàng' => 3,
+            'Thành công' => 4,
+            'Đã hủy' => 4,
+        ];
 
-            // Kiểm tra nếu trạng thái mới nhỏ hơn trạng thái hiện tại
-            if ($statusOrder[$request->status] < $statusOrder[$oldStatus]) {
-                return redirect()->route('admin.orders.index')->with('error', 'Không thể thay đổi trạng thái ngược về trước!');
-            }
-
-            if (in_array($order->status, ['Thành công', 'Đang giao hàng']) && $request->status === 'Đã hủy') {
-                return redirect()->route('admin.orders.index')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
-            }
-
-            $order->status = $request->status;
-            $order->save();
-
-            // Gửi mail nếu có user và email
-            if ($order->user && $order->user->email) {
-                Mail::to($order->user->email)->send(new OrderStatusChanged($order, $oldStatus, $order->status));
-            }
-
-            return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành công và đã gửi email!');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.orders.index')->with('error', 'Lỗi khi cập nhật trạng thái đơn hàng!');
+        if ($statusOrder[$request->status] < $statusOrder[$oldStatus]) {
+            return redirect()->route('admin.orders.index')->with('error', 'Không thể thay đổi trạng thái ngược về trước!');
         }
+
+        if (in_array($order->status, ['Thành công', 'Đang giao hàng']) && $request->status === 'Đã hủy') {
+            return redirect()->route('admin.orders.index')->with('error', 'Không thể hủy đơn hàng đang giao hoặc đã thành công!');
+        }
+
+        // Lưu trạng thái mới
+        $order->status = $request->status;
+        $order->save();
+
+        // ===== Notification =====
+        if ($order->user) {
+            DB::table('notifications')->updateOrInsert(
+                [
+                    'user_id'  => $order->user->id,
+                    'order_id' => $order->id,
+                    'type'     => 'order_status',
+                ],
+                [
+                    'title'      => 'Cập nhật trạng thái đơn hàng',
+                    'message'    => "Trạng thái đơn hàng #{$order->id} đã thay đổi từ '{$oldStatus}' sang '{$order->status}'",
+                    'is_read'    => 0,
+                    'updated_at' => now(),
+                    'created_at' => now(), // chỉ dùng khi insert mới
+                ]
+            );
+        }
+
+        // ===== Send Mail =====
+        if ($order->user && $order->user->email) {
+            Mail::to($order->user->email)->send(new OrderStatusChanged($order, $oldStatus, $order->status));
+        }
+
+        return redirect()->route('admin.orders.index')
+            ->with('success', 'Cập nhật trạng thái đơn hàng thành công, đã gửi email & thông báo!');
+    } catch (\Exception $e) {
+        return redirect()->route('admin.orders.index')
+            ->with('error', 'Lỗi khi cập nhật trạng thái đơn hàng!');
     }
+}
+
 
     /**
      * Hiển thị chi tiết đơn hàng.

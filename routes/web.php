@@ -51,7 +51,9 @@ use App\Http\Middleware\CheckNewsManager;
 use App\Http\Middleware\CheckProductsManager;
 use App\Models\Products;
 use App\Models\product_variants;
-
+// thông báo
+use App\Http\Controllers\NotificationController;
+// 
 Route::get('about', function () {
     return view('about');
 });
@@ -64,10 +66,6 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 Route::get('cart', function () {
     return view('cart');
 });
-
-// Route::get('login', function () {
-//     return view('login');
-// });
 
 // login bằng web
 Route::get('/showlogin', [LoginController::class, 'showLogin'])->name('showlogin');
@@ -92,6 +90,7 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 
 // kiểm trạng thái đăng nhập
 Route::middleware('auth')->group(function () {
+    // mạnh thông báo
 
     // mạnh trang info {
     Route::get('infouser', [UserInFoController::class, 'ShowInFo'])->middleware('auth')->name('infouser');
@@ -316,7 +315,6 @@ Route::post('/review/{order}', [ReviewController::class, 'store'])->name('review
 
 // laays biến thể mua ngay
 Route::get('/api/product/{id}', [PageController::class, 'get_variant']);
-
 
 
 

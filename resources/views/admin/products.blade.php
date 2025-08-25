@@ -358,6 +358,9 @@
             <div class="aproducts-modal" id="productDetailModal-{{ $product->id }}" style="display: none;">
                 <div class="aproducts-modal-content">
                     <h2>Chi tiết sản phẩm</h2>
+                    <div class="aproducts-modal-actions">
+                        <button style="border: none; background-color: white" onclick="closeDetailModal({{ $product->id }})"><i style="font-size: 20px" class="fa fa-times" aria-hidden="true"></i></button>
+                    </div>
                     <div class="aproducts-detail-info">
                         <div>
                             <strong>Ảnh:</strong><br>
@@ -390,9 +393,6 @@
                         <p><strong>Trạng thái:</strong> {{ $product->variants->sum('quantity') > 0 ? 'Còn hàng' : 'Hết hàng' }}</p>
                         <p><strong>Kinh doanh:</strong> {{ $product->is_active > 0 ? 'Đang kinh doanh' : 'Ngừng kinh doanh' }}</p>
                         <p><strong>Mô tả:</strong> {{ $product->description }}</p>
-                    </div>
-                    <div class="aproducts-modal-actions">
-                        <button class="aproducts-btn aproducts-btn-primary" onclick="closeDetailModal({{ $product->id }})">Đóng</button>
                     </div>
                 </div>
             </div>

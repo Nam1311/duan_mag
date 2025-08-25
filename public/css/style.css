@@ -553,12 +553,6 @@ header>.nav-top>.nav-pc>ul>li>a {
     font-size: 18px;
 }
 
-.mobile_link::before {
-    content: "• ";
-    color: black;
-    font-size: 22px;
-}
-
 .sp {
     padding: 5px 60px;
 }
@@ -2505,7 +2499,9 @@ footer {
 /* Mobile styles */
 @media (max-width: 767px) {
 
-
+    .product-recommend{
+        height: 310px !important;
+    }
     .search-input-mobile {
         display: none;
         width: 100%;
@@ -3270,7 +3266,7 @@ footer {
     }
 
     .btn-log {
-        padding: 14px 35px;
+        /* padding: 14px 35px; */
         font-size: 16px;
     }
 }
@@ -3291,10 +3287,6 @@ footer {
 
     .text-content>h2>.text {
         font-size: 22px;
-    }
-
-    .btn-log {
-        padding: 12px 30px;
     }
 }
 /* Phân trang */
@@ -3571,4 +3563,60 @@ del {
         transform: scale(1.05);
         box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
     }
+}
+
+
+/* Overlay mờ + làm mờ nền */
+#listening-overlay[hidden] { display: none !important; }
+#listening-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);          /* lớp tối */
+  backdrop-filter: blur(6px);                /* làm mờ nền */
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Hộp nội dung ở giữa */
+.listening-sheet {
+  min-width: 280px;
+  max-width: 90vw;
+  padding: 24px 28px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  text-align: center;
+}
+
+/* Icon mic nhịp nháy */
+.mic-pulse {
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.listening-text {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.hint {
+  font-size: 14px;
+  opacity: .7;
+}
+
+/* Hiệu ứng nhịp */
+@keyframes pulse {
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.12); opacity: .85; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* (tuỳ chọn) Ẩn animation nếu người dùng giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  .mic-pulse { animation: none; }
 }

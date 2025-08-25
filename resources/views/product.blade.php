@@ -441,6 +441,49 @@
                 });
             });
 
+            function addToCart(productId) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                // Vì trang chủ không có lựa chọn biến thể, giả định số lượng là 1 và biến thể mặc định
+                fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        product_variant_id: null, // Sẽ xử lý ở backend
+                        quantity: 1,
+                        product_id: productId // Thêm product_id để backend xử lý
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message); // Hiển thị thông báo từ server
+                    })
+                    updateCartCount()
+
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+                    });
+            }
+            function updateCartCount() {
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.querySelector('.cart-badge');
+                    if (cartBadge) {
+                        cartBadge.textContent = data.count;
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy số lượng giỏ hàng:', error);
+                });
+        }
+
+
             // Handle "Mua ngay" buttons
             const buyNowButtons = document.querySelectorAll('.a-buy-now');
             const modal = document.getElementById('variantModal');
@@ -616,75 +659,6 @@
             });
         });
 
-        function addToCart(productId) {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    product_variant_id: null,
-                    quantity: 1,
-                    product_id: productId
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const toast = Toastify({
-                        text: `
-                            <div class="toastify-content">
-                                <div class="toast-icon">✓</div>
-                                <div class="toast-message">${data.message}</div>
-                                <button class="toast-close">×</button>
-                            </div>
-                        `,
-                        duration: 3000,
-                        close: false,
-                        gravity: "top",
-                        position: "right",
-                        className: "custom-toast success",
-                        escapeMarkup: false
-                    });
-                    toast.showToast();
-
-                    setTimeout(() => {
-                        const toastElement = document.querySelector('.custom-toast');
-                        const closeBtn = toastElement?.querySelector('.toast-close');
-                        if (closeBtn) {
-                            closeBtn.addEventListener('click', function () {
-                                toastElement.style.animation = 'fade-out 0.4s forwards';
-                                toastElement.addEventListener('animationend', function () {
-                                    toastElement.remove();
-                                });
-                            });
-                        }
-                    }, 10);
-
-                    updateCartCount();
-                })
-                .catch(error => {
-                    console.error('Lỗi:', error);
-                    alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
-                });
-        }
-
-        function updateCartCount() {
-            fetch('/cart/count')
-                .then(response => response.json())
-                .then(data => {
-                    const cartBadge = document.querySelector('.cart-badge');
-                    if (cartBadge) {
-                        cartBadge.textContent = data.count;
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi khi lấy số lượng giỏ hàng:', error);
-                });
-        }
-
         function BuyInHome(variantId, quantity, productId) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             fetch('/cart/add/home', {
@@ -722,9 +696,9 @@
                 });
             }
         });
-    </script>
+</script>
 
-<script>
+{{-- <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Lấy tất cả các biểu tượng giỏ hàng
         const cartIcons = document.querySelectorAll('.item-icon');
@@ -769,8 +743,10 @@
                 alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
             });
     }
-</script>
+</script> --}}
+
 <script src="{{ asset('/js/detail.js') }}"></script>
+
 <script>
     // Xử lý sắp xếp sản phẩm
     const sortButton = document.getElementById('sortButton');

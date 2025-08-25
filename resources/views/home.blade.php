@@ -431,13 +431,15 @@
                 <div>
                     <h2 class="section-title-ab" style="margin-top: 30px">Đăng ký nhận ưu đãi</h2>
                 </div>
-                <div class="about-us" style="background-image: url('{{ asset('img/slider_2.webp') }}');">
+                <div class="about-us" style="background-image: url('{{asset('img/slider_2.webp')}}');">
                     <div class="box-log">
                         <div class="text-content">
                             <h3 class="text">Trở thành thành viên của M A G ngay hôm nay !!</h3>
                             <h2 class="text">Tận hưởng ưu đãi mua sắm hằng ngày</h2>
                             <div style="display: flex; align-item:center; justify-content: center; gap: 10px  ">
-                                <a href="{{ asset('/contact') }}"><button class="btn-log">Truy cập ngay </button></a>
+                                <input class="input-email" style="width: 300px; height: 41px; padding: 10px; border: none;"
+                                    type="text" placeholder="Nhập email nhận ưu đãi ">
+                                <button class="btn-log">Gửi</button>
                             </div>
                         </div>
                     </div>
