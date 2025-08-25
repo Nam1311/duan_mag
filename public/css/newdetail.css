@@ -186,6 +186,10 @@
       border-radius: 4px;
   }
 
+  .media-item a >img {
+      width: 100%;
+  }
+
   .VCSortableInPreviewMode .noCaption img{
     margin: auto;
   }
