@@ -89,7 +89,7 @@
                     <button class="filter-dropdown-btn">Lọc bài viết <span class="dropdown-arrow">▼</span></button>
                     <div class="filter-dropdown-content">
                         @foreach ($news_category as $cate)
-                            <a href="#">{{ $cate->name }}</a>
+                            <a href="{{ route('news.all', $cate->id) }}">{{ $cate->name }}</a>
                             {{-- <a href="#">Xem nhiều nhất</a>
                             <a href="#">Theo chủ đề</a>
                             <a href="#">Theo tác giả</a> --}}
@@ -101,7 +101,7 @@
             <div class="news-articles-grid">
                 <!-- Article 1 -->
 
-                @foreach ($news_all as $item)
+                @foreach ($news as $item)
                     <a style="text-decoration: none" class="news-article-card" href="new_detail/{{ $item->id }}">
                         <span class="news-article-badge"><i class="fa-solid fa-eye"></i> {{ $item->views }}</span>
                         <div class="news-article-image">
@@ -133,7 +133,7 @@
             </div>
             {{-- Hiển thị nút phân trang --}}
             <div class="chuyentrang">
-                {{ $news_all->links('pagination') }}
+                {{ $news->links('pagination') }}
             </div>
         </div>
     </section>

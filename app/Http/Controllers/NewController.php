@@ -47,14 +47,19 @@ class NewController extends Controller
 
 
 
-    public function news_all()
+    public function news_all($id = null)
     {
-        $news_all = News::where('status', '=', 'Đã xuất bản')->paginate(6);
         $news_category = NewCategory::all();
-        $data =  [
-            "news_all" => $news_all,
-            "news_category" => $news_category
-        ];
-        return view('news/news_all', $data);
+
+        if ($id) {
+            // lọc theo danh mục
+            $news = News::where('category_id', $id)
+                ->where('status', 'Đã xuất bản')
+                ->paginate(6);
+        } else {
+            $news = News::where('status', 'Đã xuất bản')->paginate(6);
+        }
+
+        return view('news.news_all', compact('news', 'news_category'));
     }
 }

@@ -212,7 +212,7 @@ Route::get('/order/{order_code}', [OrderController::class, 'showPublic'])->name(
 
 Route::get('news', [NewController::class, 'show_new']);
 Route::get('new_detail/{id}', [NewController::class, 'new_detail']);
-Route::get('news_all', [NewController::class, 'news_all']);
+Route::get('/news_all/{id?}', [NewController::class, 'news_all'])->name('news.all');
 
 Route::get('/wishlist/remove/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
